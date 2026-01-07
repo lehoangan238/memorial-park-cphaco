@@ -1,27 +1,27 @@
 import { Facebook, Instagram, Youtube } from 'lucide-react';
 
 const gettingStartedLinks = [
-  { label: 'Immediate Need', href: '#' },
-  { label: 'Pre-Planning', href: '#' },
+  { label: 'Nhu Cầu Cấp Bách', href: '#' },
+  { label: 'Lên Kế Hoạch Trước', href: '#' },
 ];
 
 const planningOptionsLinks = [
-  { label: 'Funeral Service', href: '#' },
-  { label: 'Burial Plots', href: '#' },
-  { label: 'Columbaria', href: '#' },
-  { label: 'Pets', href: '#' },
-  { label: 'Other Products', href: '#' },
+  { label: 'Dịch Vụ Tang Lễ', href: '#' },
+  { label: 'Lô Đất An Táng', href: '#' },
+  { label: 'Nhà Lưu Trữ Tro Cốt', href: '#' },
+  { label: 'Thú Cưng', href: '#' },
+  { label: 'Sản Phẩm Khác', href: '#' },
 ];
 
 const resourcesLinks = [
-  { label: 'Who We Are', href: '#' },
-  { label: 'Branches', href: '#' },
-  { label: '360 Virtual Tour', href: '#' },
-  { label: 'Latest Updates', href: '#' },
-  { label: 'Contact Us', href: '#' },
-  { label: 'Article', href: '#' },
+  { label: 'Về Chúng Tôi', href: '#' },
+  { label: 'Chi Nhánh', href: '#' },
+  { label: 'Tham Quan 360°', href: '#' },
+  { label: 'Cập Nhật Mới Nhất', href: '#' },
+  { label: 'Liên Hệ', href: '#' },
+  { label: 'Bài Viết', href: '#' },
   { label: 'Life Cafe', href: '#' },
-  { label: 'Nirvana Store', href: '#' },
+  { label: 'Cửa Hàng Nirvana', href: '#' },
 ];
 
 export const Footer = () => {
@@ -42,13 +42,13 @@ export const Footer = () => {
                 className="text-white text-xl font-semibold mb-4"
                 style={{ fontFamily: "'Cormorant Garamond', serif" }}
               >
-                Get in Touch
+                Liên Hệ
               </h3>
               <p 
                 className="text-white/90 text-sm mb-2"
                 style={{ fontFamily: "'Open Sans', sans-serif" }}
               >
-                Careline 1800-88-1818
+                Đường dây nóng 1800-88-1818
               </p>
               <p 
                 className="text-white/80 text-sm mb-4"
@@ -60,14 +60,14 @@ export const Footer = () => {
                 className="text-white/70 text-xs mb-1"
                 style={{ fontFamily: "'Open Sans', sans-serif" }}
               >
-                Corporate Office
+                Văn Phòng Công Ty
               </p>
               <p 
                 className="text-white/70 text-xs mb-4 leading-relaxed"
                 style={{ fontFamily: "'Open Sans', sans-serif" }}
               >
-                Level 9, Tower 1, Avenue 3, The Horizon, Bangsar South,<br />
-                No 8, Jalan Kerinchi 59200 Kuala Lumpur, Malaysia.
+                Tầng 9, Tháp 1, Avenue 3, The Horizon, Bangsar South,<br />
+                Số 8, Jalan Kerinchi 59200 Kuala Lumpur, Malaysia.
               </p>
               
               {/* Social Icons */}
@@ -96,17 +96,16 @@ export const Footer = () => {
                 className="text-white/50 text-xs mt-6"
                 style={{ fontFamily: "'Open Sans', sans-serif" }}
               >
-                © 2024 NIRVANA ASIA. All Rights Reserved.
+                © 2024 NIRVANA ASIA. Bảo lưu mọi quyền.
               </p>
             </div>
 
-            {/* Getting Started */}
             <div>
               <h4 
                 className="text-white/80 text-sm font-semibold mb-4 tracking-wide"
                 style={{ fontFamily: "'Open Sans', sans-serif" }}
               >
-                Getting Started
+                Bắt Đầu
               </h4>
               <ul className="space-y-2">
                 {gettingStartedLinks.map((link) => (
@@ -126,7 +125,7 @@ export const Footer = () => {
                 className="text-white/80 text-sm font-semibold mt-6 mb-4 tracking-wide"
                 style={{ fontFamily: "'Open Sans', sans-serif" }}
               >
-                Planning Options
+                Tùy Chọn Kế Hoạch
               </h4>
               <ul className="space-y-2">
                 {planningOptionsLinks.map((link) => (
@@ -143,13 +142,12 @@ export const Footer = () => {
               </ul>
             </div>
 
-            {/* Resources */}
             <div>
               <h4 
                 className="text-white/80 text-sm font-semibold mb-4 tracking-wide"
                 style={{ fontFamily: "'Open Sans', sans-serif" }}
               >
-                Resources
+                Tài Nguyên
               </h4>
               <ul className="space-y-2">
                 {resourcesLinks.map((link) => (
@@ -166,14 +164,13 @@ export const Footer = () => {
               </ul>
             </div>
 
-            {/* Buttons */}
             <div>
               <div className="flex flex-col gap-2">
                 <button 
                   className="border border-white/50 text-white px-4 py-2 text-xs hover:bg-white/10 transition-colors text-left"
                   style={{ fontFamily: "'Open Sans', sans-serif" }}
                 >
-                  E-Booklet
+                  E-Brochure
                 </button>
                 <button 
                   className="border border-white/50 text-white px-4 py-2 text-xs hover:bg-white/10 transition-colors text-left"
@@ -185,7 +182,7 @@ export const Footer = () => {
                   className="border border-white/50 text-white px-4 py-2 text-xs hover:bg-white/10 transition-colors text-left"
                   style={{ fontFamily: "'Open Sans', sans-serif" }}
                 >
-                  Agent Portal
+                  Cổng Đại Lý
                 </button>
               </div>
               
@@ -195,14 +192,14 @@ export const Footer = () => {
                   className="text-white/50 text-xs hover:text-white transition-colors"
                   style={{ fontFamily: "'Open Sans', sans-serif" }}
                 >
-                  Privacy Policy
+                  Chính Sách Bảo Mật
                 </a>
                 <a 
                   href="#" 
                   className="text-white/50 text-xs hover:text-white transition-colors"
                   style={{ fontFamily: "'Open Sans', sans-serif" }}
                 >
-                  Terms of Use
+                  Điều Khoản Sử Dụng
                 </a>
               </div>
             </div>

@@ -27,7 +27,7 @@ export const QuoteSection = () => {
             className="text-white text-lg leading-relaxed max-w-md"
             style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic' }}
           >
-            "We put together many things to enrich our lives by embracing new goals and living the healthy way. We can also pre-plan a worry-free final journey by taking complete responsibility for our own life and happiness – because we deserve peace of mind – now and forever."
+            "Chúng ta kết hợp nhiều thứ để làm phong phú cuộc sống bằng cách đón nhận những mục tiêu mới và sống theo cách lành mạnh. Chúng ta cũng có thể lên kế hoạch trước cho một hành trình cuối cùng không lo lắng bằng cách chịu trách nhiệm hoàn toàn cho cuộc sống và hạnh phúc của chính mình – vì chúng ta xứng đáng được an tâm – bây giờ và mãi mãi."
           </motion.blockquote>
         </div>
 

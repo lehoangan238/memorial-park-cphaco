@@ -3,15 +3,15 @@ import familyHug from '@/assets/family-hug.jpg';
 
 const infoCards = [
   {
-    title: "5 main advantages of pre-planning",
+    title: "5 lợi ích chính của việc lên kế hoạch trước",
     image: familyHug,
   },
   {
-    title: "When is the best time to pre-plan?",
+    title: "Khi nào là thời điểm tốt nhất để lên kế hoạch trước?",
     image: familyHug,
   },
   {
-    title: "Who should pre-plan ?",
+    title: "Ai nên lên kế hoạch trước?",
     image: familyHug,
   },
 ];
@@ -34,7 +34,7 @@ export const CaringSection = () => {
             className="text-5xl md:text-6xl text-white mb-8"
             style={{ fontFamily: "'Great Vibes', cursive" }}
           >
-            Caring for Life
+            Chăm Sóc Cuộc Sống
           </motion.h2>
           
           <motion.p
@@ -45,7 +45,7 @@ export const CaringSection = () => {
             className="text-white/90 text-sm md:text-base max-w-4xl mx-auto leading-relaxed"
             style={{ fontFamily: "'Open Sans', sans-serif" }}
           >
-            Backed by integrated facilities and comprehensive products, Nirvana aims to provide a comforting experience with its internationally-acclaimed bereavement care services during a critical time of need. "Caring for Life" is our philosophy and we view every life as meaningful and precious. Be assured that our team will strive to ensure your loved one is properly honoured and celebrated with utmost professionalism and dedication.
+            Với cơ sở vật chất tích hợp và sản phẩm toàn diện, Nirvana cam kết mang đến trải nghiệm an ủi với dịch vụ tang lễ được quốc tế công nhận trong thời điểm cần thiết nhất. "Chăm Sóc Cuộc Sống" là triết lý của chúng tôi và chúng tôi coi mỗi cuộc sống đều có ý nghĩa và quý giá. Hãy yên tâm rằng đội ngũ của chúng tôi sẽ nỗ lực đảm bảo người thân của bạn được tôn vinh và kỷ niệm với sự chuyên nghiệp và tận tâm cao nhất.
           </motion.p>
         </div>
       </div>

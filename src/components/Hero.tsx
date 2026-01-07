@@ -22,7 +22,7 @@ export const Hero = () => {
           className="text-6xl md:text-7xl lg:text-8xl text-white mb-6"
           style={{ fontFamily: "'Great Vibes', cursive" }}
         >
-          Nirvana Asia
+          Nirvana Châu Á
         </motion.h1>
         
         <motion.p 
@@ -32,7 +32,7 @@ export const Hero = () => {
           className="text-2xl md:text-3xl text-white/90 tracking-wider"
           style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic' }}
         >
-          Rest. Assured.
+          An Nghỉ. Yên Tâm.
         </motion.p>
       </div>
     </section>

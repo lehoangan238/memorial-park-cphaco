@@ -2,44 +2,44 @@ import { useState, useEffect } from 'react';
 import { Menu, X, ChevronDown, Search, ShoppingCart, Phone } from 'lucide-react';
 
 const dropdownMenus = {
-  'Getting Started': [
-    { label: 'Why Pre-Plan', href: '#why-preplan' },
-    { label: 'How It Works', href: '#how-it-works' },
-    { label: 'FAQ', href: '#faq' },
-    { label: 'Testimonials', href: '#testimonials' },
-    { label: 'Contact Us', href: '#contact' },
+  'Bắt Đầu': [
+    { label: 'Tại Sao Nên Lên Kế Hoạch Trước', href: '#why-preplan' },
+    { label: 'Cách Thức Hoạt Động', href: '#how-it-works' },
+    { label: 'Câu Hỏi Thường Gặp', href: '#faq' },
+    { label: 'Đánh Giá Khách Hàng', href: '#testimonials' },
+    { label: 'Liên Hệ', href: '#contact' },
   ],
-  'Planning Options': [
-    { label: 'Memorial Parks', href: '#memorial-parks' },
-    { label: 'Nirvana Columbarium', href: '#columbarium' },
-    { label: 'Burial Plots', href: '#burial-plots' },
-    { label: 'Cremation Services', href: '#cremation' },
-    { label: 'Family Estates', href: '#family-estates' },
-    { label: 'Pet Memorial', href: '#pet-memorial' },
+  'Tùy Chọn Kế Hoạch': [
+    { label: 'Công Viên Tưởng Niệm', href: '#memorial-parks' },
+    { label: 'Nhà Lưu Trữ Tro Cốt', href: '#columbarium' },
+    { label: 'Lô Đất An Táng', href: '#burial-plots' },
+    { label: 'Dịch Vụ Hỏa Táng', href: '#cremation' },
+    { label: 'Khu Mộ Gia Đình', href: '#family-estates' },
+    { label: 'Tưởng Niệm Thú Cưng', href: '#pet-memorial' },
   ],
-  'Resources': [
-    { label: 'Blog & Articles', href: '#blog' },
-    { label: 'Planning Guide', href: '#guide' },
-    { label: 'Calculator', href: '#calculator' },
-    { label: 'Download Brochure', href: '#brochure' },
-    { label: 'News & Events', href: '#news' },
+  'Tài Nguyên': [
+    { label: 'Blog & Bài Viết', href: '#blog' },
+    { label: 'Hướng Dẫn Lập Kế Hoạch', href: '#guide' },
+    { label: 'Công Cụ Tính Toán', href: '#calculator' },
+    { label: 'Tải Brochure', href: '#brochure' },
+    { label: 'Tin Tức & Sự Kiện', href: '#news' },
   ],
 };
 
 const navItems = [
-  { label: 'Enlightenment Ceremony', href: '#ceremony' },
+  { label: 'Lễ Khai Sáng', href: '#ceremony' },
   { 
-    label: 'Getting Started', 
+    label: 'Bắt Đầu', 
     href: '#started',
     hasDropdown: true
   },
   { 
-    label: 'Planning Options', 
+    label: 'Tùy Chọn Kế Hoạch', 
     href: '#planning',
     hasDropdown: true
   },
   { 
-    label: 'Resources', 
+    label: 'Tài Nguyên', 
     href: '#resources',
     hasDropdown: true
   },
@@ -134,10 +134,10 @@ export const Header = () => {
               className="flex items-center gap-2 text-[14px] text-[#2f3237] cursor-pointer"
               style={{ fontFamily: "'Open Sans', sans-serif" }}
             >
-              <span className="w-5 h-5 rounded-sm overflow-hidden bg-blue-800 flex items-center justify-center text-white text-[10px]">
-                🇬🇧
+              <span className="w-5 h-5 rounded-sm overflow-hidden bg-red-600 flex items-center justify-center text-white text-[10px]">
+                🇻🇳
               </span>
-              English
+              Tiếng Việt
               <ChevronDown className="w-4 h-4" />
             </div>
           </nav>
@@ -153,7 +153,7 @@ export const Header = () => {
               style={{ fontFamily: "'Open Sans', sans-serif" }}
             >
               <ShoppingCart className="w-5 h-5" />
-              Cart
+              Giỏ Hàng
             </a>
             <a 
               href="tel:1800-88-1818" 
@@ -161,7 +161,7 @@ export const Header = () => {
               style={{ fontFamily: "'Open Sans', sans-serif" }}
             >
               <Phone className="w-5 h-5" />
-              Contact
+              Liên Hệ
             </a>
           </div>
 
