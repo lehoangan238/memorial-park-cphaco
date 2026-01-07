@@ -1,13 +1,12 @@
 import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
-import columbarium from '@/assets/columbarium.jpg';
 
 export const CultureSection = () => {
   return (
-    <section className="py-20 bg-white">
+    <section className="py-16 bg-white">
       <div className="container mx-auto px-4">
-        <div className="grid lg:grid-cols-2 gap-16 items-start">
-          {/* Left - Image Card with Slider */}
+        <div className="grid lg:grid-cols-2 gap-12 items-start">
+          {/* Left - Blue Promotional Card */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -15,56 +14,47 @@ export const CultureSection = () => {
             transition={{ duration: 0.8 }}
             className="relative"
           >
-            {/* Decorative lines */}
-            <div className="absolute -top-6 -left-6 z-10">
-              <svg width="60" height="60" viewBox="0 0 60 60">
-                <line x1="5" y1="15" x2="35" y2="45" stroke="#c2c9d6" strokeWidth="2" />
-                <line x1="5" y1="25" x2="25" y2="45" stroke="#c2c9d6" strokeWidth="2" />
-                <line x1="5" y1="35" x2="15" y2="45" stroke="#c2c9d6" strokeWidth="2" />
-              </svg>
-            </div>
-            
-            <div className="relative overflow-hidden shadow-lg bg-gray-100">
-              <img
-                src={columbarium}
-                alt="Rhyme of Life Columbarium"
-                className="w-full h-[480px] object-cover"
-              />
+            <div 
+              className="relative overflow-hidden py-20 px-8 text-center"
+              style={{ backgroundColor: '#4169e1' }}
+            >
+              {/* Decorative bubbles/circles */}
+              <div className="absolute top-10 left-10 w-16 h-16 rounded-full border-2 border-white/20" />
+              <div className="absolute top-20 right-16 w-12 h-12 rounded-full border-2 border-white/20" />
+              <div className="absolute bottom-16 left-20 w-20 h-20 rounded-full border-2 border-white/20" />
+              <div className="absolute bottom-10 right-10 w-14 h-14 rounded-full border-2 border-white/20" />
               
-              {/* Overlay content */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex flex-col justify-end p-8">
+              {/* Hands silhouette at bottom */}
+              <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#3158d3] to-transparent opacity-50" />
+              
+              <div className="relative z-10">
                 <h3 
-                  className="text-4xl text-white mb-2"
-                  style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic' }}
+                  className="text-2xl md:text-3xl text-white mb-4 leading-tight"
+                  style={{ fontFamily: "'Cormorant Garamond', serif" }}
                 >
-                  Nhịp Điệu Cuộc Sống
+                  Kế hoạch cuộc sống hợp lý<br />
+                  chỉ với 10 nghìn/ngày?
                 </h3>
                 <p 
-                  className="text-white text-sm tracking-[0.2em] mb-4 font-light"
+                  className="text-white/80 text-sm mb-8"
                   style={{ fontFamily: "'Open Sans', sans-serif" }}
                 >
-                  Ra Mắt Mới
-                </p>
-                <p 
-                  className="text-white/90 text-sm leading-relaxed mb-6 max-w-sm"
-                  style={{ fontFamily: "'Open Sans', sans-serif" }}
-                >
-                  "Nhịp Điệu Cuộc Sống" – là một nhà lưu trữ tro cốt sang trọng và thanh lịch, kết hợp văn hóa, phong cách và tiện ích 6 sao.
+                  Lên kế hoạch cuộc sống không tốn kém như bạn nghĩ...
                 </p>
                 <button 
-                  className="self-start border border-white text-white px-8 py-3 text-sm tracking-wider hover:bg-white hover:text-black transition-all"
+                  className="border border-white text-white px-8 py-3 text-sm tracking-wider hover:bg-white hover:text-[#4169e1] transition-all"
                   style={{ fontFamily: "'Open Sans', sans-serif" }}
                 >
-                  Xem Thêm
+                  Tìm hiểu thêm
                 </button>
               </div>
               
               {/* Slider dots */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
                 {[0, 1, 2, 3, 4, 5].map((i) => (
                   <button 
                     key={i} 
-                    className={`w-2.5 h-2.5 rounded-full transition-all ${i === 4 ? 'bg-white' : 'bg-white/40'}`}
+                    className={`w-2 h-2 rounded-full transition-all ${i === 2 ? 'bg-white' : 'bg-white/40'}`}
                   />
                 ))}
               </div>
@@ -77,7 +67,7 @@ export const CultureSection = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="pt-8"
+            className="pt-4"
           >
             <span 
               className="text-[#5e636e] text-sm tracking-[0.4em]"
@@ -87,10 +77,10 @@ export const CultureSection = () => {
             </span>
             
             <h2 
-              className="text-5xl lg:text-6xl mt-4 mb-8"
+              className="text-4xl lg:text-5xl mt-4 mb-8"
               style={{ 
-                fontFamily: "'Great Vibes', cursive",
-                color: '#0693e3'
+                fontFamily: "'Cormorant Garamond', serif",
+                color: '#4169e1'
               }}
             >
               Văn Hóa Của Chúng Tôi - Tương Lai Của Chúng Tôi
@@ -106,11 +96,11 @@ export const CultureSection = () => {
             
             <a 
               href="#about" 
-              className="inline-flex items-center gap-3 text-[#5e636e] text-sm tracking-[0.15em] hover:text-[#0693e3] transition-colors group"
+              className="inline-flex items-center gap-3 text-[#5e636e] text-sm tracking-[0.15em] hover:text-[#4169e1] transition-colors group"
               style={{ fontFamily: "'Open Sans', sans-serif" }}
             >
               XEM THÊM
-              <span className="w-6 h-6 rounded-full border border-[#0693e3] flex items-center justify-center text-[#0693e3] group-hover:bg-[#0693e3] group-hover:text-white transition-all">
+              <span className="w-6 h-6 rounded-full border border-[#4169e1] flex items-center justify-center text-[#4169e1] group-hover:bg-[#4169e1] group-hover:text-white transition-all">
                 <Plus className="w-3 h-3" />
               </span>
             </a>
