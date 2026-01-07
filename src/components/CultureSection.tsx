@@ -16,17 +16,19 @@ export const CultureSection = () => {
             className="relative"
           >
             {/* Decorative lines */}
-            <div className="absolute -top-4 -left-4 w-16 h-16">
-              <div className="absolute top-0 left-2 w-8 h-[2px] bg-[#c2c9d6] rotate-45 origin-left"></div>
-              <div className="absolute top-2 left-0 w-8 h-[2px] bg-[#c2c9d6] rotate-45 origin-left"></div>
-              <div className="absolute top-4 left-2 w-6 h-[2px] bg-[#c2c9d6] rotate-45 origin-left"></div>
+            <div className="absolute -top-6 -left-6 z-10">
+              <svg width="60" height="60" viewBox="0 0 60 60">
+                <line x1="5" y1="15" x2="35" y2="45" stroke="#c2c9d6" strokeWidth="2" />
+                <line x1="5" y1="25" x2="25" y2="45" stroke="#c2c9d6" strokeWidth="2" />
+                <line x1="5" y1="35" x2="15" y2="45" stroke="#c2c9d6" strokeWidth="2" />
+              </svg>
             </div>
             
-            <div className="relative overflow-hidden shadow-lg">
+            <div className="relative overflow-hidden shadow-lg bg-gray-100">
               <img
                 src={columbarium}
                 alt="Rhyme of Life Columbarium"
-                className="w-full h-[450px] object-cover"
+                className="w-full h-[480px] object-cover"
               />
               
               {/* Overlay content */}
@@ -37,11 +39,22 @@ export const CultureSection = () => {
                 >
                   Rhyme of Life
                 </h3>
-                <p className="text-white text-sm tracking-[0.2em] mb-4 font-light">New Launch</p>
-                <p className="text-white/90 text-sm leading-relaxed mb-6 max-w-sm">
+                <p 
+                  className="text-white text-sm tracking-[0.2em] mb-4 font-light"
+                  style={{ fontFamily: "'Open Sans', sans-serif" }}
+                >
+                  New Launch
+                </p>
+                <p 
+                  className="text-white/90 text-sm leading-relaxed mb-6 max-w-sm"
+                  style={{ fontFamily: "'Open Sans', sans-serif" }}
+                >
                   The "Rhyme of Life" – is an elegant and luxurious columbarium that integrates culture, style and six-star facilities.
                 </p>
-                <button className="self-start border border-white text-white px-6 py-2.5 text-sm tracking-wider hover:bg-white hover:text-black transition-all">
+                <button 
+                  className="self-start border border-white text-white px-8 py-3 text-sm tracking-wider hover:bg-white hover:text-black transition-all"
+                  style={{ fontFamily: "'Open Sans', sans-serif" }}
+                >
                   Read More
                 </button>
               </div>
@@ -51,7 +64,7 @@ export const CultureSection = () => {
                 {[0, 1, 2, 3, 4, 5].map((i) => (
                   <button 
                     key={i} 
-                    className={`w-2 h-2 rounded-full transition-all ${i === 4 ? 'bg-white' : 'bg-white/50'}`}
+                    className={`w-2.5 h-2.5 rounded-full transition-all ${i === 4 ? 'bg-white' : 'bg-white/40'}`}
                   />
                 ))}
               </div>
@@ -67,14 +80,14 @@ export const CultureSection = () => {
             className="pt-8"
           >
             <span 
-              className="text-[#5e636e] text-sm tracking-[0.4em] uppercase"
+              className="text-[#5e636e] text-sm tracking-[0.4em]"
               style={{ fontFamily: "'Open Sans', sans-serif" }}
             >
               N I R V A N A
             </span>
             
             <h2 
-              className="text-5xl mt-4 mb-8"
+              className="text-5xl lg:text-6xl mt-4 mb-8"
               style={{ 
                 fontFamily: "'Great Vibes', cursive",
                 color: '#0693e3'
@@ -84,7 +97,7 @@ export const CultureSection = () => {
             </h2>
             
             <p 
-              className="text-[#2f3237] leading-[1.9] text-[15px] mb-6"
+              className="text-[#2f3237] leading-[1.9] text-[16px] mb-6"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
               A culture that has stood the test of time for over a thousand years is like the flow of water – little by little, it eventually forms a rich history.{' '}
@@ -93,7 +106,8 @@ export const CultureSection = () => {
             
             <a 
               href="#about" 
-              className="inline-flex items-center gap-3 text-[#5e636e] text-sm tracking-[0.15em] hover:text-primary transition-colors group"
+              className="inline-flex items-center gap-3 text-[#5e636e] text-sm tracking-[0.15em] hover:text-[#0693e3] transition-colors group"
+              style={{ fontFamily: "'Open Sans', sans-serif" }}
             >
               READ MORE
               <span className="w-6 h-6 rounded-full border border-[#0693e3] flex items-center justify-center text-[#0693e3] group-hover:bg-[#0693e3] group-hover:text-white transition-all">

@@ -6,82 +6,102 @@ import familyGenerations from '@/assets/family-generations.jpg';
 const infoCards = [
   {
     title: "5 main advantages of pre-planning",
-    icon: "📋",
+    image: familyHug,
   },
   {
-    title: "What's the best time to start plan?",
-    icon: "⏰",
+    title: "What's the best choice for you",
+    image: familyGenerations,
   },
   {
-    title: "Why should we plan?",
-    icon: "❓",
+    title: "Why should I pre-plan?",
+    image: familyHug,
   },
 ];
 
 export const CaringSection = () => {
   return (
-    <section className="py-16 bg-secondary/40">
-      <div className="container mx-auto px-4">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-10"
-        >
-          <h2 className="text-4xl md:text-5xl font-script text-primary mb-4">
-            Caring for Life
-          </h2>
-          <p className="text-muted-foreground text-sm max-w-3xl mx-auto leading-relaxed">
-            A first-of-its-kind pre-planning program designed to help protect and sustain the things that matter most 
-            to you and your loved ones. Together, we seek to give meaning to our lives, celebrate our culture, 
-            and invest in our families' legacy.
-          </p>
-        </motion.div>
-
-        {/* Family Images Grid */}
-        <div className="grid md:grid-cols-2 gap-4 mb-12">
+    <section className="relative">
+      {/* Background with overlay */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${familyHug})` }}
+      />
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: 'linear-gradient(135deg, rgba(6, 147, 227, 0.85) 0%, rgba(155, 81, 224, 0.8) 100%)'
+        }}
+      />
+      
+      <div className="relative z-10 py-20">
+        <div className="container mx-auto px-4">
+          {/* Header */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="rounded-lg overflow-hidden shadow-lg"
+            className="text-center mb-8"
           >
-            <img src={familyHug} alt="Family together" className="w-full h-[280px] object-cover hover:scale-105 transition-transform duration-500" />
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="rounded-lg overflow-hidden shadow-lg"
-          >
-            <img src={familyGenerations} alt="Multi-generation family" className="w-full h-[280px] object-cover hover:scale-105 transition-transform duration-500" />
+            <h2 
+              className="text-5xl md:text-6xl text-white mb-6"
+              style={{ fontFamily: "'Great Vibes', cursive" }}
+            >
+              Caring for Life
+            </h2>
+            <p 
+              className="text-white/90 text-base max-w-4xl mx-auto leading-relaxed mb-8"
+              style={{ fontFamily: "'Cormorant Garamond', serif" }}
+            >
+              A first-of-its-kind pre-planning program designed to help protect and sustain the things that matter most 
+              to you and your loved ones. Together, we seek to give meaning to our lives, celebrate our culture, 
+              and invest in our families' legacy.
+            </p>
+            <button 
+              className="px-8 py-3 text-white text-sm tracking-wider hover:opacity-90 transition-opacity"
+              style={{
+                backgroundColor: '#00d084',
+                fontFamily: "'Open Sans', sans-serif"
+              }}
+            >
+              START YOUR PLANNING TODAY
+            </button>
           </motion.div>
         </div>
+      </div>
 
-        {/* Info Cards */}
-        <div className="grid md:grid-cols-3 gap-4">
-          {infoCards.map((card, index) => (
-            <motion.div
-              key={card.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="group bg-card rounded-lg p-5 shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer border border-border hover:border-primary/20 flex items-center gap-4"
-            >
-              <span className="text-2xl">{card.icon}</span>
-              <div className="flex-1">
-                <h3 className="font-medium text-foreground text-sm group-hover:text-primary transition-colors">
-                  {card.title}
-                </h3>
-              </div>
-              <ArrowRight className="w-4 h-4 text-primary opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-            </motion.div>
-          ))}
+      {/* Info Cards - outside the gradient overlay */}
+      <div className="bg-white py-12">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-3 gap-6">
+            {infoCards.map((card, index) => (
+              <motion.div
+                key={card.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="group cursor-pointer"
+              >
+                <div className="relative overflow-hidden mb-4">
+                  <img 
+                    src={card.image} 
+                    alt={card.title}
+                    className="w-full h-48 object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <h3 
+                    className="text-[#2f3237] text-sm group-hover:text-[#0693e3] transition-colors"
+                    style={{ fontFamily: "'Open Sans', sans-serif" }}
+                  >
+                    {card.title}
+                  </h3>
+                  <ArrowRight className="w-4 h-4 text-[#0693e3] opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
