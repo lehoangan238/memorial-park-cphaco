@@ -8,7 +8,7 @@ export const QuoteSection = () => {
         {/* Left: Blue Quote Box */}
         <div className="lg:w-auto relative z-10">
           <div 
-            className="py-12 lg:py-16 px-8 lg:px-12 lg:pr-16 flex items-center relative"
+            className="pt-32 lg:pt-48 pb-12 lg:pb-16 px-8 lg:px-12 lg:pr-16 flex items-end relative"
             style={{ backgroundColor: '#4a5aef' }}
           >
             {/* Cyan left border INSIDE the box */}
@@ -30,7 +30,7 @@ export const QuoteSection = () => {
         </div>
         
         {/* Right: Image - 90% width, centered */}
-        <div className="lg:w-[90%] lg:absolute lg:left-1/2 lg:-translate-x-1/2 lg:top-[40%]">
+        <div className="lg:w-[90%] lg:absolute lg:left-1/2 lg:-translate-x-1/2 lg:bottom-0">
           <div 
             className="w-full h-[400px] lg:h-[450px] bg-cover bg-center"
             style={{ backgroundImage: `url(${familyHug})` }}
