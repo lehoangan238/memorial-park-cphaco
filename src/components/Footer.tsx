@@ -1,9 +1,33 @@
-import { Facebook, Youtube } from 'lucide-react';
+import { Facebook, Instagram, Youtube } from 'lucide-react';
+
+const gettingStartedLinks = [
+  { label: 'Immediate Need', href: '#' },
+  { label: 'Pre-Planning', href: '#' },
+];
+
+const planningOptionsLinks = [
+  { label: 'Funeral Service', href: '#' },
+  { label: 'Burial Plots', href: '#' },
+  { label: 'Columbaria', href: '#' },
+  { label: 'Pets', href: '#' },
+  { label: 'Other Products', href: '#' },
+];
+
+const resourcesLinks = [
+  { label: 'Who We Are', href: '#' },
+  { label: 'Branches', href: '#' },
+  { label: '360 Virtual Tour', href: '#' },
+  { label: 'Latest Updates', href: '#' },
+  { label: 'Contact Us', href: '#' },
+  { label: 'Article', href: '#' },
+  { label: 'Life Cafe', href: '#' },
+  { label: 'Nirvana Store', href: '#' },
+];
 
 export const Footer = () => {
   return (
     <footer>
-      {/* Get in Touch Section */}
+      {/* Main Footer */}
       <div 
         className="py-12"
         style={{
@@ -11,51 +35,174 @@ export const Footer = () => {
         }}
       >
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            {/* Left - Contact Info */}
+          <div className="grid lg:grid-cols-4 gap-10">
+            {/* Get in Touch */}
             <div>
               <h3 
-                className="text-white text-xl font-semibold mb-2"
+                className="text-white text-xl font-semibold mb-4"
                 style={{ fontFamily: "'Cormorant Garamond', serif" }}
               >
                 Get in Touch
               </h3>
               <p 
-                className="text-white/90 text-sm mb-1"
+                className="text-white/90 text-sm mb-2"
                 style={{ fontFamily: "'Open Sans', sans-serif" }}
               >
                 Careline 1800-88-1818
               </p>
               <p 
-                className="text-white/70 text-xs"
+                className="text-white/80 text-sm mb-4"
                 style={{ fontFamily: "'Open Sans', sans-serif" }}
               >
-                NIRVANA ASIA LTD | 0909, FLOOR 9, TOWER<br />
-                2, ETIQA TWINS, NO.11, JALAN PINANG,<br />
-                50450 KUALA LUMPUR
+                info@nvasia.com.my
               </p>
-            </div>
-
-            {/* Right - Social & Newsletter */}
-            <div className="text-right">
               <p 
-                className="text-white/80 text-xs mb-3 tracking-wider"
+                className="text-white/70 text-xs mb-1"
                 style={{ fontFamily: "'Open Sans', sans-serif" }}
               >
-                SIGN UP FOR LATEST UPDATE
+                Corporate Office
               </p>
-              <div className="flex gap-3 justify-end">
+              <p 
+                className="text-white/70 text-xs mb-4 leading-relaxed"
+                style={{ fontFamily: "'Open Sans', sans-serif" }}
+              >
+                Level 9, Tower 1, Avenue 3, The Horizon, Bangsar South,<br />
+                No 8, Jalan Kerinchi 59200 Kuala Lumpur, Malaysia.
+              </p>
+              
+              {/* Social Icons */}
+              <div className="flex gap-2">
                 <a 
                   href="#" 
-                  className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center text-white hover:bg-white/10 transition-colors"
+                  className="w-9 h-9 rounded bg-[#1877f2] flex items-center justify-center text-white hover:opacity-80 transition-opacity"
                 >
-                  <Facebook className="w-5 h-5" />
+                  <Facebook className="w-4 h-4" />
                 </a>
                 <a 
                   href="#" 
-                  className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center text-white hover:bg-white/10 transition-colors"
+                  className="w-9 h-9 rounded bg-gradient-to-br from-[#f58529] via-[#dd2a7b] to-[#8134af] flex items-center justify-center text-white hover:opacity-80 transition-opacity"
                 >
-                  <Youtube className="w-5 h-5" />
+                  <Instagram className="w-4 h-4" />
+                </a>
+                <a 
+                  href="#" 
+                  className="w-9 h-9 rounded bg-[#ff0000] flex items-center justify-center text-white hover:opacity-80 transition-opacity"
+                >
+                  <Youtube className="w-4 h-4" />
+                </a>
+              </div>
+              
+              <p 
+                className="text-white/50 text-xs mt-6"
+                style={{ fontFamily: "'Open Sans', sans-serif" }}
+              >
+                © 2024 NIRVANA ASIA. All Rights Reserved.
+              </p>
+            </div>
+
+            {/* Getting Started */}
+            <div>
+              <h4 
+                className="text-white/80 text-sm font-semibold mb-4 tracking-wide"
+                style={{ fontFamily: "'Open Sans', sans-serif" }}
+              >
+                Getting Started
+              </h4>
+              <ul className="space-y-2">
+                {gettingStartedLinks.map((link) => (
+                  <li key={link.label}>
+                    <a 
+                      href={link.href} 
+                      className="text-white/60 text-sm hover:text-white transition-colors"
+                      style={{ fontFamily: "'Open Sans', sans-serif" }}
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              
+              <h4 
+                className="text-white/80 text-sm font-semibold mt-6 mb-4 tracking-wide"
+                style={{ fontFamily: "'Open Sans', sans-serif" }}
+              >
+                Planning Options
+              </h4>
+              <ul className="space-y-2">
+                {planningOptionsLinks.map((link) => (
+                  <li key={link.label}>
+                    <a 
+                      href={link.href} 
+                      className="text-white/60 text-sm hover:text-white transition-colors"
+                      style={{ fontFamily: "'Open Sans', sans-serif" }}
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Resources */}
+            <div>
+              <h4 
+                className="text-white/80 text-sm font-semibold mb-4 tracking-wide"
+                style={{ fontFamily: "'Open Sans', sans-serif" }}
+              >
+                Resources
+              </h4>
+              <ul className="space-y-2">
+                {resourcesLinks.map((link) => (
+                  <li key={link.label}>
+                    <a 
+                      href={link.href} 
+                      className="text-white/60 text-sm hover:text-white transition-colors"
+                      style={{ fontFamily: "'Open Sans', sans-serif" }}
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Buttons */}
+            <div>
+              <div className="flex flex-col gap-2">
+                <button 
+                  className="border border-white/50 text-white px-4 py-2 text-xs hover:bg-white/10 transition-colors text-left"
+                  style={{ fontFamily: "'Open Sans', sans-serif" }}
+                >
+                  E-Booklet
+                </button>
+                <button 
+                  className="border border-white/50 text-white px-4 py-2 text-xs hover:bg-white/10 transition-colors text-left"
+                  style={{ fontFamily: "'Open Sans', sans-serif" }}
+                >
+                  MyNirvana
+                </button>
+                <button 
+                  className="border border-white/50 text-white px-4 py-2 text-xs hover:bg-white/10 transition-colors text-left"
+                  style={{ fontFamily: "'Open Sans', sans-serif" }}
+                >
+                  Agent Portal
+                </button>
+              </div>
+              
+              <div className="mt-6 flex flex-col gap-2">
+                <a 
+                  href="#" 
+                  className="text-white/50 text-xs hover:text-white transition-colors"
+                  style={{ fontFamily: "'Open Sans', sans-serif" }}
+                >
+                  Privacy Policy
+                </a>
+                <a 
+                  href="#" 
+                  className="text-white/50 text-xs hover:text-white transition-colors"
+                  style={{ fontFamily: "'Open Sans', sans-serif" }}
+                >
+                  Terms of Use
                 </a>
               </div>
             </div>
@@ -64,26 +211,9 @@ export const Footer = () => {
       </div>
 
       {/* Bottom Bar */}
-      <div className="bg-[#1a1f3c] py-4">
+      <div className="bg-[#1a1f3c] py-3">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <span 
-                className="text-white/60 text-xs"
-                style={{ fontFamily: "'Open Sans', sans-serif" }}
-              >
-                © 2024 Nirvana Asia Ltd. All Rights Reserved.
-              </span>
-            </div>
-            <div 
-              className="flex gap-4 text-xs text-white/60"
-              style={{ fontFamily: "'Open Sans', sans-serif" }}
-            >
-              <a href="#" className="hover:text-white transition-colors">Personal Data Protection</a>
-              <a href="#" className="hover:text-white transition-colors">Terms of Use</a>
-              <a href="#" className="hover:text-white transition-colors">Sitemap</a>
-            </div>
-          </div>
+          {/* Empty bottom bar for spacing */}
         </div>
       </div>
     </footer>

@@ -2,28 +2,20 @@ import { motion } from 'framer-motion';
 import { Play } from 'lucide-react';
 import landscape from '@/assets/landscape.jpg';
 
-export const VideoSection = () => {
+export const VideoSection2 = () => {
   return (
-    <section className="py-12 bg-white">
+    <section className="py-8 bg-white">
       <div className="container mx-auto px-4">
-        {/* Watch label */}
-        <p 
-          className="text-center text-[#5e636e] text-sm tracking-[0.3em] mb-6"
-          style={{ fontFamily: "'Open Sans', sans-serif" }}
-        >
-          WATCH
-        </p>
-        
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="relative overflow-hidden rounded-lg shadow-lg max-w-4xl mx-auto"
+          className="relative overflow-hidden rounded-lg shadow-lg max-w-5xl mx-auto"
         >
           <img
             src={landscape}
-            alt="Nirvana Memorial Park"
-            className="w-full h-[400px] object-cover"
+            alt="Nirvana Memorial Park Landscape"
+            className="w-full h-[350px] object-cover"
           />
           
           {/* Play Button */}

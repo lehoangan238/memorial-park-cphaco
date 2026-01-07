@@ -5,7 +5,9 @@ import { CultureSection } from '@/components/CultureSection';
 import { CaringSection } from '@/components/CaringSection';
 import { VideoSection } from '@/components/VideoSection';
 import { ProductsSection } from '@/components/ProductsSection';
+import { VideoSection2 } from '@/components/VideoSection2';
 import { AdvantagesSection } from '@/components/AdvantagesSection';
+import { QuoteSection } from '@/components/QuoteSection';
 import { TestimonialsSection } from '@/components/TestimonialsSection';
 import { Footer } from '@/components/Footer';
 
@@ -20,7 +22,9 @@ const Index = () => {
         <CaringSection />
         <VideoSection />
         <ProductsSection />
+        <VideoSection2 />
         <AdvantagesSection />
+        <QuoteSection />
         <TestimonialsSection />
       </main>
       <Footer />

@@ -1,22 +1,21 @@
 import { motion } from 'framer-motion';
-import { ChevronRight } from 'lucide-react';
 import columbarium from '@/assets/columbarium.jpg';
 
 const products = [
   "Burial Plots",
   "Columbaria",
   "Funeral Service",
-  "Cremation Service",
-  "Memorial Services",
-  "Life Memorial Garden",
-  "Pet Cremation",
+  "Ancestral Tablet",
+  "Eternal Blessing Light",
+  "Pet Memorial Garden",
+  "NV Seed",
 ];
 
 export const ProductsSection = () => {
   return (
-    <section id="products" className="py-20 bg-white">
+    <section id="products" className="py-16 bg-white">
       <div className="container mx-auto px-4">
-        <div className="grid lg:grid-cols-2 gap-16 items-start">
+        <div className="grid lg:grid-cols-2 gap-12 items-start">
           {/* Left - Product List */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -25,7 +24,7 @@ export const ProductsSection = () => {
             transition={{ duration: 0.8 }}
           >
             <h2 
-              className="text-4xl text-[#2f3237] mb-8"
+              className="text-3xl text-[#2f3237] mb-8"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
               Our Products
@@ -39,11 +38,11 @@ export const ProductsSection = () => {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: index * 0.05 }}
-                  className="flex items-center gap-2 group cursor-pointer"
+                  className="flex items-center gap-2"
                 >
-                  <ChevronRight className="w-4 h-4 text-[#0693e3] group-hover:translate-x-1 transition-transform" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0693e3]" />
                   <span 
-                    className="text-[#5e636e] text-[15px] group-hover:text-[#0693e3] transition-colors"
+                    className="text-[#5e636e] text-[15px]"
                     style={{ fontFamily: "'Open Sans', sans-serif" }}
                   >
                     {product}
@@ -52,21 +51,21 @@ export const ProductsSection = () => {
               ))}
             </ul>
 
-            <div className="flex gap-4">
+            <div className="flex flex-col gap-3">
               <button 
-                className="border border-[#0693e3] text-[#0693e3] px-6 py-2.5 text-sm hover:bg-[#0693e3] hover:text-white transition-all"
+                className="self-start border border-[#5e636e] text-[#5e636e] px-8 py-2.5 text-xs tracking-[0.15em] hover:bg-[#5e636e] hover:text-white transition-all"
                 style={{ fontFamily: "'Open Sans', sans-serif" }}
               >
-                Learn More
+                READ MORE
               </button>
               <button 
-                className="px-6 py-2.5 text-white text-sm"
+                className="self-start px-8 py-2.5 text-white text-xs tracking-[0.1em]"
                 style={{
-                  backgroundColor: '#00d084',
+                  backgroundColor: '#0693e3',
                   fontFamily: "'Open Sans', sans-serif"
                 }}
               >
-                Get a Free Guide
+                360 SITE VIEW
               </button>
             </div>
           </motion.div>
@@ -77,32 +76,8 @@ export const ProductsSection = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative"
           >
-            {/* Decorative circular pattern */}
-            <div className="absolute -top-8 -right-8 w-32 h-32 opacity-20">
-              <svg viewBox="0 0 100 100" className="w-full h-full">
-                <circle cx="50" cy="50" r="45" fill="none" stroke="#0693e3" strokeWidth="0.5" />
-                <circle cx="50" cy="50" r="35" fill="none" stroke="#0693e3" strokeWidth="0.5" />
-                <circle cx="50" cy="50" r="25" fill="none" stroke="#0693e3" strokeWidth="0.5" />
-                <circle cx="50" cy="50" r="15" fill="none" stroke="#0693e3" strokeWidth="0.5" />
-                {/* Radial lines */}
-                {[...Array(12)].map((_, i) => (
-                  <line
-                    key={i}
-                    x1="50"
-                    y1="5"
-                    x2="50"
-                    y2="95"
-                    stroke="#0693e3"
-                    strokeWidth="0.5"
-                    transform={`rotate(${i * 30} 50 50)`}
-                  />
-                ))}
-              </svg>
-            </div>
-            
-            <div className="overflow-hidden shadow-xl">
+            <div className="overflow-hidden">
               <img
                 src={columbarium}
                 alt="Columbarium Interior"
