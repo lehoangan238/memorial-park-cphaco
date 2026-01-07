@@ -32,7 +32,7 @@ export const QuoteSection = () => {
         {/* Right: Image - 90% width, centered */}
         <div className="lg:w-[90%] lg:absolute lg:left-1/2 lg:-translate-x-1/2 lg:top-1/4">
           <div 
-            className="w-full h-[300px] lg:h-[350px] bg-cover bg-center"
+            className="w-full h-[400px] lg:h-[450px] bg-cover bg-center"
             style={{ backgroundImage: `url(${familyHug})` }}
           />
         </div>
