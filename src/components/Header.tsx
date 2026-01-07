@@ -43,22 +43,29 @@ export const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-1">
-            <span className="text-2xl font-display text-[#2f3237]" style={{ fontFamily: 'serif' }}>
+          <a href="#" className="flex items-center gap-2">
+            <span 
+              className="text-2xl text-[#2f3237]"
+              style={{ fontFamily: "'Cormorant Garamond', serif" }}
+            >
               富貴
             </span>
-            <span className="text-2xl tracking-[0.15em] text-[#2f3237] font-light ml-1" style={{ fontFamily: 'sans-serif' }}>
-              N<span className="text-xl">IRVANA</span>
+            <span 
+              className="text-xl tracking-[0.2em] text-[#2f3237] font-light"
+              style={{ fontFamily: "'Open Sans', sans-serif" }}
+            >
+              N<span className="text-lg">IRVANA</span>
             </span>
           </a>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-6">
             {navItems.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
-                className="flex items-center gap-1 text-[15px] text-[#2f3237] hover:text-primary transition-colors font-body"
+                className="flex items-center gap-1 text-[14px] text-[#2f3237] hover:text-[#0693e3] transition-colors"
+                style={{ fontFamily: "'Open Sans', sans-serif" }}
               >
                 {item.label}
                 {item.hasDropdown && <ChevronDown className="w-4 h-4" />}
@@ -66,23 +73,36 @@ export const Header = () => {
             ))}
             
             {/* Language Selector */}
-            <div className="flex items-center gap-1 text-[15px] text-[#2f3237] cursor-pointer">
-              <span className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center bg-blue-600 text-white text-xs">🇬🇧</span>
+            <div 
+              className="flex items-center gap-2 text-[14px] text-[#2f3237] cursor-pointer"
+              style={{ fontFamily: "'Open Sans', sans-serif" }}
+            >
+              <span className="w-5 h-5 rounded-sm overflow-hidden bg-blue-800 flex items-center justify-center text-white text-[10px]">
+                🇬🇧
+              </span>
               English
               <ChevronDown className="w-4 h-4" />
             </div>
           </nav>
 
           {/* Right side icons */}
-          <div className="hidden lg:flex items-center gap-6">
-            <button className="text-[#2f3237] hover:text-primary transition-colors">
+          <div className="hidden lg:flex items-center gap-5">
+            <button className="text-[#2f3237] hover:text-[#0693e3] transition-colors">
               <Search className="w-5 h-5" />
             </button>
-            <a href="#cart" className="flex items-center gap-1 text-[15px] text-[#2f3237] hover:text-primary transition-colors">
+            <a 
+              href="#cart" 
+              className="flex items-center gap-1.5 text-[14px] text-[#2f3237] hover:text-[#0693e3] transition-colors"
+              style={{ fontFamily: "'Open Sans', sans-serif" }}
+            >
               <ShoppingCart className="w-5 h-5" />
               Cart
             </a>
-            <a href="tel:1800-88-1818" className="flex items-center gap-1 text-[15px] text-[#2f3237] hover:text-primary transition-colors">
+            <a 
+              href="tel:1800-88-1818" 
+              className="flex items-center gap-1.5 text-[14px] text-[#2f3237] hover:text-[#0693e3] transition-colors"
+              style={{ fontFamily: "'Open Sans', sans-serif" }}
+            >
               <Phone className="w-5 h-5" />
               Contact
             </a>
@@ -108,12 +128,18 @@ export const Header = () => {
               key={item.label}
               href={item.href}
               className="flex items-center justify-between px-6 py-3 text-sm text-[#2f3237] hover:bg-gray-50 border-b border-gray-100 last:border-0"
+              style={{ fontFamily: "'Open Sans', sans-serif" }}
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {item.label}
               {item.hasDropdown && <ChevronDown className="w-4 h-4" />}
             </a>
           ))}
+          <div className="flex items-center justify-around py-4 border-t border-gray-100">
+            <a href="#" className="text-[#2f3237]"><Search className="w-5 h-5" /></a>
+            <a href="#" className="text-[#2f3237]"><ShoppingCart className="w-5 h-5" /></a>
+            <a href="#" className="text-[#2f3237]"><Phone className="w-5 h-5" /></a>
+          </div>
         </nav>
       </div>
     </header>
