@@ -3,7 +3,7 @@ import familyHug from '@/assets/family-hug.jpg';
 
 export const QuoteSection = () => {
   return (
-    <section className="relative pb-[300px] lg:pb-[350px]">
+    <section className="relative pb-[200px] lg:pb-[250px]">
       <div className="flex flex-col lg:flex-row">
         {/* Left: Blue Quote Box */}
         <div className="lg:w-auto relative z-10">
