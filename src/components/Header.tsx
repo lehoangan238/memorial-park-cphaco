@@ -1,6 +1,31 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, ChevronDown, Search, ShoppingCart, Phone } from 'lucide-react';
 
+const dropdownMenus = {
+  'Getting Started': [
+    { label: 'Why Pre-Plan', href: '#why-preplan' },
+    { label: 'How It Works', href: '#how-it-works' },
+    { label: 'FAQ', href: '#faq' },
+    { label: 'Testimonials', href: '#testimonials' },
+    { label: 'Contact Us', href: '#contact' },
+  ],
+  'Planning Options': [
+    { label: 'Memorial Parks', href: '#memorial-parks' },
+    { label: 'Nirvana Columbarium', href: '#columbarium' },
+    { label: 'Burial Plots', href: '#burial-plots' },
+    { label: 'Cremation Services', href: '#cremation' },
+    { label: 'Family Estates', href: '#family-estates' },
+    { label: 'Pet Memorial', href: '#pet-memorial' },
+  ],
+  'Resources': [
+    { label: 'Blog & Articles', href: '#blog' },
+    { label: 'Planning Guide', href: '#guide' },
+    { label: 'Calculator', href: '#calculator' },
+    { label: 'Download Brochure', href: '#brochure' },
+    { label: 'News & Events', href: '#news' },
+  ],
+};
+
 const navItems = [
   { label: 'Enlightenment Ceremony', href: '#ceremony' },
   { 
@@ -23,6 +48,8 @@ const navItems = [
 export const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [mobileActiveDropdown, setMobileActiveDropdown] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,15 +88,45 @@ export const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-6">
             {navItems.map((item) => (
-              <a
+              <div
                 key={item.label}
-                href={item.href}
-                className="flex items-center gap-1 text-[14px] text-[#2f3237] hover:text-[#0693e3] transition-colors"
-                style={{ fontFamily: "'Open Sans', sans-serif" }}
+                className="relative"
+                onMouseEnter={() => item.hasDropdown && setActiveDropdown(item.label)}
+                onMouseLeave={() => setActiveDropdown(null)}
               >
-                {item.label}
-                {item.hasDropdown && <ChevronDown className="w-4 h-4" />}
-              </a>
+                <a
+                  href={item.href}
+                  className="flex items-center gap-1 text-[14px] text-[#2f3237] hover:text-[#0693e3] transition-colors py-6"
+                  style={{ fontFamily: "'Open Sans', sans-serif" }}
+                >
+                  {item.label}
+                  {item.hasDropdown && (
+                    <ChevronDown 
+                      className={`w-4 h-4 transition-transform duration-200 ${
+                        activeDropdown === item.label ? 'rotate-180' : ''
+                      }`} 
+                    />
+                  )}
+                </a>
+                
+                {/* Dropdown Menu */}
+                {item.hasDropdown && activeDropdown === item.label && (
+                  <div 
+                    className="absolute top-full left-0 bg-white shadow-lg rounded-md border border-gray-100 min-w-[220px] py-2 z-50"
+                    style={{ fontFamily: "'Open Sans', sans-serif" }}
+                  >
+                    {dropdownMenus[item.label as keyof typeof dropdownMenus]?.map((subItem) => (
+                      <a
+                        key={subItem.label}
+                        href={subItem.href}
+                        className="block px-5 py-2.5 text-[14px] text-[#2f3237] hover:bg-[#0693e3] hover:text-white transition-colors"
+                      >
+                        {subItem.label}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
             
             {/* Language Selector */}
@@ -120,20 +177,49 @@ export const Header = () => {
 
       {/* Mobile Menu */}
       <div className={`lg:hidden transition-all duration-300 overflow-hidden ${
-        isMobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+        isMobileMenuOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
       }`}>
         <nav className="bg-white border-t border-gray-100">
           {navItems.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              className="flex items-center justify-between px-6 py-3 text-sm text-[#2f3237] hover:bg-gray-50 border-b border-gray-100 last:border-0"
-              style={{ fontFamily: "'Open Sans', sans-serif" }}
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              {item.label}
-              {item.hasDropdown && <ChevronDown className="w-4 h-4" />}
-            </a>
+            <div key={item.label}>
+              <button
+                className="flex items-center justify-between w-full px-6 py-3 text-sm text-[#2f3237] hover:bg-gray-50 border-b border-gray-100"
+                style={{ fontFamily: "'Open Sans', sans-serif" }}
+                onClick={() => {
+                  if (item.hasDropdown) {
+                    setMobileActiveDropdown(mobileActiveDropdown === item.label ? null : item.label);
+                  } else {
+                    setIsMobileMenuOpen(false);
+                  }
+                }}
+              >
+                {item.label}
+                {item.hasDropdown && (
+                  <ChevronDown 
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      mobileActiveDropdown === item.label ? 'rotate-180' : ''
+                    }`} 
+                  />
+                )}
+              </button>
+              
+              {/* Mobile Dropdown */}
+              {item.hasDropdown && mobileActiveDropdown === item.label && (
+                <div className="bg-gray-50">
+                  {dropdownMenus[item.label as keyof typeof dropdownMenus]?.map((subItem) => (
+                    <a
+                      key={subItem.label}
+                      href={subItem.href}
+                      className="block px-10 py-2.5 text-sm text-[#2f3237] hover:text-[#0693e3] border-b border-gray-100 last:border-0"
+                      style={{ fontFamily: "'Open Sans', sans-serif" }}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {subItem.label}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
           <div className="flex items-center justify-around py-4 border-t border-gray-100">
             <a href="#" className="text-[#2f3237]"><Search className="w-5 h-5" /></a>
