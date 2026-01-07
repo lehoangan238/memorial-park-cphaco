@@ -1,23 +1,23 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, Phone, ChevronDown, Globe } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Menu, X, ChevronDown, Search, ShoppingCart, Phone } from 'lucide-react';
 
 const navItems = [
-  { label: 'Home', href: '#' },
+  { label: 'Enlightenment Ceremony', href: '#ceremony' },
   { 
-    label: 'Products', 
-    href: '#products',
-    subItems: [
-      { label: 'Burial Plots', href: '#burial' },
-      { label: 'Columbaria', href: '#columbarium' },
-      { label: 'Funeral Service', href: '#services' },
-      { label: 'Ancestral Tablets', href: '#ancestral' },
-    ]
+    label: 'Getting Started', 
+    href: '#started',
+    hasDropdown: true
   },
-  { label: 'Pre-planning', href: '#planning' },
-  { label: 'Promotions', href: '#promotions' },
-  { label: 'Locations', href: '#locations' },
-  { label: 'News & Events', href: '#news' },
+  { 
+    label: 'Planning Options', 
+    href: '#planning',
+    hasDropdown: true
+  },
+  { 
+    label: 'Resources', 
+    href: '#resources',
+    hasDropdown: true
+  },
 ];
 
 export const Header = () => {
@@ -34,100 +34,84 @@ export const Header = () => {
 
   return (
     <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled 
-          ? 'bg-background/98 backdrop-blur-md shadow-md py-2' 
-          : 'bg-transparent py-4'
+          ? 'bg-white shadow-md' 
+          : 'bg-white'
       }`}
     >
-      <div className="container mx-auto px-4 flex items-center justify-between">
-        {/* Logo */}
-        <a href="#" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-nirvana-gradient rounded flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">富</span>
-          </div>
-          <span className={`text-xl font-display font-semibold transition-colors ${
-            isScrolled ? 'text-primary' : 'text-primary-foreground'
-          }`}>
-            Nirvana
-          </span>
-        </a>
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-20">
+          {/* Logo */}
+          <a href="#" className="flex items-center gap-1">
+            <span className="text-2xl font-display text-[#2f3237]" style={{ fontFamily: 'serif' }}>
+              富貴
+            </span>
+            <span className="text-2xl tracking-[0.15em] text-[#2f3237] font-light ml-1" style={{ fontFamily: 'sans-serif' }}>
+              N<span className="text-xl">IRVANA</span>
+            </span>
+          </a>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-6">
-          {navItems.map((item) => (
-            <div key={item.label} className="relative group">
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-8">
+            {navItems.map((item) => (
               <a
+                key={item.label}
                 href={item.href}
-                className={`flex items-center gap-1 text-sm font-medium transition-colors hover:opacity-80 ${
-                  isScrolled ? 'text-foreground' : 'text-primary-foreground'
-                }`}
+                className="flex items-center gap-1 text-[15px] text-[#2f3237] hover:text-primary transition-colors font-body"
               >
                 {item.label}
-                {item.subItems && <ChevronDown className="w-3 h-3" />}
+                {item.hasDropdown && <ChevronDown className="w-4 h-4" />}
               </a>
-              {item.subItems && (
-                <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                  <div className="bg-card rounded-lg shadow-xl border border-border overflow-hidden min-w-[180px]">
-                    {item.subItems.map((subItem) => (
-                      <a
-                        key={subItem.label}
-                        href={subItem.href}
-                        className="block px-4 py-2.5 text-sm text-card-foreground hover:bg-secondary hover:text-primary transition-colors"
-                      >
-                        {subItem.label}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
+            ))}
+            
+            {/* Language Selector */}
+            <div className="flex items-center gap-1 text-[15px] text-[#2f3237] cursor-pointer">
+              <span className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center bg-blue-600 text-white text-xs">🇬🇧</span>
+              English
+              <ChevronDown className="w-4 h-4" />
             </div>
-          ))}
-        </nav>
+          </nav>
 
-        {/* Right side */}
-        <div className="hidden lg:flex items-center gap-3">
-          <button className={`flex items-center gap-1 text-sm transition-colors ${
-            isScrolled ? 'text-foreground' : 'text-primary-foreground'
-          }`}>
-            <Globe className="w-4 h-4" />
-            EN
-          </button>
-          <a 
-            href="tel:1800-88-3838" 
-            className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
-              isScrolled ? 'text-primary' : 'text-primary-foreground'
-            }`}
+          {/* Right side icons */}
+          <div className="hidden lg:flex items-center gap-6">
+            <button className="text-[#2f3237] hover:text-primary transition-colors">
+              <Search className="w-5 h-5" />
+            </button>
+            <a href="#cart" className="flex items-center gap-1 text-[15px] text-[#2f3237] hover:text-primary transition-colors">
+              <ShoppingCart className="w-5 h-5" />
+              Cart
+            </a>
+            <a href="tel:1800-88-1818" className="flex items-center gap-1 text-[15px] text-[#2f3237] hover:text-primary transition-colors">
+              <Phone className="w-5 h-5" />
+              Contact
+            </a>
+          </div>
+
+          {/* Mobile Menu Toggle */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="lg:hidden p-2 text-[#2f3237]"
           >
-            <Phone className="w-4 h-4" />
-            1800-88-3838
-          </a>
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
-
-        {/* Mobile Menu Toggle */}
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className={`lg:hidden p-2 transition-colors ${
-            isScrolled ? 'text-foreground' : 'text-primary-foreground'
-          }`}
-        >
-          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
       </div>
 
       {/* Mobile Menu */}
       <div className={`lg:hidden transition-all duration-300 overflow-hidden ${
         isMobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
       }`}>
-        <nav className="bg-card border-t border-border mt-2">
+        <nav className="bg-white border-t border-gray-100">
           {navItems.map((item) => (
             <a
               key={item.label}
               href={item.href}
-              className="block px-6 py-3 text-sm font-medium text-card-foreground hover:bg-secondary hover:text-primary border-b border-border last:border-0 transition-colors"
+              className="flex items-center justify-between px-6 py-3 text-sm text-[#2f3237] hover:bg-gray-50 border-b border-gray-100 last:border-0"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {item.label}
+              {item.hasDropdown && <ChevronDown className="w-4 h-4" />}
             </a>
           ))}
         </nav>
