@@ -1,8 +1,8 @@
 export const CarelineBar = () => {
   return (
-    <div className="flex justify-center py-4">
+    <div className="relative z-20 flex justify-center -mt-8">
       <div 
-        className="px-16 py-4 rounded-full"
+        className="px-16 py-4 rounded-full shadow-lg"
         style={{
           background: 'linear-gradient(135deg, rgba(6, 147, 227, 1) 0%, rgb(155, 81, 224) 100%)'
         }}
