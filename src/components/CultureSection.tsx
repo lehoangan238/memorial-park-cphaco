@@ -16,7 +16,7 @@ export const CultureSection = () => {
           >
             <div 
               className="relative overflow-hidden py-20 px-8 text-center"
-              style={{ backgroundColor: '#4169e1' }}
+              style={{ backgroundColor: '#4453c4' }}
             >
               {/* Decorative bubbles/circles */}
               <div className="absolute top-10 left-10 w-16 h-16 rounded-full border-2 border-white/20" />
@@ -25,7 +25,7 @@ export const CultureSection = () => {
               <div className="absolute bottom-10 right-10 w-14 h-14 rounded-full border-2 border-white/20" />
               
               {/* Hands silhouette at bottom */}
-              <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#3158d3] to-transparent opacity-50" />
+              <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#3642a8] to-transparent opacity-50" />
               
               <div className="relative z-10">
                 <h3 
@@ -42,7 +42,7 @@ export const CultureSection = () => {
                   Lên kế hoạch cuộc sống không tốn kém như bạn nghĩ...
                 </p>
                 <button 
-                  className="border border-white text-white px-8 py-3 text-sm tracking-wider hover:bg-white hover:text-[#4169e1] transition-all"
+                  className="border border-white text-white px-8 py-3 text-sm tracking-wider hover:bg-white hover:text-[#4453c4] transition-all"
                   style={{ fontFamily: "'Open Sans', sans-serif" }}
                 >
                   Tìm hiểu thêm
@@ -80,7 +80,7 @@ export const CultureSection = () => {
               className="text-4xl lg:text-5xl mt-4 mb-8"
               style={{ 
                 fontFamily: "'Cormorant Garamond', serif",
-                color: '#4169e1'
+                color: '#4453c4'
               }}
             >
               Văn Hóa Của Chúng Tôi - Tương Lai Của Chúng Tôi
@@ -96,11 +96,11 @@ export const CultureSection = () => {
             
             <a 
               href="#about" 
-              className="inline-flex items-center gap-3 text-[#5e636e] text-sm tracking-[0.15em] hover:text-[#4169e1] transition-colors group"
+              className="inline-flex items-center gap-3 text-[#5e636e] text-sm tracking-[0.15em] hover:text-[#4453c4] transition-colors group"
               style={{ fontFamily: "'Open Sans', sans-serif" }}
             >
               XEM THÊM
-              <span className="w-6 h-6 rounded-full border border-[#4169e1] flex items-center justify-center text-[#4169e1] group-hover:bg-[#4169e1] group-hover:text-white transition-all">
+              <span className="w-6 h-6 rounded-full border border-[#4453c4] flex items-center justify-center text-[#4453c4] group-hover:bg-[#4453c4] group-hover:text-white transition-all">
                 <Plus className="w-3 h-3" />
               </span>
             </a>
