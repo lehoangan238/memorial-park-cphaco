@@ -53,10 +53,11 @@ export default {
           dark: "hsl(var(--gold-dark))",
         },
         nirvana: {
-          DEFAULT: "hsl(var(--nirvana-blue))",
-          blue: "hsl(var(--nirvana-blue))",
+          DEFAULT: "hsl(var(--nirvana-cyan-blue))",
+          cyan: "hsl(var(--nirvana-cyan-blue))",
           purple: "hsl(var(--nirvana-purple))",
-          light: "hsl(var(--nirvana-light))",
+          green: "hsl(var(--nirvana-green))",
+          "light-green": "hsl(var(--nirvana-light-green))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
@@ -70,8 +71,9 @@ export default {
         },
       },
       fontFamily: {
-        display: ["'Playfair Display'", "serif"],
-        body: ["'Lato'", "sans-serif"],
+        display: ["'Cormorant Garamond'", "serif"],
+        body: ["'Open Sans'", "sans-serif"],
+        script: ["'Great Vibes'", "cursive"],
       },
       borderRadius: {
         lg: "var(--radius)",
