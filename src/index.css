@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    /* Nirvana exact colors */
+    /* Nirvana exact colors from WordPress */
     --background: 0 0% 100%;
     --foreground: 220 20% 20%;
 
@@ -16,15 +16,19 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 20% 20%;
 
-    /* Primary blue-purple */
-    --primary: 235 60% 52%;
+    /* Primary - vivid-cyan-blue #0693e3 */
+    --primary: 200 95% 46%;
     --primary-foreground: 0 0% 100%;
 
-    /* Nirvana brand colors */
-    --nirvana-blue: 235 60% 52%;
-    --nirvana-purple: 255 50% 55%;
-    --nirvana-light: 235 65% 70%;
-    --nirvana-green: 145 65% 42%;
+    /* Nirvana brand colors - exact from website */
+    --nirvana-cyan-blue: 200 95% 46%; /* #0693e3 */
+    --nirvana-purple: 270 68% 60%; /* #9b51e0 */
+    --nirvana-green: 157 100% 41%; /* #00d084 */
+    --nirvana-light-green: 160 61% 68%; /* #7bdcb5 */
+    
+    /* WordPress preset colors */
+    --wp-cyan-bluish-gray: 204 13% 72%; /* #abb8c3 */
+    --wp-pale-cyan-blue: 201 94% 84%; /* #8ed1fc */
 
     --secondary: 220 20% 96%;
     --secondary-foreground: 220 20% 20%;
@@ -32,7 +36,7 @@
     --muted: 220 15% 96%;
     --muted-foreground: 220 10% 45%;
 
-    --accent: 235 60% 52%;
+    --accent: 200 95% 46%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -40,13 +44,13 @@
 
     --border: 220 15% 90%;
     --input: 220 15% 90%;
-    --ring: 235 60% 52%;
+    --ring: 200 95% 46%;
 
     --radius: 0.5rem;
 
-    /* Custom gradients */
-    --hero-gradient: linear-gradient(135deg, rgba(75, 85, 175, 0.88) 0%, rgba(120, 90, 165, 0.85) 50%, rgba(75, 85, 175, 0.8) 100%);
-    --blue-gradient: linear-gradient(135deg, hsl(235 60% 52%) 0%, hsl(255 50% 55%) 100%);
+    /* Custom gradients - exact from Nirvana */
+    --hero-gradient: linear-gradient(135deg, rgba(6, 147, 227, 0.9) 0%, rgba(155, 81, 224, 0.85) 100%);
+    --nirvana-gradient: linear-gradient(135deg, rgba(6, 147, 227, 1) 0%, rgb(155, 81, 224) 100%);
     --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     --elegant-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
 
@@ -75,13 +79,13 @@
     --popover: 220 20% 12%;
     --popover-foreground: 220 15% 95%;
 
-    --primary: 235 65% 58%;
+    --primary: 200 95% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --nirvana-blue: 235 65% 58%;
-    --nirvana-purple: 255 55% 60%;
-    --nirvana-light: 235 70% 75%;
-    --nirvana-green: 145 60% 45%;
+    --nirvana-cyan-blue: 200 95% 50%;
+    --nirvana-purple: 270 68% 65%;
+    --nirvana-green: 157 100% 45%;
+    --nirvana-light-green: 160 61% 72%;
 
     --secondary: 220 20% 18%;
     --secondary-foreground: 220 15% 95%;
@@ -89,7 +93,7 @@
     --muted: 220 20% 18%;
     --muted-foreground: 220 15% 60%;
 
-    --accent: 235 65% 58%;
+    --accent: 200 95% 50%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
@@ -97,7 +101,7 @@
 
     --border: 220 20% 22%;
     --input: 220 20% 22%;
-    --ring: 235 65% 58%;
+    --ring: 200 95% 50%;
 
     --gold: 38 70% 55%;
     --gold-light: 40 75% 65%;
@@ -143,15 +147,15 @@
   }
 
   .text-nirvana {
-    color: hsl(var(--nirvana-blue));
+    color: hsl(var(--nirvana-cyan-blue));
   }
 
   .bg-nirvana {
-    background-color: hsl(var(--nirvana-blue));
+    background-color: hsl(var(--nirvana-cyan-blue));
   }
 
   .bg-nirvana-gradient {
-    background: var(--blue-gradient);
+    background: var(--nirvana-gradient);
   }
 
   .bg-nirvana-green {
