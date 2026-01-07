@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Open+Sans:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    /* Nirvana blue/purple theme */
+    /* Nirvana exact colors */
     --background: 0 0% 100%;
     --foreground: 220 20% 20%;
 
@@ -17,21 +17,22 @@
     --popover-foreground: 220 20% 20%;
 
     /* Primary blue-purple */
-    --primary: 230 65% 45%;
+    --primary: 235 60% 52%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary purple shades */
-    --nirvana-blue: 230 65% 45%;
-    --nirvana-purple: 260 55% 50%;
-    --nirvana-light: 230 70% 65%;
+    /* Nirvana brand colors */
+    --nirvana-blue: 235 60% 52%;
+    --nirvana-purple: 255 50% 55%;
+    --nirvana-light: 235 65% 70%;
+    --nirvana-green: 145 65% 42%;
 
-    --secondary: 230 30% 96%;
+    --secondary: 220 20% 96%;
     --secondary-foreground: 220 20% 20%;
 
     --muted: 220 15% 96%;
     --muted-foreground: 220 10% 45%;
 
-    --accent: 230 65% 45%;
+    --accent: 235 60% 52%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -39,15 +40,15 @@
 
     --border: 220 15% 90%;
     --input: 220 15% 90%;
-    --ring: 230 65% 45%;
+    --ring: 235 60% 52%;
 
     --radius: 0.5rem;
 
-    /* Custom design tokens */
-    --hero-gradient: linear-gradient(135deg, rgba(65, 88, 208, 0.9) 0%, rgba(130, 90, 180, 0.85) 50%, rgba(65, 88, 208, 0.75) 100%);
-    --blue-gradient: linear-gradient(135deg, hsl(230 65% 45%) 0%, hsl(260 55% 50%) 100%);
-    --card-shadow: 0 10px 40px rgba(65, 88, 208, 0.1);
-    --elegant-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+    /* Custom gradients */
+    --hero-gradient: linear-gradient(135deg, rgba(75, 85, 175, 0.88) 0%, rgba(120, 90, 165, 0.85) 50%, rgba(75, 85, 175, 0.8) 100%);
+    --blue-gradient: linear-gradient(135deg, hsl(235 60% 52%) 0%, hsl(255 50% 55%) 100%);
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --elegant-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -57,6 +58,11 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Gold for backup */
+    --gold: 38 70% 50%;
+    --gold-light: 40 75% 65%;
+    --gold-dark: 35 65% 35%;
   }
 
   .dark {
@@ -69,12 +75,13 @@
     --popover: 220 20% 12%;
     --popover-foreground: 220 15% 95%;
 
-    --primary: 230 70% 55%;
+    --primary: 235 65% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --nirvana-blue: 230 70% 55%;
-    --nirvana-purple: 260 60% 55%;
-    --nirvana-light: 230 75% 70%;
+    --nirvana-blue: 235 65% 58%;
+    --nirvana-purple: 255 55% 60%;
+    --nirvana-light: 235 70% 75%;
+    --nirvana-green: 145 60% 45%;
 
     --secondary: 220 20% 18%;
     --secondary-foreground: 220 15% 95%;
@@ -82,7 +89,7 @@
     --muted: 220 20% 18%;
     --muted-foreground: 220 15% 60%;
 
-    --accent: 230 70% 55%;
+    --accent: 235 65% 58%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
@@ -90,7 +97,11 @@
 
     --border: 220 20% 22%;
     --input: 220 20% 22%;
-    --ring: 230 70% 55%;
+    --ring: 235 65% 58%;
+
+    --gold: 38 70% 55%;
+    --gold-light: 40 75% 65%;
+    --gold-dark: 35 65% 40%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -119,6 +130,10 @@
 }
 
 @layer utilities {
+  .font-script {
+    font-family: 'Great Vibes', cursive;
+  }
+
   .font-display {
     font-family: 'Cormorant Garamond', serif;
   }
@@ -139,6 +154,10 @@
     background: var(--blue-gradient);
   }
 
+  .bg-nirvana-green {
+    background-color: hsl(var(--nirvana-green));
+  }
+
   .hero-gradient {
     background: var(--hero-gradient);
   }
@@ -153,8 +172,9 @@
 
   /* Decorative swirl pattern */
   .swirl-pattern {
-    background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 50 Q80 10, 100 50 T170 50' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='2'/%3E%3Cpath d='M20 100 Q70 60, 100 100 T180 100' fill='none' stroke='rgba(255,255,255,0.08)' stroke-width='2'/%3E%3Cpath d='M40 150 Q90 110, 120 150 T190 150' fill='none' stroke='rgba(255,255,255,0.06)' stroke-width='2'/%3E%3C/svg%3E");
-    background-size: 300px 300px;
+    background-image: 
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Cpath d='M50,100 Q150,20 250,100 T450,100' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='1.5'/%3E%3Cpath d='M0,180 Q100,100 200,180 T400,180' fill='none' stroke='rgba(255,255,255,0.12)' stroke-width='1.5'/%3E%3Cpath d='M30,260 Q130,180 230,260 T430,260' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='1.5'/%3E%3Cpath d='M-20,340 Q80,260 180,340 T380,340' fill='none' stroke='rgba(255,255,255,0.08)' stroke-width='1.5'/%3E%3C/svg%3E");
+    background-size: 600px 400px;
   }
 
   .animate-fade-up {
@@ -163,10 +183,6 @@
 
   .animate-fade-in {
     animation: fadeIn 1s ease-out forwards;
-  }
-
-  .animate-scale-in {
-    animation: scaleIn 0.6s ease-out forwards;
   }
 
   @keyframes fadeUp {
@@ -181,32 +197,13 @@
   }
 
   @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  @keyframes scaleIn {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
   @keyframes float {
-    0%, 100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
   }
 
   .animate-float {
