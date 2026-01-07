@@ -3,21 +3,21 @@ import { Star } from 'lucide-react';
 
 const testimonials = [
   {
-    title: "Outstanding and exceptional customer service",
-    text: "We would like to express our gratitude on the outstanding and exceptional customer service that you provided on our late father's funeral especially Mr. Chai Teen. Outstanding and exceptional customer service On behalf of my family, we would...",
-    link: "read more",
+    title: "Dịch vụ khách hàng xuất sắc và đặc biệt",
+    text: "Chúng tôi xin bày tỏ lòng biết ơn về dịch vụ khách hàng xuất sắc và đặc biệt mà quý vị đã cung cấp trong tang lễ của cha chúng tôi, đặc biệt là ông Chai Teen. Dịch vụ khách hàng xuất sắc và đặc biệt. Thay mặt gia đình, chúng tôi...",
+    link: "xem thêm",
     isItalic: false,
   },
   {
-    title: "\"Thumbs up\" for their professionalism",
-    text: "The family of the late Mr Lee Kai Wa would like to give him the \"thumbs up\" for his professionalism. \"Thumbs up\" for their professionalism. Death leaves a heartache no one can heal. Love leaves a memory no one can steal! Wednesday 14 July, 2021...",
-    link: "read more",
+    title: '"Tuyệt vời" về sự chuyên nghiệp',
+    text: 'Gia đình cố ông Lee Kai Wa xin gửi lời khen "tuyệt vời" về sự chuyên nghiệp của anh ấy. "Tuyệt vời" về sự chuyên nghiệp của họ. Cái chết để lại nỗi đau mà không ai có thể chữa lành. Tình yêu để lại ký ức mà không ai có thể đánh cắp! Thứ Tư ngày 14 tháng 7 năm 2021...',
+    link: "xem thêm",
     isItalic: true,
   },
   {
-    title: "Quality of work and excellent planning",
-    text: "We, Ooi family are appreciated for his best service provided, quality of work, excellent planning during my late husband's funeral. Quality of work and excellent planning This is to express our special appreciation to Mr ShanZhi, Service...",
-    link: "read more",
+    title: "Chất lượng công việc và kế hoạch tuyệt vời",
+    text: "Chúng tôi, gia đình họ Ooi trân trọng dịch vụ tốt nhất được cung cấp, chất lượng công việc, kế hoạch tuyệt vời trong tang lễ của chồng tôi. Chất lượng công việc và kế hoạch tuyệt vời. Đây là lời cảm ơn đặc biệt dành cho ông ShanZhi, Dịch vụ...",
+    link: "xem thêm",
     isItalic: true,
   },
 ];
@@ -36,13 +36,13 @@ export const TestimonialsSection = () => {
             className="text-4xl text-[#2f3237] mb-4"
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
           >
-            Our Customers' Testimonials
+            Đánh Giá Của Khách Hàng
           </h2>
           <p 
             className="text-[#5e636e] text-sm max-w-2xl mx-auto mb-6"
             style={{ fontFamily: "'Open Sans', sans-serif" }}
           >
-            Our customers share their experiences that continue to motivate us on this inspirational journey of compassion and professionalism.
+            Khách hàng chia sẻ những trải nghiệm tiếp tục thúc đẩy chúng tôi trên hành trình đầy cảm hứng của sự từ bi và chuyên nghiệp.
           </p>
           
           {/* Star Rating */}
@@ -98,7 +98,7 @@ export const TestimonialsSection = () => {
             className="border border-[#5e636e] text-[#5e636e] px-8 py-2.5 text-sm hover:bg-[#5e636e] hover:text-white transition-all"
             style={{ fontFamily: "'Open Sans', sans-serif" }}
           >
-            Read More
+            Xem Thêm
           </button>
         </motion.div>
       </div>

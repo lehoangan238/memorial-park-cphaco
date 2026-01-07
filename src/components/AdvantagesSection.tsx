@@ -4,29 +4,29 @@ import { Shield, Percent, Compass, PawPrint, Building2 } from 'lucide-react';
 const advantages = [
   {
     icon: Shield,
-    title: "RM100 million maintenance trust fund",
-    description: "Nirvana's memorial parks are backed by a maintenance trust fund of over RM100 million managed by an independent trustee for road works, garden landscaping and infrastructure maintenance.",
+    title: "Quỹ bảo trì 100 triệu RM",
+    description: "Các công viên tưởng niệm của Nirvana được hỗ trợ bởi quỹ bảo trì trên 100 triệu RM do một bên ủy thác độc lập quản lý để bảo dưỡng đường sá, cảnh quan vườn và cơ sở hạ tầng.",
   },
   {
     icon: Percent,
-    title: "0% interest",
-    description: "Enjoy peace of mind with our 0% interest instalment plan up to 36 months with low down payment.",
+    title: "Lãi suất 0%",
+    description: "Yên tâm với gói trả góp lãi suất 0% lên đến 36 tháng với số tiền đặt cọc thấp.",
     customIcon: true,
   },
   {
     icon: Compass,
-    title: "Excellent Feng Shui",
-    description: "Our memorial parks are endorsed by renowned Feng Shui masters for having excellent Feng Shui.",
+    title: "Phong Thủy Tuyệt Vời",
+    description: "Các công viên tưởng niệm của chúng tôi được các thầy Phong Thủy nổi tiếng chứng nhận có Phong Thủy tuyệt vời.",
   },
   {
     icon: PawPrint,
-    title: "Comprehensive facilities",
-    description: "Our numerous memorial parks and integrated centres has comprehensive facilities with professional service support.",
+    title: "Tiện ích toàn diện",
+    description: "Nhiều công viên tưởng niệm và trung tâm tích hợp của chúng tôi có tiện ích toàn diện với đội ngũ hỗ trợ chuyên nghiệp.",
   },
   {
     icon: Building2,
-    title: "Majestic architecture",
-    description: "Each of our memorial parks are designed with elegant and majestic architecture to ensure peace and comfort.",
+    title: "Kiến trúc tráng lệ",
+    description: "Mỗi công viên tưởng niệm được thiết kế với kiến trúc thanh lịch và tráng lệ để đảm bảo sự bình yên và thoải mái.",
   },
 ];
 
@@ -45,16 +45,16 @@ export const AdvantagesSection = () => {
               className="text-4xl md:text-5xl text-[#2f3237] leading-tight mb-4"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
-              The 5 main<br />
-              advantages of pre-<br />
-              planning with<br />
+              5 lợi ích chính<br />
+              khi lên kế hoạch<br />
+              trước với<br />
               Nirvana
             </h2>
             <p 
               className="text-[#5e636e] text-sm mb-8"
               style={{ fontFamily: "'Open Sans', sans-serif" }}
             >
-              Your needs are our utmost concern
+              Nhu cầu của bạn là ưu tiên hàng đầu của chúng tôi
             </p>
             <button 
               className="px-8 py-3 text-white text-sm tracking-wide"
@@ -63,7 +63,7 @@ export const AdvantagesSection = () => {
                 fontFamily: "'Open Sans', sans-serif"
               }}
             >
-              MAKE AN APPOINTMENT
+              ĐẶT LỊCH HẸN
             </button>
           </motion.div>
 

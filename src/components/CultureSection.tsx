@@ -37,25 +37,25 @@ export const CultureSection = () => {
                   className="text-4xl text-white mb-2"
                   style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic' }}
                 >
-                  Rhyme of Life
+                  Nhịp Điệu Cuộc Sống
                 </h3>
                 <p 
                   className="text-white text-sm tracking-[0.2em] mb-4 font-light"
                   style={{ fontFamily: "'Open Sans', sans-serif" }}
                 >
-                  New Launch
+                  Ra Mắt Mới
                 </p>
                 <p 
                   className="text-white/90 text-sm leading-relaxed mb-6 max-w-sm"
                   style={{ fontFamily: "'Open Sans', sans-serif" }}
                 >
-                  The "Rhyme of Life" – is an elegant and luxurious columbarium that integrates culture, style and six-star facilities.
+                  "Nhịp Điệu Cuộc Sống" – là một nhà lưu trữ tro cốt sang trọng và thanh lịch, kết hợp văn hóa, phong cách và tiện ích 6 sao.
                 </p>
                 <button 
                   className="self-start border border-white text-white px-8 py-3 text-sm tracking-wider hover:bg-white hover:text-black transition-all"
                   style={{ fontFamily: "'Open Sans', sans-serif" }}
                 >
-                  Read More
+                  Xem Thêm
                 </button>
               </div>
               
@@ -93,15 +93,15 @@ export const CultureSection = () => {
                 color: '#0693e3'
               }}
             >
-              Our Culture Our Future
+              Văn Hóa Của Chúng Tôi - Tương Lai Của Chúng Tôi
             </h2>
             
             <p 
               className="text-[#2f3237] leading-[1.9] text-[16px] mb-6"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
-              A culture that has stood the test of time for over a thousand years is like the flow of water – little by little, it eventually forms a rich history.{' '}
-              <strong>Established in 1990,</strong> Nirvana Asia Group understands this sentiment deeply by embracing our tradition and culture with pride by offering a comprehensive suite of bereavement care services to honour and uplift life.
+              Một nền văn hóa đã trải qua hàng nghìn năm thử thách giống như dòng chảy của nước – từng chút một, cuối cùng nó hình thành nên một lịch sử phong phú.{' '}
+              <strong>Thành lập năm 1990,</strong> Nirvana Asia Group thấu hiểu sâu sắc tình cảm này bằng cách tự hào gìn giữ truyền thống và văn hóa, cung cấp trọn bộ dịch vụ tang lễ để tôn vinh và nâng cao cuộc sống.
             </p>
             
             <a 
@@ -109,7 +109,7 @@ export const CultureSection = () => {
               className="inline-flex items-center gap-3 text-[#5e636e] text-sm tracking-[0.15em] hover:text-[#0693e3] transition-colors group"
               style={{ fontFamily: "'Open Sans', sans-serif" }}
             >
-              READ MORE
+              XEM THÊM
               <span className="w-6 h-6 rounded-full border border-[#0693e3] flex items-center justify-center text-[#0693e3] group-hover:bg-[#0693e3] group-hover:text-white transition-all">
                 <Plus className="w-3 h-3" />
               </span>

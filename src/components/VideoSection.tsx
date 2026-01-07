@@ -11,7 +11,7 @@ export const VideoSection = () => {
           className="text-center text-[#5e636e] text-sm tracking-[0.3em] mb-6"
           style={{ fontFamily: "'Open Sans', sans-serif" }}
         >
-          WATCH
+          XEM VIDEO
         </p>
         
         <motion.div

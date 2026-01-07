@@ -2,12 +2,12 @@ import { motion } from 'framer-motion';
 import columbarium from '@/assets/columbarium.jpg';
 
 const products = [
-  "Burial Plots",
-  "Columbaria",
-  "Funeral Service",
-  "Ancestral Tablet",
-  "Eternal Blessing Light",
-  "Pet Memorial Garden",
+  "Lô Đất An Táng",
+  "Nhà Lưu Trữ Tro Cốt",
+  "Dịch Vụ Tang Lễ",
+  "Bài Vị Tổ Tiên",
+  "Đèn Phước Lành Vĩnh Cửu",
+  "Vườn Tưởng Niệm Thú Cưng",
   "NV Seed",
 ];
 
@@ -27,7 +27,7 @@ export const ProductsSection = () => {
               className="text-3xl text-[#2f3237] mb-8"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
-              Our Products
+              Sản Phẩm Của Chúng Tôi
             </h2>
             
             <ul className="space-y-3 mb-10">
@@ -56,7 +56,7 @@ export const ProductsSection = () => {
                 className="self-start border border-[#5e636e] text-[#5e636e] px-8 py-2.5 text-xs tracking-[0.15em] hover:bg-[#5e636e] hover:text-white transition-all"
                 style={{ fontFamily: "'Open Sans', sans-serif" }}
               >
-                READ MORE
+                XEM THÊM
               </button>
               <button 
                 className="self-start px-8 py-2.5 text-white text-xs tracking-[0.1em]"
@@ -65,7 +65,7 @@ export const ProductsSection = () => {
                   fontFamily: "'Open Sans', sans-serif"
                 }}
               >
-                360 SITE VIEW
+                THAM QUAN 360°
               </button>
             </div>
           </motion.div>
