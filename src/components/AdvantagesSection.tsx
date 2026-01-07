@@ -1,55 +1,48 @@
 import { motion } from 'framer-motion';
-import heroTrees from '@/assets/hero-trees.jpg';
+import { Shield, Percent, Compass, PawPrint, Building2 } from 'lucide-react';
 
 const advantages = [
   {
-    title: "Build an everlasting legacy",
-    description: "Create a meaningful tribute that honors your family's heritage and values for generations to come.",
+    icon: Shield,
+    title: "RM100 million maintenance trust fund",
+    description: "Nirvana's memorial parks are backed by a maintenance trust fund of over RM100 million managed by an independent trustee for road works, garden landscaping and infrastructure maintenance.",
   },
   {
-    title: "Ease your family's burden",
-    description: "Relieve your loved ones from making difficult decisions during an emotional time.",
+    icon: Percent,
+    title: "0% interest",
+    description: "Enjoy peace of mind with our 0% interest instalment plan up to 36 months with low down payment.",
+    customIcon: true,
   },
   {
-    title: "60-month interest-free installment plan",
-    description: "Flexible payment options that make planning accessible and affordable.",
+    icon: Compass,
+    title: "Excellent Feng Shui",
+    description: "Our memorial parks are endorsed by renowned Feng Shui masters for having excellent Feng Shui.",
   },
   {
-    title: "Compassionate care",
-    description: "Our dedicated team provides personalized guidance with empathy and respect.",
+    icon: PawPrint,
+    title: "Comprehensive facilities",
+    description: "Our numerous memorial parks and integrated centres has comprehensive facilities with professional service support.",
   },
   {
-    title: "Comprehensive post-need services",
-    description: "Complete support for your family when they need it most.",
+    icon: Building2,
+    title: "Majestic architecture",
+    description: "Each of our memorial parks are designed with elegant and majestic architecture to ensure peace and comfort.",
   },
 ];
 
 export const AdvantagesSection = () => {
   return (
-    <section className="relative overflow-hidden">
-      <div className="grid lg:grid-cols-2">
-        {/* Left - Image */}
-        <div className="relative min-h-[600px]">
-          <div 
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${heroTrees})` }}
-          />
-        </div>
-
-        {/* Right - Content */}
-        <div 
-          className="py-16 px-8 lg:px-16"
-          style={{
-            background: 'linear-gradient(180deg, #1a1f3c 0%, #2d2a4a 100%)'
-          }}
-        >
+    <section className="py-20 bg-white">
+      <div className="container mx-auto px-4">
+        <div className="grid lg:grid-cols-2 gap-16 items-start">
+          {/* Left - Title & CTA */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
             <h2 
-              className="text-3xl md:text-4xl text-white leading-snug mb-4"
+              className="text-4xl md:text-5xl text-[#2f3237] leading-tight mb-4"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
               The 5 main<br />
@@ -58,24 +51,24 @@ export const AdvantagesSection = () => {
               Nirvana
             </h2>
             <p 
-              className="text-white/60 text-sm mb-8"
+              className="text-[#5e636e] text-sm mb-8"
               style={{ fontFamily: "'Open Sans', sans-serif" }}
             >
-              Don't wait to plan for what matters
+              Your needs are our utmost concern
             </p>
             <button 
-              className="px-6 py-3 text-white text-sm tracking-wide mb-12"
+              className="px-8 py-3 text-white text-sm tracking-wide"
               style={{
-                backgroundColor: '#00d084',
+                backgroundColor: '#0693e3',
                 fontFamily: "'Open Sans', sans-serif"
               }}
             >
-              Start the conversation
+              MAKE AN APPOINTMENT
             </button>
           </motion.div>
 
-          {/* Advantages Grid */}
-          <div className="grid md:grid-cols-2 gap-x-8 gap-y-6">
+          {/* Right - Advantages Grid */}
+          <div className="grid md:grid-cols-2 gap-8">
             {advantages.map((item, index) => (
               <motion.div
                 key={item.title}
@@ -84,14 +77,28 @@ export const AdvantagesSection = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
+                {/* Icon */}
+                <div className="w-14 h-14 rounded-full border border-[#0693e3] flex items-center justify-center mb-4">
+                  {item.customIcon ? (
+                    <span 
+                      className="text-[#0693e3] text-lg font-semibold"
+                      style={{ fontFamily: "'Open Sans', sans-serif" }}
+                    >
+                      0%
+                    </span>
+                  ) : (
+                    <item.icon className="w-6 h-6 text-[#0693e3]" strokeWidth={1.5} />
+                  )}
+                </div>
+                
                 <h3 
-                  className="text-white text-sm font-semibold mb-2"
+                  className="text-[#2f3237] text-sm font-semibold mb-2"
                   style={{ fontFamily: "'Open Sans', sans-serif" }}
                 >
                   {item.title}
                 </h3>
                 <p 
-                  className="text-white/50 text-xs leading-relaxed"
+                  className="text-[#5e636e] text-xs leading-relaxed"
                   style={{ fontFamily: "'Open Sans', sans-serif" }}
                 >
                   {item.description}
