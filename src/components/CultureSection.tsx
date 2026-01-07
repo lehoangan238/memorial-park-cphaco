@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion';
-import family1 from '@/assets/family-1.jpg';
+import coupleBeach from '@/assets/couple-beach.jpg';
 
 export const CultureSection = () => {
   return (
-    <section className="py-20 bg-background">
+    <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Image */}
+          {/* Left - Image */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -14,35 +14,45 @@ export const CultureSection = () => {
             transition={{ duration: 0.8 }}
             className="relative"
           >
-            <div className="rounded-2xl overflow-hidden card-shadow">
+            <div className="rounded-lg overflow-hidden shadow-xl">
               <img
-                src={family1}
-                alt="Happy family gathering"
-                className="w-full h-[400px] object-cover"
+                src={coupleBeach}
+                alt="Happy elderly couple on beach"
+                className="w-full h-[380px] object-cover"
               />
             </div>
-            {/* Decorative element */}
-            <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-nirvana-gradient rounded-2xl -z-10 opacity-20" />
+            {/* Info boxes overlay */}
+            <div className="absolute bottom-4 left-4 right-4 flex gap-2">
+              <div className="bg-primary/90 backdrop-blur-sm text-primary-foreground px-3 py-2 rounded text-xs">
+                <span className="font-semibold">Peace of Mind</span>
+              </div>
+              <div className="bg-primary/90 backdrop-blur-sm text-primary-foreground px-3 py-2 rounded text-xs">
+                <span className="font-semibold">Love</span>
+              </div>
+              <div className="bg-primary/90 backdrop-blur-sm text-primary-foreground px-3 py-2 rounded text-xs">
+                <span className="font-semibold">Your Family</span>
+              </div>
+            </div>
           </motion.div>
 
-          {/* Content */}
+          {/* Right - Content */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <span className="text-primary text-sm font-medium uppercase tracking-wider">Our Culture</span>
-            <h2 className="text-4xl md:text-5xl font-display text-foreground mt-3 mb-6 leading-tight">
-              Our Culture <br />Our Future
+            <span className="text-primary text-sm font-medium uppercase tracking-widest">Our Culture</span>
+            <h2 className="text-4xl md:text-5xl font-script text-primary mt-2 mb-6">
+              Our Culture Our Future
             </h2>
-            <p className="text-muted-foreground leading-relaxed mb-6">
+            <p className="text-muted-foreground leading-relaxed mb-4 text-sm">
               At Nirvana Asia, we understand that our cultural heritage, our history and our traditions have shaped who we are, 
-              and inform how we live and make decisions. To better honour your past and loved ones while giving peace of mind 
-              for your family's future, we provide a range of products and services for your consideration today.
+              and inform how we live and make decisions.
             </p>
-            <p className="text-muted-foreground leading-relaxed">
-              Our commitment is to help you protect what matters most - your legacy and your loved ones' memories.
+            <p className="text-muted-foreground leading-relaxed text-sm">
+              To better honour your past and loved ones while giving peace of mind for your family's future, 
+              we provide a range of products and services for your consideration today.
             </p>
           </motion.div>
         </div>
