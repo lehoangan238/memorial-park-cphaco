@@ -52,6 +52,12 @@ export default {
           light: "hsl(var(--gold-light))",
           dark: "hsl(var(--gold-dark))",
         },
+        nirvana: {
+          DEFAULT: "hsl(var(--nirvana-blue))",
+          blue: "hsl(var(--nirvana-blue))",
+          purple: "hsl(var(--nirvana-purple))",
+          light: "hsl(var(--nirvana-light))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

@@ -3,19 +3,19 @@ import { Menu, X, Phone, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const navItems = [
-  { label: 'Trang chủ', href: '#' },
+  { label: 'Home', href: '#' },
   { 
-    label: 'Sản phẩm', 
+    label: 'Products', 
     href: '#products',
     subItems: [
-      { label: 'Phần mộ gia đình', href: '#burial' },
-      { label: 'Nhà tro cốt', href: '#columbarium' },
-      { label: 'Bài vị thờ cúng', href: '#ancestral' },
+      { label: 'Burial Plots', href: '#burial' },
+      { label: 'Columbaria', href: '#columbarium' },
+      { label: 'Ancestral Tablets', href: '#ancestral' },
     ]
   },
-  { label: 'Dịch vụ tang lễ', href: '#services' },
-  { label: 'Về chúng tôi', href: '#about' },
-  { label: 'Liên hệ', href: '#contact' },
+  { label: 'Funeral Service', href: '#services' },
+  { label: 'About Us', href: '#about' },
+  { label: 'Contact', href: '#contact' },
 ];
 
 export const Header = () => {
@@ -40,16 +40,14 @@ export const Header = () => {
     >
       <div className="container mx-auto px-4 flex items-center justify-between">
         {/* Logo */}
-        <a href="#" className="flex items-center gap-3">
-          <div className={`text-2xl md:text-3xl font-display font-bold transition-colors ${
-            isScrolled ? 'text-gold' : 'text-primary-foreground'
-          }`}>
-            NIRVANA
+        <a href="#" className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-nirvana-gradient rounded-lg flex items-center justify-center">
+            <span className="text-primary-foreground font-bold text-sm">N</span>
           </div>
-          <span className={`hidden md:block text-sm font-body transition-colors ${
-            isScrolled ? 'text-muted-foreground' : 'text-primary-foreground/80'
+          <span className={`text-xl font-display font-semibold transition-colors ${
+            isScrolled ? 'text-primary' : 'text-primary-foreground'
           }`}>
-            Caring for Life
+            Nirvana
           </span>
         </a>
 
@@ -59,7 +57,7 @@ export const Header = () => {
             <div key={item.label} className="relative group">
               <a
                 href={item.href}
-                className={`flex items-center gap-1 text-sm font-medium transition-colors hover:text-gold ${
+                className={`flex items-center gap-1 text-sm font-medium transition-colors hover:text-primary ${
                   isScrolled ? 'text-foreground' : 'text-primary-foreground'
                 }`}
               >
@@ -73,7 +71,7 @@ export const Header = () => {
                       <a
                         key={subItem.label}
                         href={subItem.href}
-                        className="block px-4 py-3 text-sm text-card-foreground hover:bg-secondary hover:text-gold transition-colors"
+                        className="block px-4 py-3 text-sm text-card-foreground hover:bg-secondary hover:text-primary transition-colors"
                       >
                         {subItem.label}
                       </a>
@@ -90,14 +88,14 @@ export const Header = () => {
           <a 
             href="tel:1800-88-3838" 
             className={`flex items-center gap-2 text-sm font-medium transition-colors ${
-              isScrolled ? 'text-gold' : 'text-primary-foreground'
+              isScrolled ? 'text-primary' : 'text-primary-foreground'
             }`}
           >
             <Phone className="w-4 h-4" />
             1800-88-3838
           </a>
-          <Button variant="gold" size="sm">
-            Đặt lịch hẹn
+          <Button variant="nirvana" size="sm">
+            Make Appointment
           </Button>
         </div>
 
@@ -121,15 +119,15 @@ export const Header = () => {
             <a
               key={item.label}
               href={item.href}
-              className="block px-6 py-4 text-sm font-medium text-card-foreground hover:bg-secondary hover:text-gold border-b border-border last:border-0 transition-colors"
+              className="block px-6 py-4 text-sm font-medium text-card-foreground hover:bg-secondary hover:text-primary border-b border-border last:border-0 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {item.label}
             </a>
           ))}
           <div className="p-4 border-t border-border">
-            <Button variant="gold" className="w-full">
-              Đặt lịch hẹn
+            <Button variant="nirvana" className="w-full">
+              Make Appointment
             </Button>
           </div>
         </nav>
