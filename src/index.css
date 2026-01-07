@@ -6,7 +6,13 @@
 
 @layer base {
   :root {
-    /* Nirvana exact colors from WordPress */
+    /* Primary brand color #4453c4 */
+    --primary-brand: 232 53% 52%;
+    /* Dark background #1a1d2e */
+    --dark-bg: 229 28% 14%;
+    /* Light gray #f8f9fa */
+    --light-gray: 210 17% 98%;
+    
     --background: 0 0% 100%;
     --foreground: 220 20% 20%;
 
@@ -16,8 +22,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 20% 20%;
 
-    /* Primary - vivid-cyan-blue #0693e3 */
-    --primary: 200 95% 46%;
+    /* Primary - #4453c4 */
+    --primary: 232 53% 52%;
     --primary-foreground: 0 0% 100%;
 
     /* Nirvana brand colors - exact from website */
@@ -124,7 +130,8 @@
   }
 
   body {
-    @apply bg-background text-foreground font-body antialiased;
+    @apply bg-background text-foreground font-body antialiased leading-relaxed;
+    color: #333;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -143,7 +150,7 @@
   }
 
   .font-body {
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
 
   .text-nirvana {

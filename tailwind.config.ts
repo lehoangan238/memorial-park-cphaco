@@ -72,7 +72,7 @@ export default {
       },
       fontFamily: {
         display: ["'Cormorant Garamond'", "serif"],
-        body: ["'Open Sans'", "sans-serif"],
+        body: ["'Segoe UI'", "Tahoma", "Geneva", "Verdana", "sans-serif"],
         script: ["'Great Vibes'", "cursive"],
       },
       borderRadius: {
