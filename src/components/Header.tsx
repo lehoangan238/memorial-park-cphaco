@@ -96,7 +96,7 @@ export const Header = () => {
               >
                 <a
                   href={item.href}
-                  className="flex items-center gap-1 text-[14px] text-[#2f3237] hover:text-primary transition-colors py-6"
+                  className="flex items-center gap-1 text-[14px] text-[#2f3237] hover:text-[#0693e3] transition-colors py-6"
                   style={{ fontFamily: "'Open Sans', sans-serif" }}
                 >
                   {item.label}
@@ -119,7 +119,7 @@ export const Header = () => {
                       <a
                         key={subItem.label}
                         href={subItem.href}
-                        className="block px-5 py-2.5 text-[14px] text-[#2f3237] hover:bg-primary hover:text-white transition-colors"
+                        className="block px-5 py-2.5 text-[14px] text-[#2f3237] hover:bg-[#0693e3] hover:text-white transition-colors"
                       >
                         {subItem.label}
                       </a>
@@ -144,12 +144,12 @@ export const Header = () => {
 
           {/* Right side icons */}
           <div className="hidden lg:flex items-center gap-5">
-            <button className="text-[#2f3237] hover:text-primary transition-colors">
+            <button className="text-[#2f3237] hover:text-[#0693e3] transition-colors">
               <Search className="w-5 h-5" />
             </button>
             <a 
               href="#cart" 
-              className="flex items-center gap-1.5 text-[14px] text-[#2f3237] hover:text-primary transition-colors"
+              className="flex items-center gap-1.5 text-[14px] text-[#2f3237] hover:text-[#0693e3] transition-colors"
               style={{ fontFamily: "'Open Sans', sans-serif" }}
             >
               <ShoppingCart className="w-5 h-5" />
@@ -157,7 +157,7 @@ export const Header = () => {
             </a>
             <a 
               href="tel:1800-88-1818" 
-              className="flex items-center gap-1.5 text-[14px] text-[#2f3237] hover:text-primary transition-colors"
+              className="flex items-center gap-1.5 text-[14px] text-[#2f3237] hover:text-[#0693e3] transition-colors"
               style={{ fontFamily: "'Open Sans', sans-serif" }}
             >
               <Phone className="w-5 h-5" />
@@ -210,7 +210,7 @@ export const Header = () => {
                     <a
                       key={subItem.label}
                       href={subItem.href}
-                      className="block px-10 py-2.5 text-sm text-[#2f3237] hover:text-primary border-b border-gray-100 last:border-0"
+                      className="block px-10 py-2.5 text-sm text-[#2f3237] hover:text-[#0693e3] border-b border-gray-100 last:border-0"
                       style={{ fontFamily: "'Open Sans', sans-serif" }}
                       onClick={() => setIsMobileMenuOpen(false)}
                     >

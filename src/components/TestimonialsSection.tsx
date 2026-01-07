@@ -79,7 +79,7 @@ export const TestimonialsSection = () => {
               
               <a 
                 href="#"
-                className="text-primary text-sm hover:underline"
+                className="text-[#0693e3] text-sm hover:underline"
                 style={{ fontFamily: "'Open Sans', sans-serif" }}
               >
                 {testimonial.link}
