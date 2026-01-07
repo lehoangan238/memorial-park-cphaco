@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Lato:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,49 +6,48 @@
 
 @layer base {
   :root {
-    /* Elegant gold and dark theme inspired by memorial/luxury services */
+    /* Nirvana blue/purple theme */
     --background: 0 0% 100%;
-    --foreground: 30 10% 15%;
+    --foreground: 220 20% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 30 10% 15%;
+    --card-foreground: 220 20% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 30 10% 15%;
+    --popover-foreground: 220 20% 20%;
 
-    /* Warm gold primary color */
-    --primary: 38 70% 45%;
+    /* Primary blue-purple */
+    --primary: 230 65% 45%;
     --primary-foreground: 0 0% 100%;
 
-    /* Gold accent shades */
-    --gold: 38 70% 50%;
-    --gold-light: 40 75% 65%;
-    --gold-dark: 35 65% 35%;
+    /* Secondary purple shades */
+    --nirvana-blue: 230 65% 45%;
+    --nirvana-purple: 260 55% 50%;
+    --nirvana-light: 230 70% 65%;
 
-    --secondary: 30 15% 95%;
-    --secondary-foreground: 30 10% 15%;
+    --secondary: 230 30% 96%;
+    --secondary-foreground: 220 20% 20%;
 
-    --muted: 30 10% 96%;
-    --muted-foreground: 30 10% 45%;
+    --muted: 220 15% 96%;
+    --muted-foreground: 220 10% 45%;
 
-    --accent: 38 70% 50%;
+    --accent: 230 65% 45%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 30 15% 88%;
-    --input: 30 15% 88%;
-    --ring: 38 70% 45%;
+    --border: 220 15% 90%;
+    --input: 220 15% 90%;
+    --ring: 230 65% 45%;
 
     --radius: 0.5rem;
 
     /* Custom design tokens */
-    --hero-overlay: linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.3) 100%);
-    --gold-gradient: linear-gradient(135deg, hsl(38 70% 45%) 0%, hsl(40 75% 55%) 50%, hsl(38 70% 45%) 100%);
-    --text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    --elegant-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-    --card-shadow: 0 4px 30px rgba(0,0,0,0.08);
+    --hero-gradient: linear-gradient(135deg, rgba(65, 88, 208, 0.9) 0%, rgba(130, 90, 180, 0.85) 50%, rgba(65, 88, 208, 0.75) 100%);
+    --blue-gradient: linear-gradient(135deg, hsl(230 65% 45%) 0%, hsl(260 55% 50%) 100%);
+    --card-shadow: 0 10px 40px rgba(65, 88, 208, 0.1);
+    --elegant-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -61,37 +60,37 @@
   }
 
   .dark {
-    --background: 20 15% 8%;
-    --foreground: 30 20% 95%;
+    --background: 220 20% 8%;
+    --foreground: 220 15% 95%;
 
-    --card: 20 15% 12%;
-    --card-foreground: 30 20% 95%;
+    --card: 220 20% 12%;
+    --card-foreground: 220 15% 95%;
 
-    --popover: 20 15% 12%;
-    --popover-foreground: 30 20% 95%;
+    --popover: 220 20% 12%;
+    --popover-foreground: 220 15% 95%;
 
-    --primary: 38 70% 50%;
-    --primary-foreground: 20 15% 8%;
+    --primary: 230 70% 55%;
+    --primary-foreground: 0 0% 100%;
 
-    --gold: 38 70% 55%;
-    --gold-light: 40 75% 65%;
-    --gold-dark: 35 65% 40%;
+    --nirvana-blue: 230 70% 55%;
+    --nirvana-purple: 260 60% 55%;
+    --nirvana-light: 230 75% 70%;
 
-    --secondary: 20 15% 18%;
-    --secondary-foreground: 30 20% 95%;
+    --secondary: 220 20% 18%;
+    --secondary-foreground: 220 15% 95%;
 
-    --muted: 20 15% 18%;
-    --muted-foreground: 30 15% 60%;
+    --muted: 220 20% 18%;
+    --muted-foreground: 220 15% 60%;
 
-    --accent: 38 70% 55%;
-    --accent-foreground: 20 15% 8%;
+    --accent: 230 70% 55%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 20 15% 22%;
-    --input: 20 15% 22%;
-    --ring: 38 70% 50%;
+    --border: 220 20% 22%;
+    --input: 220 20% 22%;
+    --ring: 230 70% 55%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -110,51 +109,52 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Lato', sans-serif;
+    @apply bg-background text-foreground font-body antialiased;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
     @apply font-medium tracking-tight;
   }
 }
 
 @layer utilities {
   .font-display {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
   }
 
   .font-body {
-    font-family: 'Lato', sans-serif;
+    font-family: 'Open Sans', sans-serif;
   }
 
-  .text-gold {
-    color: hsl(var(--gold));
+  .text-nirvana {
+    color: hsl(var(--nirvana-blue));
   }
 
-  .bg-gold {
-    background-color: hsl(var(--gold));
+  .bg-nirvana {
+    background-color: hsl(var(--nirvana-blue));
   }
 
-  .bg-gold-gradient {
-    background: var(--gold-gradient);
+  .bg-nirvana-gradient {
+    background: var(--blue-gradient);
   }
 
-  .text-shadow {
-    text-shadow: var(--text-shadow);
-  }
-
-  .elegant-shadow {
-    box-shadow: var(--elegant-shadow);
+  .hero-gradient {
+    background: var(--hero-gradient);
   }
 
   .card-shadow {
     box-shadow: var(--card-shadow);
   }
 
-  .hero-overlay {
-    background: var(--hero-overlay);
+  .elegant-shadow {
+    box-shadow: var(--elegant-shadow);
+  }
+
+  /* Decorative swirl pattern */
+  .swirl-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 50 Q80 10, 100 50 T170 50' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='2'/%3E%3Cpath d='M20 100 Q70 60, 100 100 T180 100' fill='none' stroke='rgba(255,255,255,0.08)' stroke-width='2'/%3E%3Cpath d='M40 150 Q90 110, 120 150 T190 150' fill='none' stroke='rgba(255,255,255,0.06)' stroke-width='2'/%3E%3C/svg%3E");
+    background-size: 300px 300px;
   }
 
   .animate-fade-up {
@@ -167,10 +167,6 @@
 
   .animate-scale-in {
     animation: scaleIn 0.6s ease-out forwards;
-  }
-
-  .animate-slide-left {
-    animation: slideLeft 0.8s ease-out forwards;
   }
 
   @keyframes fadeUp {
@@ -204,14 +200,16 @@
     }
   }
 
-  @keyframes slideLeft {
-    from {
-      opacity: 0;
-      transform: translateX(-30px);
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
     }
-    to {
-      opacity: 1;
-      transform: translateX(0);
+    50% {
+      transform: translateY(-10px);
     }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
   }
 }

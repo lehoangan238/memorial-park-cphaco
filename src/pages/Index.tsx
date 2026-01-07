@@ -1,8 +1,11 @@
 import { Header } from '@/components/Header';
 import { Hero } from '@/components/Hero';
-import { Advantages } from '@/components/Advantages';
-import { Products } from '@/components/Products';
-import { CTA } from '@/components/CTA';
+import { CultureSection } from '@/components/CultureSection';
+import { CaringSection } from '@/components/CaringSection';
+import { VideoSection } from '@/components/VideoSection';
+import { ProductsSection } from '@/components/ProductsSection';
+import { AdvantagesSection } from '@/components/AdvantagesSection';
+import { TestimonialsSection } from '@/components/TestimonialsSection';
 import { Footer } from '@/components/Footer';
 
 const Index = () => {
@@ -10,9 +13,12 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <Hero />
-      <Advantages />
-      <Products />
-      <CTA />
+      <CultureSection />
+      <CaringSection />
+      <VideoSection />
+      <ProductsSection />
+      <AdvantagesSection />
+      <TestimonialsSection />
       <Footer />
     </div>
   );
