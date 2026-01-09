@@ -243,39 +243,44 @@ const PrePlanning = () => {
       </section>
 
       {/* Section 5: Three Link Cards - Dark Background with Center Badge */}
-      <section className="relative py-20 md:py-24 bg-[hsl(var(--dark-bg))] overflow-hidden">
-        {/* Subtle decorative texture */}
-        <div className="absolute inset-0 swirl-pattern opacity-40" aria-hidden="true" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[hsl(var(--dark-bg))]" aria-hidden="true" />
+      <section className="relative overflow-hidden">
+        {/* Mountain/photo background + dark overlay (like reference) */}
+        <div
+          className="absolute inset-0"
+          aria-hidden="true"
+          style={{
+            backgroundImage: `linear-gradient(to bottom, hsl(var(--dark-bg) / 0.55), hsl(var(--dark-bg) / 0.9)), url(${landscapeImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center"
+          }}
+        />
 
-        <div className="container mx-auto px-4 md:px-8 lg:px-16 relative">
-          {/* Center badge */}
-          <div className="flex justify-center mb-12">
-            <motion.div
-              {...fadeInUp}
-              className="w-56 h-56 bg-primary text-primary-foreground flex flex-col items-center justify-center text-center"
-            >
-              <p className="text-[10px] tracking-[0.6em] uppercase font-medium">R E A D</p>
-              <p className="mt-2 text-sm tracking-[0.2em]">Pre-Planning</p>
-            </motion.div>
-          </div>
+        {/* Center badge (overlaps section top like the reference) */}
+        <motion.div
+          {...fadeInUp}
+          className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 w-56 h-56 bg-primary text-primary-foreground flex flex-col items-center justify-center text-center z-10"
+        >
+          <p className="text-[10px] tracking-[0.6em] uppercase font-medium">R E A D</p>
+          <p className="mt-2 text-sm tracking-[0.2em]">Pre-Planning</p>
+        </motion.div>
 
+        <div className="container mx-auto px-4 md:px-8 lg:px-16 relative pt-32 md:pt-36 pb-20 md:pb-24">
           {/* Cards */}
           <motion.div
             {...fadeInUp}
-            className="grid md:grid-cols-3 gap-8 lg:gap-12"
+            className="mx-auto max-w-5xl grid md:grid-cols-3 gap-10 lg:gap-14 justify-items-center"
           >
             {linkCards.map((card, index) => (
-              <div key={index} className="group cursor-pointer">
-                <div className="bg-background p-2 shadow-xl">
+              <div key={index} className="group w-full max-w-sm cursor-pointer">
+                <div className="bg-background/95 p-1 shadow-2xl">
                   <img
                     src={card.image}
                     alt={card.title}
                     loading="lazy"
-                    className="w-full aspect-[16/10] object-cover"
+                    className="w-full aspect-[16/9] object-cover"
                   />
                 </div>
-                <p className="mt-4 text-primary-foreground text-sm font-medium leading-tight max-w-[240px]">
+                <p className="mt-6 text-primary-foreground text-sm md:text-base font-medium leading-snug max-w-[260px]">
                   {card.title}
                 </p>
               </div>
