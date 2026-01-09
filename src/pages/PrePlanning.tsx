@@ -39,19 +39,19 @@ const fadeInRight = {
 };
 
 const forYourselfBenefits = [
-  "You assume financial responsibility for your loved ones",
+  "You assume financial responsibility of your own funeral",
   "You will have time and space to consider all factors and concerns",
-  "You can be selective and choose the way you wish to be remembered and memorialized",
+  "You can be self-reliant and choose the way you wish to be celebrated and remembered",
   "You get the option of paying over time through an installment plan",
   "You will be able to enjoy greater peace of mind and complete financial planning"
 ];
 
 const forFamilyBenefits = [
   "Your family will know who to contact in the event of an emergency",
-  "Your family will not be panicked into making hasty decisions",
+  "Your family will not be pressured into making hasty decisions",
   "Your family can focus on remembering and healing",
-  "Your family can avoid being suddenly required to spend a huge sum of money at once",
-  "Your family can take time to grieve in their own way, in their own time"
+  "Your family can avoid being suddenly forced to spend a huge amount to finance a funeral",
+  "Your family is protected from rising funeral costs due to inflation"
 ];
 
 const linkCards = [
@@ -117,19 +117,19 @@ const PrePlanning = () => {
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
             {/* Left: Text Content */}
             <motion.div {...fadeInLeft}>
-              <h2 className="font-display text-3xl md:text-4xl text-foreground mb-6">
+              <h2 className="text-3xl md:text-4xl text-foreground font-light mb-6">
                 Pre-planning
               </h2>
               <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                You can help reduce the emotional and financial burden on your family. Pre-planning 
-                your own funeral also takes the burden off loved ones in advance of 
-                a stressful situation and ensures that your preferences and wishes are 
-                adhered to with precision regarding your final farewell. By thinking this 
-                through now, you relieve your loved ones of having to make difficult 
-                arrangements during a time of grief.
+                We prepare for almost everything in life. To cover for the possibility of 
+                accidents and sickness, we have insurance. To get married, couples 
+                spend months to years to ensure everything goes right. To safeguard our 
+                children&apos;s future education, we start an education fund. To live life to the 
+                fullest, we have bucket lists. But hold up, are we forgetting something 
+                here?
               </p>
-              <a href="#" className="text-primary text-sm flex items-center gap-1 hover:underline">
-                READ MORE <ChevronRight className="w-4 h-4" />
+              <a href="#" className="text-muted-foreground text-xs flex items-center gap-1 hover:text-primary uppercase tracking-wider">
+                READ MORE
               </a>
             </motion.div>
 
@@ -137,83 +137,108 @@ const PrePlanning = () => {
             <motion.div {...fadeInRight}>
               <img 
                 src={coupleBeachImage} 
-                alt="Couple planning" 
+                alt="Person with balloons" 
                 className="w-full aspect-[4/3] object-cover"
               />
             </motion.div>
           </div>
 
-          {/* What is Pre-planning? */}
-          <motion.div {...fadeInUp} className="mt-16 max-w-2xl ml-auto">
-            <h3 className="font-display text-2xl md:text-3xl text-foreground mb-4">
-              What is Pre-planning?
+          {/* What is Pre-planning? - Right aligned */}
+          <motion.div {...fadeInUp} className="mt-20 lg:ml-auto lg:w-1/2 lg:pl-8">
+            <h3 className="text-2xl md:text-3xl text-foreground font-light mb-4">
+              What is Pre-planning ?
             </h3>
             <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-              Pre-planning is pre-planning or making advance funeral arrangements 
-              (also known as pre-need planning). It is the process of making 
-              decisions about what will happen after you pass on. Pre-planning allows 
-              families to pick and choose final resting arrangements that best complies 
-              with preferences and budget. It will allow you to choose what type of 
-              funeral service you want.
+              To put it simply, pre-planning (sometimes also called &quot;pre-arrangement&quot;, 
+              &quot;pre-arrangement planning&quot; or &quot;pre-need planning&quot;) means setting up 
+              your funeral arrangements in advance before the need for these services 
+              occurs, either as a funeral insurance or pre-need funeral contract. The 
+              concept may seem novel and even morbid. However, pre-planning is not 
+              actually something new.
             </p>
-            <a href="#" className="text-primary text-sm flex items-center gap-1 hover:underline">
+            <a href="#" className="text-muted-foreground text-xs flex items-center gap-1 hover:text-primary uppercase tracking-wider">
               READ MORE <ChevronRight className="w-4 h-4" />
             </a>
           </motion.div>
         </div>
       </section>
 
-      {/* Section 3: 5 main advantages - Blue Background */}
-      <section className="py-16 md:py-24 bg-primary">
+      {/* Section 3: 5 main advantages - Blue Header with Image */}
+      <section className="bg-primary">
         <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          <motion.div {...fadeInUp} className="mb-12">
-            <h2 className="font-display text-3xl md:text-4xl text-white">
-              5 main advantages<br />
-              of pre-planning
-            </h2>
-          </motion.div>
-
-          {/* For Yourself */}
-          <motion.div {...fadeInUp} className="mb-8">
-            <h3 className="font-display text-2xl text-white italic mb-6">
-              For Yourself
-            </h3>
-            <div className="space-y-4">
-              {forYourselfBenefits.map((benefit, index) => (
-                <div key={index} className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-white mt-0.5 flex-shrink-0" />
-                  <span className="text-white/90 text-sm">{benefit}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
+          <div className="grid lg:grid-cols-2">
+            {/* Left: Title */}
+            <motion.div {...fadeInLeft} className="py-12 md:py-16">
+              <h2 className="font-display text-3xl md:text-4xl text-white">
+                5 main advantages<br />
+                of pre-planning
+              </h2>
+            </motion.div>
+            {/* Right: Image */}
+            <motion.div {...fadeInRight} className="relative">
+              <img 
+                src={familyGenerationsImage} 
+                alt="Family together" 
+                className="w-full h-full object-cover min-h-[200px]"
+              />
+            </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Section 4: For Your Family - White Background */}
-      <section className="py-16 md:py-24 bg-white">
+      {/* Section 4: For Yourself - White Background */}
+      <section className="py-16 md:py-20 bg-white">
+        <div className="container mx-auto px-4 md:px-8 lg:px-16">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+            {/* Left: For Yourself with blue border */}
+            <motion.div {...fadeInLeft}>
+              <h3 className="font-display text-2xl md:text-3xl text-foreground italic mb-8">
+                For Yourself
+              </h3>
+              <div className="space-y-5 border-l-4 border-primary pl-6">
+                {forYourselfBenefits.map((benefit, index) => (
+                  <p key={index} className="text-muted-foreground text-sm leading-relaxed">
+                    {benefit}
+                  </p>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Right: Image */}
+            <motion.div {...fadeInRight}>
+              <img 
+                src={family1Image} 
+                alt="Family with laptop" 
+                className="w-full aspect-[4/3] object-cover"
+              />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 5: For Your Family - White Background */}
+      <section className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4 md:px-8 lg:px-16">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
             {/* Left: Image */}
             <motion.div {...fadeInLeft}>
               <img 
-                src={familyGenerationsImage} 
+                src={family2Image} 
                 alt="Family generations" 
                 className="w-full aspect-[4/3] object-cover"
               />
             </motion.div>
 
-            {/* Right: For Your Family Content */}
+            {/* Right: For Your Family with blue border */}
             <motion.div {...fadeInRight}>
-              <h3 className="font-display text-2xl md:text-3xl text-foreground italic mb-6">
+              <h3 className="font-display text-2xl md:text-3xl text-foreground italic mb-8">
                 For Your Family
               </h3>
-              <div className="space-y-4">
+              <div className="space-y-5 border-l-4 border-primary pl-6">
                 {forFamilyBenefits.map((benefit, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground text-sm">{benefit}</span>
-                  </div>
+                  <p key={index} className="text-muted-foreground text-sm leading-relaxed">
+                    {benefit}
+                  </p>
                 ))}
               </div>
             </motion.div>
