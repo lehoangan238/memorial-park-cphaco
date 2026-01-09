@@ -342,9 +342,7 @@ const PrePlanning = () => {
       </section>
 
       {/* Section 7: Additional Resources - Dark Background */}
-      <section className="relative py-20 md:py-28 bg-[hsl(var(--dark-bg))] overflow-hidden">
-        {/* Subtle decorative texture */}
-        <div className="absolute inset-0 swirl-pattern opacity-30" aria-hidden="true" />
+      <section className="py-20 md:py-28 bg-[hsl(var(--dark-bg))]">
 
         <div className="container mx-auto px-4 md:px-8 lg:px-16 relative">
           {/* Center heading */}
