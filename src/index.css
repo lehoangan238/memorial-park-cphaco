@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Open+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -131,12 +131,13 @@
 
   body {
     @apply bg-background text-foreground font-body antialiased leading-relaxed;
-    color: #333;
+    color: hsl(0 0% 40%); /* #666666 */
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Cormorant Garamond', serif;
-    @apply font-medium tracking-tight;
+    font-family: 'Poppins', sans-serif;
+    @apply font-semibold tracking-tight;
+    color: hsl(232 53% 52%); /* #4453c4 */
   }
 }
 
@@ -146,11 +147,30 @@
   }
 
   .font-display {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
   }
 
   .font-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+  }
+
+  .font-heading {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+  }
+
+  .font-subheading {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+  }
+
+  .font-label {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 300;
+    letter-spacing: 3px;
+    text-transform: uppercase;
   }
 
   .text-nirvana {
