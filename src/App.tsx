@@ -8,6 +8,7 @@ import BurialPlots from "./pages/BurialPlots";
 import FuneralService from "./pages/FuneralService";
 import Columbaria from "./pages/Columbaria";
 import Others from "./pages/Others";
+import ImmediateNeed from "./pages/ImmediateNeed";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/funeral-service" element={<FuneralService />} />
           <Route path="/columbaria" element={<Columbaria />} />
           <Route path="/others" element={<Others />} />
+          <Route path="/immediate-need" element={<ImmediateNeed />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
