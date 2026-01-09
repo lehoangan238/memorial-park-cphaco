@@ -341,37 +341,40 @@ const PrePlanning = () => {
         </div>
       </section>
 
-      {/* Section 7: Additional Resources */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          <motion.div {...fadeInUp} className="text-center mb-12">
-            <span className="text-primary text-[10px] tracking-[0.4em] uppercase font-medium">
+      {/* Section 7: Additional Resources - Dark Background */}
+      <section className="relative py-20 md:py-28 bg-[hsl(var(--dark-bg))] overflow-hidden">
+        {/* Subtle decorative texture */}
+        <div className="absolute inset-0 swirl-pattern opacity-30" aria-hidden="true" />
+
+        <div className="container mx-auto px-4 md:px-8 lg:px-16 relative">
+          {/* Center heading */}
+          <motion.div {...fadeInUp} className="text-center mb-14">
+            <span className="text-primary text-[10px] tracking-[0.5em] uppercase font-medium">
               R E A D &nbsp; M O R E
             </span>
-            <h2 className="font-display text-3xl md:text-4xl text-foreground mt-4">
+            <h2 className="font-display text-3xl md:text-4xl text-white mt-4">
               Additional Resources
             </h2>
           </motion.div>
 
-          <motion.div 
+          {/* Cards with white frames */}
+          <motion.div
             {...fadeInUp}
-            className="grid md:grid-cols-3 gap-6"
+            className="grid md:grid-cols-3 gap-8 lg:gap-10"
           >
             {resources.map((resource, index) => (
-              <div 
-                key={index}
-                className="relative group cursor-pointer overflow-hidden"
-              >
-                <img 
-                  src={resource.image}
-                  alt={resource.title}
-                  className="w-full aspect-[4/3] object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-primary/70 flex items-center justify-center p-6">
-                  <p className="text-white text-center text-sm font-medium leading-relaxed">
-                    {resource.title}
-                  </p>
+              <div key={index} className="group cursor-pointer">
+                <div className="bg-white p-2 shadow-xl">
+                  <img
+                    src={resource.image}
+                    alt={resource.title}
+                    loading="lazy"
+                    className="w-full aspect-[4/3] object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                  />
                 </div>
+                <p className="mt-4 text-white text-sm font-medium leading-tight">
+                  {resource.title}
+                </p>
               </div>
             ))}
           </motion.div>
