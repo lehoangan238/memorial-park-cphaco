@@ -250,7 +250,7 @@ const BurialPlots = () => {
             </div>
 
             {/* Right Column - Offset down, text on top */}
-            <div className="flex flex-col gap-8 lg:mt-32">
+            <div className="flex flex-col gap-8 lg:mt-24">
               {plotTypesRight.map((plot) => (
                 <div key={plot.id} className="bg-white shadow-md overflow-hidden">
                   <div className="p-6 md:p-8">
