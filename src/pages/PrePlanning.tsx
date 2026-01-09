@@ -242,26 +242,38 @@ const PrePlanning = () => {
         </div>
       </section>
 
-      {/* Section 5: Three Link Cards - Gray Background */}
-      <section className="py-16 md:py-20 bg-[#f5f5f5]">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          <motion.div 
+      {/* Section 5: Three Link Cards - Dark Background with Center Badge */}
+      <section className="relative py-20 md:py-24 bg-[hsl(var(--dark-bg))] overflow-hidden">
+        {/* Subtle decorative texture */}
+        <div className="absolute inset-0 swirl-pattern opacity-40" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[hsl(var(--dark-bg))]" aria-hidden="true" />
+
+        <div className="container mx-auto px-4 md:px-8 lg:px-16 relative">
+          {/* Center badge */}
+          <motion.div
             {...fadeInUp}
-            className="grid md:grid-cols-3 gap-6"
+            className="absolute left-1/2 -top-12 -translate-x-1/2 w-56 h-56 bg-primary text-primary-foreground flex flex-col items-center justify-center text-center"
+          >
+            <p className="text-[10px] tracking-[0.6em] uppercase font-medium">R E A D</p>
+            <p className="mt-2 text-sm tracking-[0.2em]">Pre-Planning</p>
+          </motion.div>
+
+          {/* Cards */}
+          <motion.div
+            {...fadeInUp}
+            className="pt-40 grid md:grid-cols-3 gap-8 lg:gap-12"
           >
             {linkCards.map((card, index) => (
-              <div 
-                key={index}
-                className="group cursor-pointer"
-              >
-                <div className="overflow-hidden mb-4">
-                  <img 
+              <div key={index} className="group cursor-pointer">
+                <div className="bg-background p-2 shadow-xl">
+                  <img
                     src={card.image}
                     alt={card.title}
-                    className="w-full aspect-[4/3] object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                    className="w-full aspect-[16/10] object-cover"
                   />
                 </div>
-                <p className="text-foreground text-sm font-medium group-hover:text-primary transition-colors">
+                <p className="mt-4 text-primary-foreground text-sm font-medium leading-tight max-w-[240px]">
                   {card.title}
                 </p>
               </div>
