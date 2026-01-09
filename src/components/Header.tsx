@@ -3,6 +3,7 @@ import { Menu, X, ChevronDown, Search, ShoppingCart, Phone } from 'lucide-react'
 
 const dropdownMenus = {
   'Bắt Đầu': [
+    { label: 'Nhu Cầu Cấp Bách', href: '/immediate-need' },
     { label: 'Tại Sao Nên Lên Kế Hoạch Trước', href: '#why-preplan' },
     { label: 'Cách Thức Hoạt Động', href: '#how-it-works' },
     { label: 'Câu Hỏi Thường Gặp', href: '#faq' },
