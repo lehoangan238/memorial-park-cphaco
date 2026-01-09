@@ -1,6 +1,27 @@
 import { motion } from 'framer-motion';
 import { Shield, Percent, Compass, PawPrint, Building2 } from 'lucide-react';
 
+const easeOut = [0.22, 1, 0.36, 1] as const;
+
+const staggerContainer = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.1
+    }
+  }
+};
+
+const staggerItem = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.6, ease: easeOut }
+  }
+};
+
 const advantages = [
   {
     icon: Shield,
@@ -37,9 +58,10 @@ export const AdvantagesSection = () => {
         <div className="grid lg:grid-cols-2 gap-16 items-start">
           {/* Left - Title & CTA */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            initial={{ opacity: 0, x: -40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.7, ease: easeOut }}
           >
             <h2 
               className="text-4xl md:text-5xl text-[#2f3237] leading-tight mb-4"
@@ -56,7 +78,9 @@ export const AdvantagesSection = () => {
             >
               Nhu cầu của bạn là ưu tiên hàng đầu của chúng tôi
             </p>
-            <button 
+            <motion.button 
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
               className="px-8 py-3 text-white text-sm tracking-wide"
               style={{
                 backgroundColor: '#0693e3',
@@ -64,21 +88,28 @@ export const AdvantagesSection = () => {
               }}
             >
               ĐẶT LỊCH HẸN
-            </button>
+            </motion.button>
           </motion.div>
 
           {/* Right - Advantages Grid */}
-          <div className="grid md:grid-cols-2 gap-8">
-            {advantages.map((item, index) => (
+          <motion.div 
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            className="grid md:grid-cols-2 gap-8"
+          >
+            {advantages.map((item) => (
               <motion.div
                 key={item.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                variants={staggerItem}
+                whileHover={{ y: -5 }}
               >
                 {/* Icon */}
-                <div className="w-14 h-14 rounded-full border border-[#0693e3] flex items-center justify-center mb-4">
+                <motion.div 
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  className="w-14 h-14 rounded-full border border-[#0693e3] flex items-center justify-center mb-4"
+                >
                   {item.customIcon ? (
                     <span 
                       className="text-[#0693e3] text-lg font-semibold"
@@ -89,7 +120,7 @@ export const AdvantagesSection = () => {
                   ) : (
                     <item.icon className="w-6 h-6 text-[#0693e3]" strokeWidth={1.5} />
                   )}
-                </div>
+                </motion.div>
                 
                 <h3 
                   className="text-[#2f3237] text-sm font-semibold mb-2"
@@ -105,7 +136,7 @@ export const AdvantagesSection = () => {
                 </p>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

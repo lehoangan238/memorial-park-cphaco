@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 
+const easeOut = [0.22, 1, 0.36, 1] as const;
+
 export const CultureSection = () => {
   return (
     <section className="py-16 bg-white">
@@ -8,10 +10,10 @@ export const CultureSection = () => {
         <div className="grid lg:grid-cols-2 gap-12 items-start">
           {/* Left - Blue Promotional Card */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.7, ease: easeOut }}
             className="relative"
           >
             <div 
@@ -19,34 +21,72 @@ export const CultureSection = () => {
               style={{ backgroundColor: '#4169e1' }}
             >
               {/* Decorative bubbles/circles */}
-              <div className="absolute top-10 left-10 w-16 h-16 rounded-full border-2 border-white/20" />
-              <div className="absolute top-20 right-16 w-12 h-12 rounded-full border-2 border-white/20" />
-              <div className="absolute bottom-16 left-20 w-20 h-20 rounded-full border-2 border-white/20" />
-              <div className="absolute bottom-10 right-10 w-14 h-14 rounded-full border-2 border-white/20" />
+              <motion.div 
+                initial={{ scale: 0, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                className="absolute top-10 left-10 w-16 h-16 rounded-full border-2 border-white/20" 
+              />
+              <motion.div 
+                initial={{ scale: 0, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+                className="absolute top-20 right-16 w-12 h-12 rounded-full border-2 border-white/20" 
+              />
+              <motion.div 
+                initial={{ scale: 0, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.5, duration: 0.5 }}
+                className="absolute bottom-16 left-20 w-20 h-20 rounded-full border-2 border-white/20" 
+              />
+              <motion.div 
+                initial={{ scale: 0, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+                className="absolute bottom-10 right-10 w-14 h-14 rounded-full border-2 border-white/20" 
+              />
               
               {/* Hands silhouette at bottom */}
               <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#3158d3] to-transparent opacity-50" />
               
               <div className="relative z-10">
-                <h3 
+                <motion.h3 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2, duration: 0.6, ease: easeOut }}
                   className="text-2xl md:text-3xl text-white mb-4 leading-tight"
                   style={{ fontFamily: "'Cormorant Garamond', serif" }}
                 >
                   Kế hoạch cuộc sống hợp lý<br />
                   chỉ với 10 nghìn/ngày?
-                </h3>
-                <p 
+                </motion.h3>
+                <motion.p 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3, duration: 0.6, ease: easeOut }}
                   className="text-white/80 text-sm mb-8"
                   style={{ fontFamily: "'Open Sans', sans-serif" }}
                 >
                   Lên kế hoạch cuộc sống không tốn kém như bạn nghĩ...
-                </p>
-                <button 
+                </motion.p>
+                <motion.button 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4, duration: 0.6, ease: easeOut }}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
                   className="border border-white text-white px-8 py-3 text-sm tracking-wider hover:bg-white hover:text-[#4169e1] transition-all"
                   style={{ fontFamily: "'Open Sans', sans-serif" }}
                 >
                   Tìm hiểu thêm
-                </button>
+                </motion.button>
               </div>
               
               {/* Slider dots */}
@@ -63,20 +103,28 @@ export const CultureSection = () => {
 
           {/* Right - Content */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
+            initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.7, delay: 0.15, ease: easeOut }}
             className="pt-4"
           >
-            <span 
+            <motion.span 
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, duration: 0.5 }}
               className="text-[#5e636e] text-sm tracking-[0.4em]"
               style={{ fontFamily: "'Open Sans', sans-serif" }}
             >
               N I R V A N A
-            </span>
+            </motion.span>
             
-            <h2 
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4, duration: 0.6, ease: easeOut }}
               className="text-4xl lg:text-5xl mt-4 mb-8"
               style={{ 
                 fontFamily: "'Cormorant Garamond', serif",
@@ -84,17 +132,26 @@ export const CultureSection = () => {
               }}
             >
               Văn Hóa Của Chúng Tôi - Tương Lai Của Chúng Tôi
-            </h2>
+            </motion.h2>
             
-            <p 
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5, duration: 0.6, ease: easeOut }}
               className="text-[#2f3237] leading-[1.9] text-[16px] mb-6"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
               Một nền văn hóa đã trải qua hàng nghìn năm thử thách giống như dòng chảy của nước – từng chút một, cuối cùng nó hình thành nên một lịch sử phong phú.{' '}
               <strong>Thành lập năm 1990,</strong> Nirvana Asia Group thấu hiểu sâu sắc tình cảm này bằng cách tự hào gìn giữ truyền thống và văn hóa, cung cấp trọn bộ dịch vụ tang lễ để tôn vinh và nâng cao cuộc sống.
-            </p>
+            </motion.p>
             
-            <a 
+            <motion.a 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.6, duration: 0.6, ease: easeOut }}
+              whileHover={{ x: 5 }}
               href="#about" 
               className="inline-flex items-center gap-3 text-[#5e636e] text-sm tracking-[0.15em] hover:text-[#4169e1] transition-colors group"
               style={{ fontFamily: "'Open Sans', sans-serif" }}
@@ -103,7 +160,7 @@ export const CultureSection = () => {
               <span className="w-6 h-6 rounded-full border border-[#4169e1] flex items-center justify-center text-[#4169e1] group-hover:bg-[#4169e1] group-hover:text-white transition-all">
                 <Plus className="w-3 h-3" />
               </span>
-            </a>
+            </motion.a>
           </motion.div>
         </div>
       </div>

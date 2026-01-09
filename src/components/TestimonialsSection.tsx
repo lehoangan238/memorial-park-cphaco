@@ -1,6 +1,27 @@
 import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 
+const easeOut = [0.22, 1, 0.36, 1] as const;
+
+const staggerContainer = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.1
+    }
+  }
+};
+
+const staggerItem = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.6, ease: easeOut }
+  }
+};
+
 const testimonials = [
   {
     title: "Dịch vụ khách hàng xuất sắc và đặc biệt",
@@ -24,12 +45,13 @@ const testimonials = [
 
 export const TestimonialsSection = () => {
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-white overflow-hidden">
       <div className="container mx-auto px-4">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.7, ease: easeOut }}
           className="text-center mb-12"
         >
           <h2 
@@ -46,22 +68,40 @@ export const TestimonialsSection = () => {
           </p>
           
           {/* Star Rating */}
-          <div className="flex justify-center gap-1">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3, duration: 0.5, ease: easeOut }}
+            className="flex justify-center gap-1"
+          >
             {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, rotate: -180 }}
+                whileInView={{ opacity: 1, rotate: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 + i * 0.1, duration: 0.4 }}
+              >
+                <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-8 mb-10">
-          {testimonials.map((testimonial, index) => (
+        <motion.div 
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          className="grid md:grid-cols-3 gap-8 mb-10"
+        >
+          {testimonials.map((testimonial) => (
             <motion.div
               key={testimonial.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-white rounded-lg p-6 shadow-md"
+              variants={staggerItem}
+              whileHover={{ y: -8, boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}
+              className="bg-white rounded-lg p-6 shadow-md transition-shadow"
             >
               <h3 
                 className={`text-[#2f3237] text-sm font-semibold mb-4 ${testimonial.isItalic ? 'italic' : ''}`}
@@ -86,20 +126,23 @@ export const TestimonialsSection = () => {
               </a>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ delay: 0.3, duration: 0.5, ease: easeOut }}
           className="text-center"
         >
-          <button 
+          <motion.button 
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
             className="border border-[#5e636e] text-[#5e636e] px-8 py-2.5 text-sm hover:bg-[#5e636e] hover:text-white transition-all"
             style={{ fontFamily: "'Open Sans', sans-serif" }}
           >
             Xem Thêm
-          </button>
+          </motion.button>
         </motion.div>
       </div>
     </section>
