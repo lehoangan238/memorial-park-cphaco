@@ -211,63 +211,63 @@ const BurialPlots = () => {
         </div>
       </section>
 
-      {/* Burial Plot Types Section - White Background */}
-      <section className="py-20 bg-white">
+      {/* Burial Plot Types Section */}
+      <section className="py-20 bg-[#f5f6f8]">
         <div className="container mx-auto px-4">
           <motion.div {...fadeInUp} className="text-center mb-16">
-            <span className="text-primary text-sm tracking-[0.3em] uppercase font-medium">KHÁM PHÁ</span>
-            <h2 className="font-display text-4xl md:text-5xl mt-4 text-foreground">
-              Các Loại Lô Đất An Táng
+            <span className="text-[#4a5aef] text-sm tracking-[0.4em] uppercase font-medium">E X P L O R E</span>
+            <h2 className="font-display text-4xl md:text-5xl mt-4 text-foreground italic">
+              Burial Plot Types
             </h2>
           </motion.div>
 
           {/* Staggered Cards Layout */}
-          <motion.div {...fadeInUp} className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-            {/* Left Column */}
+          <motion.div {...fadeInUp} className="grid lg:grid-cols-2 gap-6 lg:gap-10 max-w-6xl mx-auto">
+            {/* Left Column - Card with image on top */}
             <div className="space-y-8">
-              {plotTypesLeft.map((plot, index) => (
-                <div key={plot.id} className="bg-white shadow-lg rounded-lg overflow-hidden">
-                  <ImageCarousel images={plot.images} className="h-64 md:h-80" />
+              {plotTypesLeft.map((plot) => (
+                <div key={plot.id} className="bg-white shadow-md overflow-hidden">
+                  <ImageCarousel images={plot.images} className="h-56 md:h-64" />
                   <div className="p-6 md:p-8">
-                    <span className="text-muted-foreground text-xs tracking-[0.15em] uppercase">
+                    <span className="text-muted-foreground text-[10px] tracking-[0.2em] uppercase block mb-2">
                       {plot.category}
                     </span>
-                    <h3 className="font-display text-2xl md:text-3xl text-primary mt-2 mb-4">
+                    <h3 className="font-display text-xl md:text-2xl text-foreground mb-4">
                       {plot.title}
                     </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-5">
                       {plot.description}
                     </p>
-                    <button className="text-foreground text-sm flex items-center gap-2 mb-4 hover:text-primary transition-colors">
-                      {plot.buttonText} <ChevronRight className="w-4 h-4 text-primary" />
+                    <button className="text-foreground text-xs flex items-center gap-2 mb-6 hover:text-primary transition-colors tracking-[0.15em] uppercase">
+                      READ MORE <ChevronRight className="w-4 h-4 text-[#4a5aef]" />
                     </button>
-                    <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white">
-                      NHẬN BÁO GIÁ
+                    <Button variant="outline" className="border-foreground text-foreground hover:bg-foreground hover:text-white px-8 text-xs tracking-[0.15em]">
+                      GET QUOTE
                     </Button>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Right Column - Offset */}
-            <div className="space-y-8 lg:mt-32">
+            {/* Right Column - Offset, text on top */}
+            <div className="space-y-8 lg:mt-24">
               {plotTypesRight.map((plot) => (
-                <div key={plot.id} className="bg-white shadow-lg rounded-lg overflow-hidden">
+                <div key={plot.id} className="bg-white shadow-md overflow-hidden">
                   <div className="p-6 md:p-8">
-                    <span className="text-muted-foreground text-xs tracking-[0.15em] uppercase">
+                    <span className="text-muted-foreground text-[10px] tracking-[0.2em] uppercase block mb-2">
                       {plot.category}
                     </span>
-                    <h3 className="font-display text-2xl md:text-3xl text-primary mt-2 mb-4">
+                    <h3 className="font-display text-xl md:text-2xl text-[#4a5aef] mb-4 italic">
                       {plot.title}
                     </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-5">
                       {plot.description}
                     </p>
-                    <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white">
-                      {plot.buttonText}
+                    <Button variant="outline" className="border-foreground text-foreground hover:bg-foreground hover:text-white px-8 text-xs tracking-[0.15em]">
+                      GET QUOTE
                     </Button>
                   </div>
-                  <ImageCarousel images={plot.images} className="h-64 md:h-80" />
+                  <ImageCarousel images={plot.images} className="h-56 md:h-64" />
                 </div>
               ))}
             </div>
