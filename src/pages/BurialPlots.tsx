@@ -174,32 +174,36 @@ const BurialPlots = () => {
       {/* Video & Commitment Section */}
       <section className="py-16 bg-[#e8eaed]">
         <div className="container mx-auto px-4">
-          <motion.div {...fadeInUp} className="grid lg:grid-cols-3 gap-8 items-stretch">
-            {/* Video Thumbnail */}
-            <div className="lg:col-span-2 relative rounded-lg overflow-hidden shadow-xl aspect-video">
-              <img 
-                src={coupleBeachImage} 
-                alt="Video thumbnail" 
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-black/20" />
-              <button className="absolute inset-0 flex items-center justify-center">
-                <div className="w-20 h-20 rounded-full border-2 border-white flex items-center justify-center bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors">
-                  <Play className="w-8 h-8 text-white fill-white ml-1" />
-                </div>
-              </button>
+          <motion.div {...fadeInUp} className="flex flex-col lg:flex-row gap-0 items-stretch">
+            {/* Video Thumbnail - Left side, larger */}
+            <div className="lg:w-[65%] relative overflow-hidden shadow-xl">
+              <div className="aspect-[16/10]">
+                <img 
+                  src={coupleBeachImage} 
+                  alt="Video thumbnail" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/10" />
+                <button className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-20 h-20 rounded-full border-2 border-white flex items-center justify-center bg-transparent hover:bg-white/10 transition-colors">
+                    <Play className="w-8 h-8 text-white fill-white ml-1" />
+                  </div>
+                </button>
+              </div>
             </div>
 
-            {/* Commitment Card */}
-            <div className="flex flex-col">
-              <span className="text-primary text-sm tracking-[0.2em] uppercase font-medium mb-4">XEM</span>
-              <div className="bg-primary text-white p-8 rounded-lg flex-1 flex flex-col justify-center">
-                <h3 className="font-display text-3xl italic mb-6">Cam Kết</h3>
-                <p className="text-white/90 leading-relaxed mb-4">
-                  Một cam kết vượt qua mọi ranh giới được ràng buộc bởi tình yêu đích thực.
+            {/* Commitment Card - Right side */}
+            <div className="lg:w-[35%] flex flex-col items-end lg:pl-8">
+              <span className="text-[#4a5aef] text-sm tracking-[0.3em] uppercase font-medium mb-4">W A T C H</span>
+              <div className="bg-[#4a5aef] text-white p-8 lg:p-10 flex-1 flex flex-col justify-center text-center w-full max-w-sm">
+                <h3 className="font-display text-3xl lg:text-4xl italic mb-6">
+                  The<br />Commitment
+                </h3>
+                <p className="text-white/90 leading-relaxed mb-4 text-sm lg:text-base">
+                  A commitment that transcends boundaries is bound by true love.
                 </p>
-                <p className="text-white/80 leading-relaxed">
-                  Tại Nirvana, hãy yên tâm rằng việc thực hiện cam kết đó là lời hứa của chúng tôi.
+                <p className="text-white/80 leading-relaxed text-sm lg:text-base">
+                  At Nirvana, rest assured the fulfillment of that commitment is our promise.
                 </p>
               </div>
             </div>
