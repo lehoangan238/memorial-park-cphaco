@@ -43,8 +43,8 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, enableRipple = true, onClick, ...props }, ref) => {
-    const { createRipple, RippleContainer } = useRipple();
+  ({ className, variant, size, asChild = false, enableRipple = true, onClick, children, ...props }, ref) => {
+    const { createRipple, rippleElements } = useRipple();
     
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
       if (enableRipple && variant !== "link" && variant !== "ghost") {
@@ -54,7 +54,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     if (asChild) {
-      return <Slot className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />;
+      return <Slot className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props}>{children}</Slot>;
     }
 
     return (
@@ -64,8 +64,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         onClick={handleClick}
         {...props}
       >
-        {props.children}
-        {enableRipple && variant !== "link" && variant !== "ghost" && <RippleContainer />}
+        {children}
+        {enableRipple && variant !== "link" && variant !== "ghost" && rippleElements}
       </button>
     );
   },

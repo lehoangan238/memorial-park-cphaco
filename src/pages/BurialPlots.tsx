@@ -1,12 +1,17 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronRight, MapPin, Users, TreePine, Building, Flower2, Mountain, Shield, Heart, Clock, Landmark } from "lucide-react";
+import { Play, ChevronRight, Plus, ChevronLeft } from "lucide-react";
 import familyImage from "@/assets/family-generations.jpg";
 import landscapeImage from "@/assets/landscape.jpg";
 import columbariumImage from "@/assets/columbarium.jpg";
 import heroParkImage from "@/assets/hero-park.jpg";
+import heroTreesImage from "@/assets/hero-trees.jpg";
+import coupleBeachImage from "@/assets/couple-beach.jpg";
+import family1Image from "@/assets/family-1.jpg";
+import family2Image from "@/assets/family-2.jpg";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -15,61 +20,105 @@ const fadeInUp = {
   transition: { duration: 0.6 }
 };
 
-const plotTypes = [
+// Plot types data for the staggered card layout
+const plotTypesLeft = [
   {
     id: 1,
-    category: "KHU MỘ GIA ĐÌNH",
-    title: "Lô Đất An Táng Gia Đình",
-    description: "Không gian riêng tư và trang trọng dành cho cả gia đình, nơi nhiều thế hệ có thể an nghỉ cùng nhau. Lô đất gia đình được thiết kế với diện tích rộng rãi, có thể chứa từ 4-12 vị trí an táng.",
-    features: [
-      "Diện tích từ 20m² - 100m²",
-      "Có thể chứa 4-12 vị trí",
-      "Thiết kế theo yêu cầu gia đình",
-      "Khu vực riêng biệt, yên tĩnh"
-    ],
-    image: familyImage,
-    reverse: false
+    category: "NƠI GỌI LÀ NHÀ",
+    title: "Lô Đất Gia Đình Hoàng Gia",
+    description: "Lá rụng sẽ luôn rơi gần gốc cây. Trong tư tưởng truyền thống Việt Nam, dù ở đâu, nhà luôn là nơi ấm áp nhất. Sâu trong tâm hồn, trái tim của người lữ khách sẽ luôn khao khát về nhà. Dù đi xa đến đâu, chúng ta sẽ luôn mong chờ ngày sum họp với người thân yêu.",
+    images: [heroParkImage, landscapeImage, columbariumImage],
+    buttonText: "XEM THÊM"
   },
   {
     id: 2,
-    category: "KHU TƯỞNG NIỆM TÔN GIÁO",
-    title: "Khu Tưởng Niệm Công Giáo",
-    description: "Được thiết kế đặc biệt cho cộng đồng Công giáo, khu vực này mang đậm nét tâm linh với các biểu tượng tôn giáo và không gian cầu nguyện. Môi trường thanh tịnh giúp gia đình tưởng nhớ người thân.",
-    features: [
-      "Thiết kế theo phong cách Công giáo",
-      "Khu vực cầu nguyện riêng",
-      "Tượng và biểu tượng tôn giáo",
-      "Lễ tang theo nghi thức tôn giáo"
-    ],
-    image: heroParkImage,
-    reverse: true
-  },
+    category: "CON NGƯỜI VÀ THIÊN NHIÊN HÒA QUYỆN",
+    title: "Lô Đất Đơn và Đôi",
+    description: "Công viên tưởng niệm Nirvana được thiết kế hài hòa với cảnh quan thiên nhiên. Thanh bình và thơ mộng, nơi đây xoa dịu tâm hồn và làm dịu trái tim. Với những ai tìm được nơi an nghỉ ở đây, đó đơn giản là một chốn bình yên.",
+    images: [landscapeImage, heroParkImage],
+    buttonText: "XEM THÊM"
+  }
+];
+
+const plotTypesRight = [
   {
     id: 3,
-    category: "LÔ ĐẤT ĐƠN VÀ ĐÔI",
-    title: "Lô Đất Đơn & Đôi",
-    description: "Lựa chọn linh hoạt cho cá nhân hoặc cặp đôi muốn an nghỉ bên nhau. Các lô đất được quy hoạch trong môi trường xanh mát, thoáng đãng với cảnh quan thiên nhiên tuyệt đẹp.",
-    features: [
-      "Lô đơn: 4m² - 6m²",
-      "Lô đôi: 8m² - 12m²",
-      "Vị trí đẹp, view thoáng",
-      "Giá cả hợp lý"
-    ],
-    image: landscapeImage,
-    reverse: false
+    category: "VINH QUANG VỚI NGHỆ THUẬT TINH XẢO",
+    title: "Lô Đất Gia Đình",
+    description: "Mỗi thiết kế cá nhân hóa kể một câu chuyện xứng đáng được tưởng niệm. Có thể ví như một bài thơ đẹp với sự huy hoàng bền vững. Tại đây, bạn được chào đón bởi những kỷ niệm quý giá gợi nhớ sở thích, tính cách và đặc điểm của người thân yêu.",
+    images: [columbariumImage, heroParkImage],
+    buttonText: "NHẬN BÁO GIÁ"
+  },
+  {
+    id: 4,
+    category: "NƠI AN NGHỈ VĨNH HẰNG THIÊN ĐƯỜNG",
+    title: "Khu Tưởng Niệm Công Giáo",
+    description: "Lấy cảm hứng từ \"Vương quốc Thiên đường\", Khu Tưởng Niệm Công Giáo là nơi an nghỉ vĩnh hằng trang nghiêm và tao nhã dành cho người Công giáo. Thiết kế trật tự và thanh bình bao gồm các lô đất đa dạng và nhà lưu trữ tro cốt.",
+    images: [heroTreesImage, landscapeImage],
+    buttonText: "NHẬN BÁO GIÁ"
   }
 ];
 
 const considerations = [
-  { icon: MapPin, title: "Vị trí và khả năng tiếp cận", description: "Khoảng cách từ nhà và giao thông thuận tiện" },
-  { icon: Building, title: "Cơ sở vật chất và tiện nghi", description: "Nhà tang lễ, nhà nguyện, khu vực đỗ xe" },
-  { icon: TreePine, title: "Môi trường và cảnh quan", description: "Cây xanh, hồ nước, không gian yên tĩnh" },
-  { icon: Shield, title: "An ninh và bảo trì", description: "Bảo vệ 24/7, chăm sóc mộ phần định kỳ" },
-  { icon: Users, title: "Chính sách thăm viếng", description: "Giờ mở cửa linh hoạt cho gia đình" },
-  { icon: Heart, title: "Dịch vụ hỗ trợ tang lễ", description: "Hỗ trợ toàn diện trong thời gian tang lễ" },
-  { icon: Clock, title: "Kế hoạch thanh toán", description: "Trả góp linh hoạt, không lãi suất" },
-  { icon: Landmark, title: "Uy tín và lịch sử", description: "Kinh nghiệm hơn 30 năm phục vụ" }
+  "Giá cả và khả năng phát sinh phí",
+  "Vị trí chính xác của lô đất",
+  "Bảo trì, tiện ích và tiện nghi",
+  "Cân nhắc cá nhân và gia đình lâu dài",
+  "Mối quan hệ với đơn vị chăm sóc tang lễ",
+  "Các tùy chọn lô đất an táng",
+  "Lắp đặt bia mộ hoặc tượng đài",
+  "Kế hoạch phát triển tương lai"
 ];
+
+// Image carousel component
+const ImageCarousel = ({ images, className = "" }: { images: string[], className?: string }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  return (
+    <div className={`relative group ${className}`}>
+      <img 
+        src={images[currentIndex]} 
+        alt="Gallery" 
+        className="w-full h-full object-cover"
+      />
+      {images.length > 1 && (
+        <>
+          <button 
+            onClick={prevSlide}
+            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button 
+            onClick={nextSlide}
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+            {images.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentIndex(idx)}
+                className={`w-2 h-2 rounded-full transition-colors ${
+                  idx === currentIndex ? 'bg-primary' : 'bg-white/60'
+                }`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
 
 const BurialPlots = () => {
   return (
@@ -103,226 +152,282 @@ const BurialPlots = () => {
         </div>
       </section>
 
-      {/* Intro Section */}
-      <section className="py-20 bg-white">
+      {/* Intro Section with Gray Background */}
+      <section className="py-16 bg-[#f5f5f5]">
         <div className="container mx-auto px-4">
-          <motion.div {...fadeInUp} className="text-center max-w-4xl mx-auto">
-            <span className="text-primary text-sm tracking-[0.2em] uppercase font-medium">Nơi An Nghỉ</span>
+          <motion.div {...fadeInUp} className="text-center max-w-4xl mx-auto mb-12">
+            <span className="text-primary text-sm tracking-[0.2em] uppercase font-medium">NƠI AN NGHỈ</span>
             <h2 className="font-display text-3xl md:text-4xl lg:text-5xl mt-4 mb-6 text-foreground">
-              Không gian an nghỉ trang trọng với cảnh quan tuyệt đẹp
+              Không gian an nghỉ vượt trội với sự khác biệt độc đáo
             </h2>
-            <p className="text-muted-foreground text-lg leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed">
               Tại Nirvana, chúng tôi hiểu rằng việc lựa chọn nơi an nghỉ cuối cùng là một quyết định quan trọng. 
-              Các khu vực an táng của chúng tôi được thiết kế với sự tôn trọng và chăm sóc tỉ mỉ, 
-              mang đến không gian thanh bình cho người đã khuất và sự an ủi cho gia đình.
+              Các khu vực an táng của chúng tôi được thiết kế với sự tôn trọng và chăm sóc tỉ mỉ.
             </p>
+            <button className="text-primary text-sm mt-4 flex items-center gap-1 mx-auto hover:gap-2 transition-all">
+              Xem thêm <ChevronRight className="w-4 h-4" />
+            </button>
           </motion.div>
+        </div>
+      </section>
 
-          <motion.div 
-            {...fadeInUp}
-            className="grid md:grid-cols-2 gap-8 mt-16 items-center"
-          >
-            <div className="rounded-2xl overflow-hidden shadow-xl">
+      {/* Video & Commitment Section */}
+      <section className="py-16 bg-[#e8eaed]">
+        <div className="container mx-auto px-4">
+          <motion.div {...fadeInUp} className="grid lg:grid-cols-3 gap-8 items-stretch">
+            {/* Video Thumbnail */}
+            <div className="lg:col-span-2 relative rounded-lg overflow-hidden shadow-xl aspect-video">
               <img 
-                src={familyImage} 
-                alt="Gia đình tưởng niệm" 
-                className="w-full h-[400px] object-cover"
+                src={coupleBeachImage} 
+                alt="Video thumbnail" 
+                className="w-full h-full object-cover"
               />
+              <div className="absolute inset-0 bg-black/20" />
+              <button className="absolute inset-0 flex items-center justify-center">
+                <div className="w-20 h-20 rounded-full border-2 border-white flex items-center justify-center bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors">
+                  <Play className="w-8 h-8 text-white fill-white ml-1" />
+                </div>
+              </button>
             </div>
-            <div className="bg-primary text-white p-8 md:p-12 rounded-2xl">
-              <h3 className="text-2xl font-display mb-6">Cam Kết Của Chúng Tôi</h3>
-              <ul className="space-y-4">
-                {[
-                  "Chăm sóc mộ phần suốt đời",
-                  "Bảo trì cảnh quan định kỳ",
-                  "An ninh 24/7",
-                  "Hỗ trợ gia đình tận tâm"
-                ].map((item, index) => (
-                  <li key={index} className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-white/80 flex-shrink-0" />
-                    <span className="text-white/90">{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <Button variant="outline" className="mt-8 border-white text-white hover:bg-white hover:text-primary">
-                Tìm Hiểu Thêm
-                <ChevronRight className="w-4 h-4 ml-1" />
-              </Button>
+
+            {/* Commitment Card */}
+            <div className="flex flex-col">
+              <span className="text-primary text-sm tracking-[0.2em] uppercase font-medium mb-4">XEM</span>
+              <div className="bg-primary text-white p-8 rounded-lg flex-1 flex flex-col justify-center">
+                <h3 className="font-display text-3xl italic mb-6">Cam Kết</h3>
+                <p className="text-white/90 leading-relaxed mb-4">
+                  Một cam kết vượt qua mọi ranh giới được ràng buộc bởi tình yêu đích thực.
+                </p>
+                <p className="text-white/80 leading-relaxed">
+                  Tại Nirvana, hãy yên tâm rằng việc thực hiện cam kết đó là lời hứa của chúng tôi.
+                </p>
+              </div>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Plot Types Section */}
-      <section className="py-20 bg-secondary/30">
+      {/* Burial Plot Types Section - White Background */}
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <motion.div {...fadeInUp} className="text-center mb-16">
-            <span className="text-primary text-sm tracking-[0.2em] uppercase font-medium">Loại Hình</span>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl mt-4 text-foreground">
+            <span className="text-primary text-sm tracking-[0.3em] uppercase font-medium">KHÁM PHÁ</span>
+            <h2 className="font-display text-4xl md:text-5xl mt-4 text-foreground">
               Các Loại Lô Đất An Táng
             </h2>
           </motion.div>
 
-          <div className="space-y-20">
-            {plotTypes.map((plot, index) => (
-              <motion.div
-                key={plot.id}
-                {...fadeInUp}
-                className={`grid md:grid-cols-2 gap-8 lg:gap-16 items-center ${
-                  plot.reverse ? 'md:flex-row-reverse' : ''
-                }`}
-              >
-                <div className={plot.reverse ? 'md:order-2' : ''}>
-                  <div className="rounded-2xl overflow-hidden shadow-xl">
-                    <img 
-                      src={plot.image} 
-                      alt={plot.title}
-                      className="w-full h-[350px] lg:h-[450px] object-cover hover:scale-105 transition-transform duration-500"
-                    />
+          {/* Staggered Cards Layout */}
+          <motion.div {...fadeInUp} className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+            {/* Left Column */}
+            <div className="space-y-8">
+              {plotTypesLeft.map((plot, index) => (
+                <div key={plot.id} className="bg-white shadow-lg rounded-lg overflow-hidden">
+                  <ImageCarousel images={plot.images} className="h-64 md:h-80" />
+                  <div className="p-6 md:p-8">
+                    <span className="text-muted-foreground text-xs tracking-[0.15em] uppercase">
+                      {plot.category}
+                    </span>
+                    <h3 className="font-display text-2xl md:text-3xl text-primary mt-2 mb-4">
+                      {plot.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+                      {plot.description}
+                    </p>
+                    <button className="text-foreground text-sm flex items-center gap-2 mb-4 hover:text-primary transition-colors">
+                      {plot.buttonText} <ChevronRight className="w-4 h-4 text-primary" />
+                    </button>
+                    <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white">
+                      NHẬN BÁO GIÁ
+                    </Button>
                   </div>
                 </div>
-                <div className={plot.reverse ? 'md:order-1' : ''}>
-                  <span className="text-primary text-xs tracking-[0.2em] uppercase font-medium">
-                    {plot.category}
-                  </span>
-                  <h3 className="font-display text-2xl md:text-3xl mt-3 mb-4 text-foreground">
-                    {plot.title}
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed mb-6">
-                    {plot.description}
-                  </p>
-                  <ul className="space-y-3 mb-8">
-                    {plot.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center gap-3 text-foreground">
-                        <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <Button variant="default" size="lg">
-                    Xem Chi Tiết
-                    <ChevronRight className="w-4 h-4 ml-1" />
-                  </Button>
+              ))}
+            </div>
+
+            {/* Right Column - Offset */}
+            <div className="space-y-8 lg:mt-32">
+              {plotTypesRight.map((plot) => (
+                <div key={plot.id} className="bg-white shadow-lg rounded-lg overflow-hidden">
+                  <div className="p-6 md:p-8">
+                    <span className="text-muted-foreground text-xs tracking-[0.15em] uppercase">
+                      {plot.category}
+                    </span>
+                    <h3 className="font-display text-2xl md:text-3xl text-primary mt-2 mb-4">
+                      {plot.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+                      {plot.description}
+                    </p>
+                    <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white">
+                      {plot.buttonText}
+                    </Button>
+                  </div>
+                  <ImageCarousel images={plot.images} className="h-64 md:h-80" />
                 </div>
-              </motion.div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Quote Section */}
-      <section className="py-20 bg-primary text-white">
-        <div className="container mx-auto px-4 text-center">
-          <motion.div {...fadeInUp}>
-            <Flower2 className="w-12 h-12 mx-auto mb-6 text-white/60" />
-            <blockquote className="font-display text-2xl md:text-3xl lg:text-4xl italic max-w-4xl mx-auto leading-relaxed">
-              "Một nơi an nghỉ đẹp đẽ là món quà cuối cùng dành cho người thân yêu"
-            </blockquote>
-            <p className="mt-6 text-white/70">— Triết lý Nirvana</p>
+      {/* Blue Background Plot Types Section */}
+      <section className="py-20 bg-primary">
+        <div className="container mx-auto px-4">
+          <motion.div {...fadeInUp} className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+            {/* Left Card - Image Top */}
+            <div className="bg-primary border border-white/20 rounded-lg overflow-hidden">
+              <ImageCarousel images={[landscapeImage, heroParkImage]} className="h-64 md:h-72" />
+              <div className="p-6 md:p-8">
+                <span className="text-white/60 text-xs tracking-[0.15em] uppercase">
+                  CON NGƯỜI VÀ THIÊN NHIÊN HÒA QUYỆN
+                </span>
+                <h3 className="font-display text-2xl md:text-3xl text-white mt-2 mb-4">
+                  Lô Đất Đơn và Đôi
+                </h3>
+                <p className="text-white/80 text-sm leading-relaxed mb-6">
+                  Công viên tưởng niệm Nirvana được thiết kế hài hòa với cảnh quan thiên nhiên. 
+                  Thanh bình và thơ mộng, nơi đây xoa dịu tâm hồn. Phong thủy tuyệt vời mang lại 
+                  sự thịnh vượng cho các thế hệ.
+                </p>
+                <button className="text-white text-sm flex items-center gap-2 mb-4 hover:text-white/80 transition-colors">
+                  XEM THÊM <ChevronRight className="w-4 h-4" />
+                </button>
+                <Button variant="secondary" className="bg-white text-primary hover:bg-white/90">
+                  NHẬN BÁO GIÁ
+                </Button>
+              </div>
+            </div>
+
+            {/* Right Card - Text Top */}
+            <div className="bg-primary border border-white/20 rounded-lg overflow-hidden">
+              <div className="p-6 md:p-8">
+                <span className="text-white/60 text-xs tracking-[0.15em] uppercase">
+                  NƠI AN NGHỈ VĨNH HẰNG THIÊN ĐƯỜNG
+                </span>
+                <h3 className="font-display text-2xl md:text-3xl text-white mt-2 mb-4">
+                  Khu Tưởng Niệm Công Giáo
+                </h3>
+                <p className="text-white/80 text-sm leading-relaxed mb-6">
+                  Lấy cảm hứng từ "Vương quốc Thiên đường", Khu Tưởng Niệm Công Giáo là nơi 
+                  an nghỉ vĩnh hằng trang nghiêm và tao nhã dành cho người Công giáo. 
+                  Thiết kế thanh bình bao gồm các lô đất đa dạng và nhà lưu trữ tro cốt.
+                </p>
+                <Button variant="secondary" className="bg-white text-primary hover:bg-white/90">
+                  NHẬN BÁO GIÁ
+                </Button>
+              </div>
+              <ImageCarousel images={[heroTreesImage, columbariumImage]} className="h-64 md:h-72" />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 360 View Section */}
+      <section className="py-20 bg-[#8b9dc3]">
+        <div className="container mx-auto px-4">
+          <motion.div {...fadeInUp} className="text-center">
+            <span className="text-white/80 text-sm tracking-[0.3em] uppercase font-medium">XEM</span>
+            <h2 className="font-display text-3xl md:text-4xl text-white mt-3 mb-6 tracking-wider">
+              CÔNG VIÊN TƯỞNG NIỆM NIRVANA
+            </h2>
+            <Button 
+              variant="outline" 
+              className="border-white/50 text-white hover:bg-white/10 mb-10"
+            >
+              Tham Quan 360°
+            </Button>
+            
+            {/* Video Section */}
+            <div className="relative max-w-4xl mx-auto rounded-lg overflow-hidden shadow-2xl aspect-video">
+              <img 
+                src={heroParkImage} 
+                alt="Nirvana Memorial Park" 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black/10" />
+              <button className="absolute inset-0 flex items-center justify-center">
+                <div className="w-20 h-20 rounded-full border-2 border-white/80 flex items-center justify-center bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors">
+                  <Play className="w-8 h-8 text-white fill-white/80 ml-1" />
+                </div>
+              </button>
+            </div>
           </motion.div>
         </div>
       </section>
 
       {/* 8 Considerations Section */}
-      <section className="py-20 bg-[#e8eaf6]">
-        <div className="container mx-auto px-4">
-          <motion.div {...fadeInUp} className="text-center mb-16">
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-foreground">
-              8 Điều Cần Cân Nhắc Khi
-              <br />
-              <span className="text-primary">Chọn Nơi An Táng</span>
-            </h2>
-          </motion.div>
-
-          <motion.div 
-            {...fadeInUp}
-            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
-          >
-            {considerations.map((item, index) => (
-              <div 
-                key={index}
-                className="bg-white p-6 rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 group"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
-                    <item.icon className="w-5 h-5 text-primary group-hover:text-white transition-colors" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-foreground mb-1">{item.title}</h4>
-                    <p className="text-sm text-muted-foreground">{item.description}</p>
-                  </div>
-                </div>
+      <section className="py-0">
+        {/* Top Half - Blue with Title and Image */}
+        <div className="bg-primary">
+          <div className="container mx-auto px-4">
+            <motion.div {...fadeInUp} className="grid lg:grid-cols-2 gap-8 items-center py-16">
+              <div className="text-white">
+                <h2 className="font-display text-4xl md:text-5xl lg:text-6xl leading-tight">
+                  8 điều cần cân nhắc khi<br />
+                  <span className="text-white/90">chọn nơi an táng</span>
+                </h2>
               </div>
-            ))}
-          </motion.div>
+              <div className="relative">
+                <img 
+                  src={family1Image} 
+                  alt="Happy family" 
+                  className="w-full h-80 object-cover rounded-lg shadow-xl"
+                />
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Bottom Half - White with Considerations List */}
+        <div className="bg-white">
+          <div className="container mx-auto px-4 py-16">
+            <motion.div {...fadeInUp} className="grid md:grid-cols-2 gap-x-12 gap-y-6">
+              {considerations.map((item, index) => (
+                <div 
+                  key={index} 
+                  className="flex items-center justify-between py-4 border-l-4 border-primary pl-4 hover:bg-gray-50 transition-colors cursor-pointer group"
+                >
+                  <span className="text-foreground">{item}</span>
+                  <Plus className="w-5 h-5 text-primary group-hover:rotate-45 transition-transform" />
+                </div>
+              ))}
+            </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Differences Section */}
+      {/* Difference Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <motion.div 
-            {...fadeInUp}
-            className="grid md:grid-cols-2 gap-12 items-center"
-          >
-            <div className="rounded-2xl overflow-hidden shadow-xl">
+          <motion.div {...fadeInUp} className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Image with Border */}
+            <div className="relative">
+              <div className="absolute left-0 top-0 bottom-0 w-2 bg-primary rounded-full" />
               <img 
-                src={heroParkImage} 
-                alt="Công viên tưởng niệm" 
-                className="w-full h-[450px] object-cover"
+                src={family2Image} 
+                alt="Family in park" 
+                className="w-full h-[400px] object-cover ml-6 rounded-lg shadow-lg"
               />
             </div>
+
+            {/* Content */}
             <div>
-              <span className="text-primary text-sm tracking-[0.2em] uppercase font-medium">
-                Sự Khác Biệt
-              </span>
-              <h3 className="font-display text-3xl md:text-4xl mt-4 mb-6 text-foreground">
-                Điểm Khác Biệt Giữa Nghĩa Trang Công Viên Và Nghĩa Trang Truyền Thống
+              <h3 className="font-display text-3xl md:text-4xl text-primary mb-6">
+                Sự khác biệt giữa công viên tưởng niệm và nghĩa trang truyền thống
               </h3>
               <p className="text-muted-foreground leading-relaxed mb-6">
-                Nghĩa trang công viên như Nirvana mang đến một cách tiếp cận hiện đại trong việc tưởng niệm người đã khuất. 
-                Thay vì không gian u ám và buồn bã, chúng tôi tạo nên một công viên xanh tươi, 
-                nơi gia đình có thể đến thăm viếng và tìm thấy sự bình yên.
+                Khi lên kế hoạch trước hoặc tìm kiếm nơi an nghỉ cho người thân, bạn có thể gặp 
+                các thuật ngữ "công viên tưởng niệm" và "nghĩa trang". Đôi khi bạn có thể nghe 
+                hai thuật ngữ này được sử dụng thay thế cho nhau. Hai thuật ngữ này có cùng ý nghĩa không?
               </p>
-              <ul className="space-y-4 mb-8">
-                {[
-                  "Cảnh quan được chăm sóc chuyên nghiệp",
-                  "Không gian mở và thoáng đãng",
-                  "Tiện nghi hiện đại cho khách thăm viếng",
-                  "Quy hoạch bài bản và khoa học"
-                ].map((item, index) => (
-                  <li key={index} className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span className="text-foreground">{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <Button variant="default" size="lg">
-                Đặt Lịch Tham Quan
-                <ChevronRight className="w-4 h-4 ml-1" />
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 bg-primary">
-        <div className="container mx-auto px-4 text-center">
-          <motion.div {...fadeInUp}>
-            <h2 className="font-display text-3xl md:text-4xl text-white mb-4">
-              Sẵn Sàng Tìm Hiểu Thêm?
-            </h2>
-            <p className="text-white/80 mb-8 max-w-2xl mx-auto">
-              Liên hệ với chúng tôi để được tư vấn miễn phí và tham quan các khu vực an táng
-            </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-primary">
-                Đặt Lịch Tư Vấn
-              </Button>
-              <Button variant="secondary" size="lg" className="bg-white text-primary hover:bg-white/90">
-                Gọi 1800-88-1818
-              </Button>
+              <p className="text-muted-foreground leading-relaxed mb-8">
+                Mặc dù mục đích có thể giống nhau, công viên tưởng niệm và nghĩa trang thực sự 
+                có sự khác biệt rõ ràng về cảnh quan, tiện nghi và trải nghiệm thăm viếng.
+              </p>
+              <button className="text-foreground text-sm flex items-center gap-2 hover:text-primary transition-colors font-medium tracking-wide">
+                XEM THÊM <ChevronRight className="w-4 h-4 text-primary" />
+              </button>
             </div>
           </motion.div>
         </div>
