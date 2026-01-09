@@ -192,46 +192,52 @@ const Columbaria = () => {
         </div>
       </section>
 
-      {/* Columbaria Type 2: Blue Left + Image Right */}
-      <section className="py-8 md:py-12 bg-white">
+      {/* Columbaria Type 2: Blue Box with Image Overlay */}
+      <section className="py-10 md:py-16 bg-[#f0f4f8]">
         <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-0 overflow-hidden">
-              {/* Left - Blue Box */}
-              <motion.div {...fadeInLeft} className="bg-primary p-8 md:p-12 flex flex-col justify-center order-2 lg:order-1">
-                <span className="text-white/60 text-[10px] tracking-[0.2em] uppercase mb-3">
-                  A HARMONIOUS FUSION OF TRADITIONAL
-                </span>
-                <h3 className="font-display text-2xl md:text-3xl text-white italic mb-6">
-                  Modern Columbarium
-                </h3>
-                <p className="text-white/80 text-sm leading-relaxed">
-                  The modern columbarium is designed along vibrant artistic lines set amidst an 
-                  auspicious environment that promotes prosperity. The design conveys the essence 
-                  of a timeless masterpiece. The rustic pavilions are complemented with minimalist 
-                  murals, sculptures and paintings.
-                </p>
-              </motion.div>
-              
-              {/* Right - Image with Pattern Background */}
-              <motion.div 
-                {...fadeInRight} 
-                className="relative order-1 lg:order-2"
-                style={{
-                  backgroundImage: `radial-gradient(circle, #e2e8f0 1px, transparent 1px)`,
-                  backgroundSize: '15px 15px',
-                  backgroundColor: '#f8fafc'
-                }}
-              >
-                <div className="p-6 md:p-8">
-                  <img 
-                    src={landscapeImage} 
-                    alt="Modern Columbarium" 
-                    className="w-full h-56 md:h-72 object-cover shadow-lg"
-                  />
+          <div className="max-w-5xl mx-auto">
+            <motion.div 
+              {...fadeInUp}
+              className="relative bg-primary py-12 md:py-16 px-6 md:px-12"
+            >
+              <div className="grid lg:grid-cols-2 gap-8 items-center">
+                {/* Left - Text Content */}
+                <div className="lg:pr-4">
+                  <span className="text-white/60 text-[10px] tracking-[0.2em] uppercase mb-3 block">
+                    SPIRITUAL COMFORT MEETS CONTEMPORARY SENSIBILITIES
+                  </span>
+                  <h3 className="font-display text-2xl md:text-3xl text-white italic mb-6">
+                    Christian Columbarium
+                  </h3>
+                  <p className="text-white/80 text-sm leading-relaxed mb-6">
+                    The artistic Christian Columbarium is a masterpiece of bereavement architecture 
+                    that is unlike any other. While its unique style exudes a distinctive Christian 
+                    character, the Christian Columbarium presents the best of both worlds: spiritual 
+                    comfort and contemporary sensibilities.
+                  </p>
+                  <button className="text-white text-xs flex items-center gap-2 hover:text-white/80 transition-colors tracking-[0.1em] uppercase font-medium">
+                    READ MORE <ChevronRight className="w-4 h-4 bg-white/20 rounded-full p-0.5" />
+                  </button>
                 </div>
-              </motion.div>
-            </div>
+                
+                {/* Right - Image with Overflow Effect */}
+                <div className="relative lg:absolute lg:right-6 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%]">
+                  <img 
+                    src={columbariumImage} 
+                    alt="Christian Columbarium" 
+                    className="w-full h-64 md:h-80 object-cover shadow-xl"
+                  />
+                  {/* Carousel Dots */}
+                  <div className="flex justify-center gap-2 mt-4">
+                    <span className="w-2 h-2 rounded-full bg-white/40" />
+                    <span className="w-2 h-2 rounded-full bg-white" />
+                    <span className="w-2 h-2 rounded-full bg-white/40" />
+                    <span className="w-2 h-2 rounded-full bg-white/40" />
+                    <span className="w-2 h-2 rounded-full bg-white/40" />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
