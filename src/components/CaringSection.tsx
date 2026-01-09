@@ -3,22 +3,23 @@ import familyHug from '@/assets/family-hug.jpg';
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
+// Optimized stagger - faster timing for mobile
 const staggerContainer = {
   hidden: {},
   visible: {
     transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.1
+      staggerChildren: 0.08,
+      delayChildren: 0.05
     }
   }
 };
 
 const staggerItem = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 20 },
   visible: { 
     opacity: 1, 
     y: 0,
-    transition: { duration: 0.6, ease: easeOut }
+    transition: { duration: 0.4, ease: easeOut }
   }
 };
 
@@ -49,21 +50,21 @@ export const CaringSection = () => {
         
         <div className="relative z-10 container mx-auto px-4 text-center">
           <motion.h2
-            initial={{ opacity: 0, y: 30, scale: 0.95 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7, ease: easeOut }}
-            className="text-5xl md:text-6xl text-white mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5, ease: easeOut }}
+            className="text-5xl md:text-6xl text-white mb-8 will-change-transform"
             style={{ fontFamily: "'Great Vibes', cursive" }}
           >
             Chăm Sóc Cuộc Sống
           </motion.h2>
           
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ delay: 0.15, duration: 0.7, ease: easeOut }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ delay: 0.1, duration: 0.5, ease: easeOut }}
             className="text-white/90 text-sm md:text-base max-w-4xl mx-auto leading-relaxed"
             style={{ fontFamily: "'Open Sans', sans-serif" }}
           >
@@ -79,23 +80,21 @@ export const CaringSection = () => {
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true, margin: "-50px" }}
             className="grid md:grid-cols-3 gap-8"
           >
             {infoCards.map((card) => (
               <motion.div
                 key={card.title}
                 variants={staggerItem}
-                whileHover={{ y: -8 }}
                 className="group cursor-pointer"
               >
                 <div className="relative overflow-hidden mb-4">
-                  <motion.img 
+                  <img 
                     src={card.image} 
                     alt={card.title}
-                    className="w-full h-48 object-cover"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.5 }}
+                    className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+                    loading="lazy"
                   />
                 </div>
                 <h3 
