@@ -108,57 +108,53 @@ const Others = () => {
       {/* Section 1: Ancestral Tablet - White Background */}
       <section className="py-16 md:py-24 bg-white">
         <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
-            {/* Left: Image Carousel with caption */}
-            <motion.div {...fadeInLeft} className="group">
-              <ImageCarousel 
-                images={[columbariumImage, landscapeImage, heroParkImage]}
-                className="w-full aspect-[4/3] shadow-lg"
-                showDots={true}
-                showArrows={true}
-                dotsPosition="outside"
-                dotsColor="primary"
-              />
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-20 items-start">
+            {/* Left: Static Image with caption */}
+            <motion.div {...fadeInLeft}>
+              <div className="border border-gray-200 p-1">
+                <img 
+                  src={columbariumImage} 
+                  alt="Ancestral Tablet" 
+                  className="w-full aspect-square object-cover"
+                />
+              </div>
               <p className="text-center font-display text-xl italic text-foreground mt-4">
                 Ancestral Tablet
               </p>
             </motion.div>
 
-            {/* Right: Text Content */}
+            {/* Right: Text Content + Carousel at bottom */}
             <motion.div {...fadeInRight} className="flex flex-col justify-start">
-              <h2 className="font-display text-3xl md:text-4xl text-primary italic mb-6">
+              <h2 className="font-display text-3xl md:text-4xl text-[#c9a227] mb-6">
                 Ancestral Tablet
               </h2>
               <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                Chinese custom ancestral tablet, a significant artifact within various Asian cultures, especially 
-                within communities influenced by Confucian traditions. This sacred object represents the 
-                ancestral spirit tablets that honor the memory and spirits of one's forebears.
+                Ancestral worship in the form of ancestral tablets is a Chinese tradition 
+                that dates back to the ancient times. Ancestral tablets in the past 
+                usually take central position at the altar of traditional Chinese homes. 
+                It is a sacred item that is synonymous with the virtue of filial piety.
               </p>
-              <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-                By preserving and honoring these legacy vessels for your ancestors, each family member 
-                perpetuates shared heritage and family history, passes the importance of continuing traditions 
-                to future generations, preserves valuable documentation, customs and commemorates those 
-                who are the bedrock of you, and you to them at the simplest, yet most important respect of 
-                our existence, and forever honours the sacrifice of lives lost for us to exist in our evolved 
-                settings.
+              <p className="text-muted-foreground text-sm leading-relaxed mb-8">
+                The passage of time is changing the way we pay homage to our 
+                ancestors and families may not have time or space to honour their ancestors 
+                at home. Nirvana offers the option of installing ancestral tablets at 
+                various memorial centres to preserve and promote the virtuous 
+                tradition of honouring our ancestors while accommodating modern 
+                lifestyles. At the same time, we offer thoughtfully-designed ancestral 
+                tablets that are installed in elegant and air-conditioned settings – 
+                surrounding sanctified altars dedicated to divinities and enlightened 
+                beings.
               </p>
               
-              {/* Small gallery of 3 images */}
-              <div className="grid grid-cols-3 gap-3 mt-4">
-                <img 
-                  src={family1Image} 
-                  alt="Ancestral tablet detail 1" 
-                  className="w-full aspect-[4/3] object-cover"
-                />
-                <img 
-                  src={family2Image} 
-                  alt="Ancestral tablet detail 2" 
-                  className="w-full aspect-[4/3] object-cover"
-                />
-                <img 
-                  src={family3Image} 
-                  alt="Ancestral tablet detail 3" 
-                  className="w-full aspect-[4/3] object-cover"
+              {/* Image Carousel at bottom */}
+              <div className="group">
+                <ImageCarousel 
+                  images={[columbariumImage, landscapeImage, heroParkImage]}
+                  className="w-full aspect-[16/10]"
+                  showDots={true}
+                  showArrows={true}
+                  dotsPosition="outside"
+                  dotsColor="primary"
                 />
               </div>
             </motion.div>
