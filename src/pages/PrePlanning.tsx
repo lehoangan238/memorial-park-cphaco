@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ChevronRight, Plus, Check } from "lucide-react";
+import { ChevronRight, Plus } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
@@ -163,85 +163,81 @@ const PrePlanning = () => {
         </div>
       </section>
 
-      {/* Section 3: 5 main advantages - Blue Header with Image */}
-      <section className="bg-primary">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          <div className="grid lg:grid-cols-2">
-            {/* Left: Title */}
-            <motion.div {...fadeInLeft} className="py-12 md:py-16">
-              <h2 className="font-display text-3xl md:text-4xl text-white">
+      {/* Section 3: 5 main advantages - Blue Header + Stacked Layout */}
+      <section className="relative bg-background">
+        <div className="absolute inset-x-0 top-0 h-[240px] bg-primary" />
+
+        <div className="container mx-auto px-4 md:px-8 lg:px-16 relative pt-12 pb-16">
+          {/* Title (left) + Image (right spans into For Yourself) */}
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+            <motion.div {...fadeInLeft}>
+              <h2 className="font-display text-3xl md:text-4xl text-primary-foreground">
                 5 main advantages<br />
                 of pre-planning
               </h2>
             </motion.div>
-            {/* Right: Image */}
-            <motion.div {...fadeInRight} className="relative">
-              <img 
-                src={familyGenerationsImage} 
-                alt="Family together" 
-                className="w-full h-full object-cover min-h-[200px]"
-              />
-            </motion.div>
-          </div>
-        </div>
-      </section>
 
-      {/* Section 4: For Yourself - White Background */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
-            {/* Left: For Yourself with blue border */}
-            <motion.div {...fadeInLeft}>
-              <h3 className="font-display text-2xl md:text-3xl text-foreground italic mb-8">
-                For Yourself
-              </h3>
-              <div className="space-y-5 border-l-4 border-primary pl-6">
-                {forYourselfBenefits.map((benefit, index) => (
-                  <p key={index} className="text-muted-foreground text-sm leading-relaxed">
-                    {benefit}
-                  </p>
-                ))}
+            <motion.div {...fadeInRight} className="lg:row-span-2">
+              <div className="bg-background p-2 shadow-lg">
+                <img
+                  src={familyHugImage}
+                  alt="Family support"
+                  className="w-full aspect-[4/3] object-cover"
+                />
               </div>
             </motion.div>
 
-            {/* Right: Image */}
-            <motion.div {...fadeInRight}>
-              <img 
-                src={family1Image} 
-                alt="Family with laptop" 
-                className="w-full aspect-[4/3] object-cover"
-              />
-            </motion.div>
-          </div>
-        </div>
-      </section>
+            <motion.div {...fadeInLeft} className="pt-2">
+              <h3 className="text-foreground text-xl font-light mb-6">For Yourself</h3>
 
-      {/* Section 5: For Your Family - White Background */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
-            {/* Left: Image */}
-            <motion.div {...fadeInLeft}>
-              <img 
-                src={family2Image} 
-                alt="Family generations" 
-                className="w-full aspect-[4/3] object-cover"
-              />
-            </motion.div>
+              <div className="relative pl-8">
+                <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-primary" />
 
-            {/* Right: For Your Family with blue border */}
-            <motion.div {...fadeInRight}>
-              <h3 className="font-display text-2xl md:text-3xl text-foreground italic mb-8">
-                For Your Family
-              </h3>
-              <div className="space-y-5 border-l-4 border-primary pl-6">
-                {forFamilyBenefits.map((benefit, index) => (
-                  <p key={index} className="text-muted-foreground text-sm leading-relaxed">
-                    {benefit}
-                  </p>
-                ))}
+                <div className="space-y-4">
+                  {forYourselfBenefits.map((benefit, index) => (
+                    <div key={index} className="flex items-start justify-between gap-6">
+                      <p className="text-primary text-sm leading-relaxed">{benefit}</p>
+                      <span className="mt-1.5 w-2 h-2 rounded-full bg-primary flex-shrink-0" />
+                    </div>
+                  ))}
+                </div>
               </div>
             </motion.div>
+          </div>
+
+          {/* For Your Family row */}
+          <div className="mt-14 grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+            <motion.div {...fadeInLeft}>
+              <div className="bg-background p-2 shadow-lg">
+                <img
+                  src={family1Image}
+                  alt="Family together"
+                  className="w-full aspect-[4/3] object-cover"
+                />
+              </div>
+            </motion.div>
+
+            <motion.div {...fadeInRight} className="pt-2">
+              <h3 className="text-foreground text-xl font-light mb-6">For Your Family</h3>
+
+              <div className="relative pl-8">
+                <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-primary" />
+
+                <div className="space-y-4">
+                  {forFamilyBenefits.map((benefit, index) => (
+                    <div key={index} className="flex items-start justify-between gap-6">
+                      <p className="text-primary text-sm leading-relaxed">{benefit}</p>
+                      <span className="mt-1.5 w-2 h-2 rounded-full bg-primary flex-shrink-0" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Small blue divider like the reference */}
+          <div className="mt-12 flex justify-center">
+            <div className="h-3 w-28 bg-primary" />
           </div>
         </div>
       </section>
