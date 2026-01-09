@@ -71,9 +71,18 @@ export default {
         },
       },
       fontFamily: {
-        display: ["'Cormorant Garamond'", "serif"],
-        body: ["'Segoe UI'", "Tahoma", "Geneva", "Verdana", "sans-serif"],
+        display: ["'Poppins'", "sans-serif"],
+        body: ["'Poppins'", "sans-serif"],
         script: ["'Great Vibes'", "cursive"],
+        heading: ["'Poppins'", "sans-serif"],
+      },
+      fontWeight: {
+        light: "300",
+        normal: "400",
+        medium: "500",
+        semibold: "600",
+        bold: "700",
+        extrabold: "800",
       },
       borderRadius: {
         lg: "var(--radius)",
