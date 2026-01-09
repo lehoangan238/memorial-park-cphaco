@@ -162,90 +162,86 @@ const Others = () => {
         </div>
       </section>
 
-      {/* Section 2: NV Seed - Blue Background */}
-      <section className="py-16 md:py-24 bg-primary">
+      {/* Section 2: NV Seed - Gray Background */}
+      <section className="py-16 md:py-24 bg-[#e8ecf1]">
         <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-            {/* Left: Text Content with small image */}
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+            {/* Left: Text Content */}
             <motion.div {...fadeInLeft}>
-              <h2 className="font-display text-3xl md:text-4xl text-white italic mb-6">
+              <h2 className="font-display text-3xl md:text-4xl text-foreground mb-6">
                 NV Seed
               </h2>
-              <p className="text-white/80 text-sm leading-relaxed mb-4">
-                Originated in China over 1,500 years ago, Sheng Ji literally means "to grow 
-                from the dragon, also known as "Sheng Ji," is a sacred practice of 
-                burial where part of a living person's 
-                personal belongings are buried to improve their luck.
+              <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                The principles of Sheng Ji or "Living Tomb" involves the creation of a 
+                tomb for a living person in order to harness auspicious energies of an 
+                environment with excellent Feng Shui to remedy imperfections 
+                contained within the subject's destiny or Ba Zi.
               </p>
-              <p className="text-white/80 text-sm leading-relaxed mb-6">
-                It is the belief that the land is alive and has life-giving energy called Chi (Qi). 
-                Blessed by nature's forces such as sun, rain and wind, the chi within the land 
-                contains the power of creating good fortune for your family and 
-                descendants.
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                NV Seed takes advantage of the powerful Feng Shui dynamics found at 
+                Nirvana's various memorial parks which are endorsed by renowned 
+                masters for the purpose of installing Sheng Ji. By deploying this Feng 
+                Shui remedy, a person's life can be improved in various ways such as 
+                enhanced fortune, career, health, family relations and overall luck.
               </p>
-              
-              {/* Small image with caption */}
-              <div className="inline-block mt-4">
+            </motion.div>
+
+            {/* Right: Blue Box with Image + Caption */}
+            <motion.div {...fadeInRight}>
+              <div className="bg-primary p-6 md:p-8">
                 <img 
-                  src={heroParkImage} 
+                  src={landscapeImage} 
                   alt="NV Seed" 
-                  className="w-48 md:w-56 aspect-[4/3] object-cover"
+                  className="w-full aspect-[4/3] object-cover"
                 />
-                <p className="text-center font-display text-lg italic text-white mt-3">
+                <p className="text-center font-display text-xl italic text-white mt-4">
                   NV Seed
                 </p>
               </div>
-            </motion.div>
-
-            {/* Right: Large Image */}
-            <motion.div {...fadeInRight}>
-              <img 
-                src={landscapeImage} 
-                alt="NV Seed landscape" 
-                className="w-full aspect-[4/3] object-cover shadow-xl"
-              />
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Section 3: 7 Benefits of Installing Sheng Ji - White Background */}
-      <section className="py-16 md:py-24 bg-white">
+      {/* Section 3: 7 Benefits - Gray Background continues */}
+      <section className="py-10 md:py-16 bg-[#e8ecf1]">
         <div className="container mx-auto px-4 md:px-8 lg:px-16">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
-            {/* Left: Large Image */}
+            {/* Left: Image */}
             <motion.div {...fadeInLeft}>
               <img 
                 src={heroParkImage} 
-                alt="Sheng Ji benefits" 
-                className="w-full aspect-[4/3] object-cover shadow-lg"
+                alt="Sheng Ji memorial" 
+                className="w-full aspect-[4/3] object-cover"
               />
             </motion.div>
 
-            {/* Right: Text Content with Benefits List */}
+            {/* Right: Blue Box with Title + Benefits List */}
             <motion.div {...fadeInRight}>
-              <h2 className="font-display text-3xl md:text-4xl text-primary italic mb-6">
-                7 benefits of installing Sheng Ji
-              </h2>
-              <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-                With the Sheng Ji plot, Chinese ancestors have traditionally believed that they can 
-                enhance their luck by tapping into the positive chi of the plot. Also known as 
-                "Sheng Ji."
-              </p>
-              
-              {/* Benefits List */}
-              <div className="space-y-3">
-                {benefits.map((benefit, index) => (
-                  <div 
-                    key={index} 
-                    className="flex items-center justify-between py-3 border-b border-gray-200"
-                  >
-                    <span className="text-foreground text-sm">{benefit}</span>
-                    <div className="w-6 h-6 bg-primary flex items-center justify-center">
-                      <Plus className="w-4 h-4 text-white" />
+              <div className="bg-primary p-6 md:p-8">
+                <h2 className="font-display text-2xl md:text-3xl text-white mb-4">
+                  7 benefits of installing Sheng Ji
+                </h2>
+                <p className="text-white/80 text-sm leading-relaxed mb-6">
+                  The installation of Sheng Ji or "Living Tomb" has many benefits if done 
+                  with proper care and consultation. The seven key benefits for installing 
+                  Sheng Ji are:
+                </p>
+                
+                {/* Benefits List */}
+                <div className="space-y-0">
+                  {benefits.map((benefit, index) => (
+                    <div 
+                      key={index} 
+                      className="flex items-center justify-between py-3 border-b border-white/20 last:border-b-0"
+                    >
+                      <span className="text-white text-sm">{benefit}</span>
+                      <div className="w-6 h-6 bg-white/20 flex items-center justify-center">
+                        <Plus className="w-4 h-4 text-white" />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </motion.div>
           </div>
