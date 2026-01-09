@@ -255,32 +255,34 @@ const PrePlanning = () => {
           }}
         />
 
-        {/* Center badge (overlaps section top like the reference) */}
-        <motion.div
-          {...fadeInUp}
-          className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 w-56 h-56 bg-primary text-primary-foreground flex flex-col items-center justify-center text-center z-10"
-        >
-          <p className="text-[10px] tracking-[0.6em] uppercase font-medium">R E A D</p>
-          <p className="mt-2 text-sm tracking-[0.2em]">Pre-Planning</p>
-        </motion.div>
+        <div className="container mx-auto px-4 md:px-8 lg:px-16 relative py-16 md:py-20">
+          {/* Center badge - inline flow so it stays centered */}
+          <div className="flex justify-center mb-16 md:mb-20">
+            <motion.div
+              {...fadeInUp}
+              className="w-52 h-52 md:w-56 md:h-56 bg-primary text-primary-foreground flex flex-col items-center justify-center text-center"
+            >
+              <p className="text-[11px] tracking-[0.5em] uppercase font-medium mb-3">R E A D</p>
+              <p className="text-base md:text-lg tracking-[0.15em] font-light">Pre-Planning</p>
+            </motion.div>
+          </div>
 
-        <div className="container mx-auto px-4 md:px-8 lg:px-16 relative pt-32 md:pt-36 pb-20 md:pb-24">
           {/* Cards */}
           <motion.div
             {...fadeInUp}
-            className="mx-auto max-w-5xl grid md:grid-cols-3 gap-10 lg:gap-14 justify-items-center"
+            className="mx-auto max-w-5xl grid md:grid-cols-3 gap-8 lg:gap-12"
           >
             {linkCards.map((card, index) => (
-              <div key={index} className="group w-full max-w-sm cursor-pointer">
-                <div className="bg-background/95 p-1 shadow-2xl">
+              <div key={index} className="group cursor-pointer flex flex-col items-start">
+                <div className="bg-background p-1 shadow-2xl w-full">
                   <img
                     src={card.image}
                     alt={card.title}
                     loading="lazy"
-                    className="w-full aspect-[16/9] object-cover"
+                    className="w-full aspect-[4/3] object-cover"
                   />
                 </div>
-                <p className="mt-6 text-primary-foreground text-sm md:text-base font-medium leading-snug max-w-[260px]">
+                <p className="mt-5 text-primary-foreground text-sm md:text-[15px] font-normal leading-relaxed">
                   {card.title}
                 </p>
               </div>
