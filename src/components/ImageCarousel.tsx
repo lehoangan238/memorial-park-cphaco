@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -9,6 +9,8 @@ interface ImageCarouselProps {
   showArrows?: boolean;
   dotsPosition?: "inside" | "outside";
   dotsColor?: "white" | "primary";
+  autoPlay?: boolean;
+  autoPlayInterval?: number;
 }
 
 const ImageCarousel = ({ 
@@ -17,13 +19,16 @@ const ImageCarousel = ({
   showDots = true,
   showArrows = true,
   dotsPosition = "outside",
-  dotsColor = "white"
+  dotsColor = "white",
+  autoPlay = true,
+  autoPlayInterval = 4000
 }: ImageCarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
-  const goToNext = () => {
+  const goToNext = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % images.length);
-  };
+  }, [images.length]);
 
   const goToPrev = () => {
     setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
@@ -33,10 +38,21 @@ const ImageCarousel = ({
     setCurrentIndex(index);
   };
 
+  useEffect(() => {
+    if (!autoPlay || isPaused || images.length <= 1) return;
+    
+    const interval = setInterval(goToNext, autoPlayInterval);
+    return () => clearInterval(interval);
+  }, [autoPlay, isPaused, autoPlayInterval, goToNext, images.length]);
+
   if (images.length === 0) return null;
 
   return (
-    <div className="relative">
+    <div 
+      className="relative"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
       {/* Image Container */}
       <div className={`relative overflow-hidden ${className}`}>
         <AnimatePresence mode="wait">
