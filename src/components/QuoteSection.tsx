@@ -9,45 +9,37 @@ export const QuoteSection = () => {
       <div className="flex flex-col lg:flex-row">
         {/* Left: Blue Quote Box */}
         <motion.div 
-          initial={{ opacity: 0, x: -50 }}
+          initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.7, ease: easeOut }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5, ease: easeOut }}
           className="lg:w-auto relative z-10"
         >
           <div 
             className="py-12 lg:py-16 px-8 lg:px-12 lg:pr-16 flex items-center relative"
             style={{ backgroundColor: '#4a5aef' }}
           >
-            {/* Cyan left border INSIDE the box */}
-            <motion.div 
-              initial={{ scaleY: 0 }}
-              whileInView={{ scaleY: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3, duration: 0.6, ease: easeOut }}
-              className="absolute left-6 top-8 bottom-8 w-1 origin-top"
+            {/* Cyan left border */}
+            <div 
+              className="absolute left-6 top-8 bottom-8 w-1"
               style={{ backgroundColor: '#00d4ff' }}
             />
             
-            <motion.blockquote
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2, duration: 0.7, ease: easeOut }}
+            <blockquote
               className="text-white text-lg md:text-xl leading-relaxed max-w-md ml-6"
               style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic' }}
             >
               "Chúng ta kết hợp nhiều thứ để làm phong phú cuộc sống bằng cách đón nhận những mục tiêu mới và sống theo cách lành mạnh. Chúng ta cũng có thể lên kế hoạch trước cho một hành trình cuối cùng không lo lắng bằng cách chịu trách nhiệm hoàn toàn cho cuộc sống và hạnh phúc của chính mình – vì chúng ta xứng đáng được an tâm – bây giờ và mãi mãi."
-            </motion.blockquote>
+            </blockquote>
           </div>
         </motion.div>
         
-        {/* Right: Image - 90% width, centered */}
+        {/* Right: Image */}
         <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.98 }}
           whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ delay: 0.2, duration: 0.8, ease: easeOut }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ delay: 0.15, duration: 0.5, ease: easeOut }}
           className="lg:w-[90%] lg:absolute lg:left-1/2 lg:-translate-x-1/2 lg:top-1/4"
         >
           <div 

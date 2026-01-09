@@ -3,22 +3,23 @@ import { Shield, Percent, Compass, PawPrint, Building2 } from 'lucide-react';
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
+// Optimized stagger for mobile performance
 const staggerContainer = {
   hidden: {},
   visible: {
     transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.1
+      staggerChildren: 0.08,
+      delayChildren: 0.05
     }
   }
 };
 
 const staggerItem = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 20 },
   visible: { 
     opacity: 1, 
     y: 0,
-    transition: { duration: 0.6, ease: easeOut }
+    transition: { duration: 0.4, ease: easeOut }
   }
 };
 
@@ -58,10 +59,10 @@ export const AdvantagesSection = () => {
         <div className="grid lg:grid-cols-2 gap-16 items-start">
           {/* Left - Title & CTA */}
           <motion.div
-            initial={{ opacity: 0, x: -40 }}
+            initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7, ease: easeOut }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5, ease: easeOut }}
           >
             <h2 
               className="text-4xl md:text-5xl text-[#2f3237] leading-tight mb-4"
@@ -96,20 +97,17 @@ export const AdvantagesSection = () => {
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true, margin: "-50px" }}
             className="grid md:grid-cols-2 gap-8"
           >
             {advantages.map((item) => (
               <motion.div
                 key={item.title}
                 variants={staggerItem}
-                whileHover={{ y: -5 }}
+                className="group"
               >
-                {/* Icon */}
-                <motion.div 
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  className="w-14 h-14 rounded-full border border-[#0693e3] flex items-center justify-center mb-4"
-                >
+                {/* Icon - CSS transition instead of framer-motion for better mobile perf */}
+                <div className="w-14 h-14 rounded-full border border-[#0693e3] flex items-center justify-center mb-4 transition-transform duration-200 group-hover:scale-110">
                   {item.customIcon ? (
                     <span 
                       className="text-[#0693e3] text-lg font-semibold"
@@ -120,7 +118,7 @@ export const AdvantagesSection = () => {
                   ) : (
                     <item.icon className="w-6 h-6 text-[#0693e3]" strokeWidth={1.5} />
                   )}
-                </motion.div>
+                </div>
                 
                 <h3 
                   className="text-[#2f3237] text-sm font-semibold mb-2"
