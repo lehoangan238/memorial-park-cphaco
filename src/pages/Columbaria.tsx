@@ -3,6 +3,7 @@ import { Play, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import ImageCarousel from "@/components/ImageCarousel";
 
 // Import images
 import columbariumImage from "@/assets/columbarium.jpg";
@@ -12,6 +13,8 @@ import heroTreesImage from "@/assets/hero-trees.jpg";
 import family1Image from "@/assets/family-1.jpg";
 import family2Image from "@/assets/family-2.jpg";
 import family3Image from "@/assets/family-3.jpg";
+import familyHugImage from "@/assets/family-hug.jpg";
+import heroBgImage from "@/assets/hero-bg.jpg";
 
 // Animation
 const easeOut = [0.22, 1, 0.36, 1] as const;
@@ -223,24 +226,15 @@ const Columbaria = () => {
               </button>
             </div>
             
-            {/* Image - Positioned to overflow the blue box on RIGHT */}
-            <div className="lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%] lg:translate-x-4 p-4 lg:p-0">
-              <div className="relative">
-                <img 
-                  src={columbariumImage} 
-                  alt="Christian Columbarium" 
-                  className="w-full h-64 md:h-[340px] object-cover shadow-2xl"
-                />
-                {/* Carousel Dots */}
-                <div className="flex justify-center gap-1.5 mt-4 lg:absolute lg:-bottom-8 lg:left-1/2 lg:-translate-x-1/2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-white" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
-                </div>
-              </div>
+            {/* Image Carousel - Positioned to overflow the blue box on RIGHT */}
+            <div className="lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%] lg:translate-x-4 p-4 lg:p-0 group">
+              <ImageCarousel 
+                images={[columbariumImage, landscapeImage, heroParkImage, family1Image, familyHugImage]}
+                className="w-full h-64 md:h-[340px] shadow-2xl"
+                showDots={true}
+                showArrows={true}
+                dotsColor="white"
+              />
             </div>
           </motion.div>
         </div>
@@ -323,12 +317,14 @@ const Columbaria = () => {
               </p>
             </div>
             
-            {/* Image - Positioned to overflow on RIGHT */}
-            <div className="lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%] lg:translate-x-4 p-4 lg:p-0">
-              <img 
-                src={columbariumImage} 
-                alt="Cherished Columbarium" 
-                className="w-full h-64 md:h-[340px] object-cover shadow-2xl"
+            {/* Image Carousel - Positioned to overflow on RIGHT */}
+            <div className="lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%] lg:translate-x-4 p-4 lg:p-0 group">
+              <ImageCarousel 
+                images={[columbariumImage, heroParkImage, landscapeImage]}
+                className="w-full h-64 md:h-[340px] shadow-2xl"
+                showDots={true}
+                showArrows={true}
+                dotsColor="white"
               />
             </div>
           </motion.div>
@@ -360,12 +356,14 @@ const Columbaria = () => {
               </motion.div>
             </div>
             
-            {/* Image - Positioned to overflow on LEFT */}
-            <div className="lg:absolute lg:left-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%] lg:-translate-x-4 p-4 lg:p-0">
-              <img 
-                src={family2Image} 
-                alt="Shrine of Elite" 
-                className="w-full h-64 md:h-[340px] object-cover shadow-2xl"
+            {/* Image Carousel - Positioned to overflow on LEFT */}
+            <div className="lg:absolute lg:left-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%] lg:-translate-x-4 p-4 lg:p-0 group">
+              <ImageCarousel 
+                images={[family2Image, columbariumImage, family1Image]}
+                className="w-full h-64 md:h-[340px] shadow-2xl"
+                showDots={true}
+                showArrows={true}
+                dotsColor="white"
               />
             </div>
           </motion.div>
@@ -392,12 +390,14 @@ const Columbaria = () => {
               </p>
             </div>
             
-            {/* Image - Positioned to overflow on RIGHT */}
-            <div className="lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%] lg:translate-x-4 p-4 lg:p-0">
-              <img 
-                src={heroTreesImage} 
-                alt="Niches" 
-                className="w-full h-64 md:h-[340px] object-cover shadow-2xl"
+            {/* Image Carousel - Positioned to overflow on RIGHT */}
+            <div className="lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%] lg:translate-x-4 p-4 lg:p-0 group">
+              <ImageCarousel 
+                images={[heroTreesImage, heroParkImage, landscapeImage]}
+                className="w-full h-64 md:h-[340px] shadow-2xl"
+                showDots={true}
+                showArrows={true}
+                dotsColor="white"
               />
             </div>
           </motion.div>
