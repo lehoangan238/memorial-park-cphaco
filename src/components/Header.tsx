@@ -12,7 +12,7 @@ const dropdownMenus = {
   'Tùy Chọn Kế Hoạch': [
     { label: 'Công Viên Tưởng Niệm', href: '#memorial-parks' },
     { label: 'Nhà Lưu Trữ Tro Cốt', href: '#columbarium' },
-    { label: 'Lô Đất An Táng', href: '#burial-plots' },
+    { label: 'Lô Đất An Táng', href: '/burial-plots' },
     { label: 'Dịch Vụ Hỏa Táng', href: '#cremation' },
     { label: 'Khu Mộ Gia Đình', href: '#family-estates' },
     { label: 'Tưởng Niệm Thú Cưng', href: '#pet-memorial' },
