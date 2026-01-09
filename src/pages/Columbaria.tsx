@@ -192,53 +192,53 @@ const Columbaria = () => {
         </div>
       </section>
 
-      {/* Columbaria Type 2: Blue Box with Image Overlay */}
-      <section className="py-10 md:py-16 bg-[#f0f4f8]">
-        <div className="container mx-auto px-4">
-          <div className="max-w-5xl mx-auto">
-            <motion.div 
-              {...fadeInUp}
-              className="relative bg-primary py-12 md:py-16 px-6 md:px-12"
-            >
-              <div className="grid lg:grid-cols-2 gap-8 items-center">
-                {/* Left - Text Content */}
-                <div className="lg:pr-4">
-                  <span className="text-white/60 text-[10px] tracking-[0.2em] uppercase mb-3 block">
-                    SPIRITUAL COMFORT MEETS CONTEMPORARY SENSIBILITIES
-                  </span>
-                  <h3 className="font-display text-2xl md:text-3xl text-white italic mb-6">
-                    Christian Columbarium
-                  </h3>
-                  <p className="text-white/80 text-sm leading-relaxed mb-6">
-                    The artistic Christian Columbarium is a masterpiece of bereavement architecture 
-                    that is unlike any other. While its unique style exudes a distinctive Christian 
-                    character, the Christian Columbarium presents the best of both worlds: spiritual 
-                    comfort and contemporary sensibilities.
-                  </p>
-                  <button className="text-white text-xs flex items-center gap-2 hover:text-white/80 transition-colors tracking-[0.1em] uppercase font-medium">
-                    READ MORE <ChevronRight className="w-4 h-4 bg-white/20 rounded-full p-0.5" />
-                  </button>
-                </div>
-                
-                {/* Right - Image with Overflow Effect */}
-                <div className="relative lg:absolute lg:right-6 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%]">
-                  <img 
-                    src={columbariumImage} 
-                    alt="Christian Columbarium" 
-                    className="w-full h-64 md:h-80 object-cover shadow-xl"
-                  />
-                  {/* Carousel Dots */}
-                  <div className="flex justify-center gap-2 mt-4">
-                    <span className="w-2 h-2 rounded-full bg-white/40" />
-                    <span className="w-2 h-2 rounded-full bg-white" />
-                    <span className="w-2 h-2 rounded-full bg-white/40" />
-                    <span className="w-2 h-2 rounded-full bg-white/40" />
-                    <span className="w-2 h-2 rounded-full bg-white/40" />
-                  </div>
+      {/* Columbaria Type 2: Blue Box with Image Overlay - Matching Reference */}
+      <section className="py-10 md:py-16 bg-[#e8ecf1]">
+        <div className="container mx-auto px-4 md:px-8 lg:px-16">
+          <motion.div 
+            {...fadeInUp}
+            className="relative bg-primary"
+          >
+            {/* Inner container with padding */}
+            <div className="relative py-10 md:py-14 pl-6 md:pl-12 lg:pl-16 pr-6 md:pr-[45%] lg:pr-[50%] min-h-[350px] md:min-h-[400px] flex flex-col justify-center">
+              {/* Text Content */}
+              <span className="text-white/60 text-[10px] tracking-[0.2em] uppercase mb-3 block">
+                SPIRITUAL COMFORT MEETS CONTEMPORARY SENSIBILITIES
+              </span>
+              <h3 className="font-display text-2xl md:text-3xl text-white italic mb-6">
+                Christian Columbarium
+              </h3>
+              <p className="text-white/80 text-sm leading-relaxed mb-6 max-w-md">
+                The artistic Christian Columbarium is a masterpiece of bereavement architecture 
+                that is unlike any other. While its unique style exudes a distinctive Christian 
+                character, the Christian Columbarium presents the best of both worlds: spiritual 
+                comfort and contemporary sensibilities.
+              </p>
+              <button className="text-white text-xs flex items-center gap-2 hover:text-white/80 transition-colors tracking-[0.1em] uppercase font-medium">
+                READ MORE <span className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center"><ChevronRight className="w-3 h-3" /></span>
+              </button>
+            </div>
+            
+            {/* Image - Positioned to overflow the blue box */}
+            <div className="lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%] lg:translate-x-4 p-4 lg:p-0">
+              <div className="relative">
+                <img 
+                  src={columbariumImage} 
+                  alt="Christian Columbarium" 
+                  className="w-full h-64 md:h-[340px] object-cover shadow-2xl"
+                />
+                {/* Carousel Dots */}
+                <div className="flex justify-center gap-1.5 mt-4 lg:absolute lg:-bottom-8 lg:left-1/2 lg:-translate-x-1/2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
                 </div>
               </div>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
