@@ -15,11 +15,54 @@ import columbariumImage from "@/assets/columbarium.jpg";
 import heroParkImage from "@/assets/hero-park.jpg";
 import coupleBeachImage from "@/assets/couple-beach.jpg";
 
+// Animation variants
+const easeOut = [0.22, 1, 0.36, 1] as const;
+
 const fadeInUp = {
-  initial: { opacity: 0, y: 30 },
+  initial: { opacity: 0, y: 40 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
-  transition: { duration: 0.6 }
+  viewport: { once: true, margin: "-100px" },
+  transition: { duration: 0.7, ease: easeOut }
+};
+
+const fadeInLeft = {
+  initial: { opacity: 0, x: -50 },
+  whileInView: { opacity: 1, x: 0 },
+  viewport: { once: true, margin: "-100px" },
+  transition: { duration: 0.7, ease: easeOut }
+};
+
+const fadeInRight = {
+  initial: { opacity: 0, x: 50 },
+  whileInView: { opacity: 1, x: 0 },
+  viewport: { once: true, margin: "-100px" },
+  transition: { duration: 0.7, ease: easeOut }
+};
+
+const scaleIn = {
+  initial: { opacity: 0, scale: 0.9 },
+  whileInView: { opacity: 1, scale: 1 },
+  viewport: { once: true, margin: "-100px" },
+  transition: { duration: 0.6, ease: easeOut }
+};
+
+const staggerContainer = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.1
+    }
+  }
+};
+
+const staggerItem = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.5, ease: easeOut }
+  }
 };
 
 const howItWorksSteps = [
@@ -57,8 +100,11 @@ const FuneralService = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative h-[60vh] min-h-[400px] flex items-center justify-center">
-        <div 
+      <section className="relative h-[60vh] min-h-[400px] flex items-center justify-center overflow-hidden">
+        <motion.div 
+          initial={{ scale: 1.1 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 1.5, ease: easeOut }}
           className="absolute inset-0 bg-cover bg-center"
           style={{ 
             backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.4)), url(${heroTreesImage})` 
@@ -66,14 +112,17 @@ const FuneralService = () => {
         />
         <div className="relative z-10 text-center text-white px-4">
           <motion.h1 
-            {...fadeInUp}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: easeOut }}
             className="font-display text-4xl md:text-5xl lg:text-6xl mb-4 italic"
           >
             Funeral Service
           </motion.h1>
           <motion.p 
-            {...fadeInUp}
-            transition={{ delay: 0.2 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5, ease: easeOut }}
             className="text-base md:text-lg text-white/80 max-w-xl mx-auto"
           >
             A dignified farewell with professional and caring service
@@ -82,7 +131,13 @@ const FuneralService = () => {
       </section>
 
       {/* Gold Decorative Bar */}
-      <div className="h-1 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400" />
+      <motion.div 
+        initial={{ scaleX: 0 }}
+        whileInView={{ scaleX: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, ease: easeOut }}
+        className="h-1 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 origin-left" 
+      />
 
       {/* Nirvana Life Plan Section */}
       <section className="py-16 md:py-20 bg-white">
@@ -102,21 +157,28 @@ const FuneralService = () => {
             </p>
 
             {/* Video Placeholder */}
-            <div className="relative aspect-video bg-muted overflow-hidden group cursor-pointer shadow-lg">
+            <motion.div 
+              {...scaleIn}
+              className="relative aspect-video bg-muted overflow-hidden group cursor-pointer shadow-lg"
+            >
               <img 
                 src={columbariumImage} 
                 alt="Video thumbnail" 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/30 transition-colors">
-                <div className="w-14 h-14 md:w-16 md:h-16 bg-white rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                <motion.div 
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-14 h-14 md:w-16 md:h-16 bg-white rounded-full flex items-center justify-center shadow-lg"
+                >
                   <Play className="w-5 h-5 md:w-6 md:h-6 text-primary ml-1" fill="currentColor" />
-                </div>
+                </motion.div>
               </div>
               <span className="absolute bottom-4 left-4 text-white text-[10px] tracking-[0.25em] uppercase font-medium">
                 W A T C H
               </span>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
@@ -134,12 +196,17 @@ const FuneralService = () => {
           </motion.div>
 
           {/* Steps */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-5xl mx-auto mb-12">
-            {howItWorksSteps.map((step, index) => (
+          <motion.div 
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-5xl mx-auto mb-12"
+          >
+            {howItWorksSteps.map((step) => (
               <motion.div
                 key={step.number}
-                {...fadeInUp}
-                transition={{ delay: index * 0.1 }}
+                variants={staggerItem}
                 className="text-center"
               >
                 <div className="text-4xl md:text-5xl font-display text-primary/30 mb-3">
@@ -153,46 +220,66 @@ const FuneralService = () => {
                 </p>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           {/* Process Images Row */}
-          <motion.div {...fadeInUp} className="grid grid-cols-4 gap-2 md:gap-4 max-w-4xl mx-auto">
-            <img src={family1Image} alt="Process 1" className="w-full h-24 md:h-32 object-cover" />
-            <img src={family2Image} alt="Process 2" className="w-full h-24 md:h-32 object-cover" />
-            <img src={family3Image} alt="Process 3" className="w-full h-24 md:h-32 object-cover" />
-            <img src={familyHugImage} alt="Process 4" className="w-full h-24 md:h-32 object-cover" />
+          <motion.div 
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            className="grid grid-cols-4 gap-2 md:gap-4 max-w-4xl mx-auto"
+          >
+            {[family1Image, family2Image, family3Image, familyHugImage].map((img, i) => (
+              <motion.img 
+                key={i}
+                variants={staggerItem}
+                src={img} 
+                alt={`Process ${i + 1}`} 
+                className="w-full h-24 md:h-32 object-cover hover:scale-105 transition-transform duration-500" 
+              />
+            ))}
           </motion.div>
         </div>
       </section>
 
       {/* Grand Memorial Parlour Section - Two Column */}
-      <section className="py-16 md:py-20 bg-white">
+      <section className="py-16 md:py-20 bg-white overflow-hidden">
         <div className="container mx-auto px-4">
-          <motion.div {...fadeInUp} className="max-w-6xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
               {/* Left - Images Grid */}
-              <div className="space-y-3">
-                <img 
+              <motion.div {...fadeInLeft} className="space-y-3">
+                <motion.img 
+                  {...scaleIn}
                   src={columbariumImage} 
                   alt="Grand Memorial Parlour" 
-                  className="w-full h-48 md:h-56 object-cover"
+                  className="w-full h-48 md:h-56 object-cover hover:scale-[1.02] transition-transform duration-500"
                 />
                 <div className="grid grid-cols-2 gap-3">
-                  <img 
+                  <motion.img 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.2, duration: 0.6, ease: easeOut }}
                     src={landscapeImage} 
                     alt="Interior 1" 
-                    className="w-full h-32 md:h-36 object-cover"
+                    className="w-full h-32 md:h-36 object-cover hover:scale-[1.02] transition-transform duration-500"
                   />
-                  <img 
+                  <motion.img 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.3, duration: 0.6, ease: easeOut }}
                     src={heroParkImage} 
                     alt="Interior 2" 
-                    className="w-full h-32 md:h-36 object-cover"
+                    className="w-full h-32 md:h-36 object-cover hover:scale-[1.02] transition-transform duration-500"
                   />
                 </div>
-              </div>
+              </motion.div>
 
               {/* Right - Text Content */}
-              <div className="flex flex-col justify-center">
+              <motion.div {...fadeInRight} className="flex flex-col justify-center">
                 <h2 className="font-display text-2xl md:text-3xl text-foreground italic mb-5">
                   Grand Memorial Parlour
                 </h2>
@@ -204,45 +291,43 @@ const FuneralService = () => {
                 </p>
 
                 {/* Product Icons Row */}
-                <div className="flex gap-6 md:gap-10">
-                  <div className="text-center">
-                    <div className="w-14 h-14 md:w-16 md:h-16 bg-amber-50 rounded-full flex items-center justify-center mb-2">
-                      <span className="text-xl md:text-2xl">🏺</span>
-                    </div>
-                    <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Urn</span>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-14 h-14 md:w-16 md:h-16 bg-green-50 rounded-full flex items-center justify-center mb-2">
-                      <span className="text-xl md:text-2xl">🪻</span>
-                    </div>
-                    <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Flowers</span>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-14 h-14 md:w-16 md:h-16 bg-blue-50 rounded-full flex items-center justify-center mb-2">
-                      <span className="text-xl md:text-2xl">🕯️</span>
-                    </div>
-                    <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Candles</span>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-14 h-14 md:w-16 md:h-16 bg-pink-50 rounded-full flex items-center justify-center mb-2">
-                      <span className="text-xl md:text-2xl">💐</span>
-                    </div>
-                    <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Bouquet</span>
-                  </div>
-                </div>
-              </div>
+                <motion.div 
+                  variants={staggerContainer}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  className="flex gap-6 md:gap-10"
+                >
+                  {[
+                    { icon: "🏺", label: "Urn", bg: "bg-amber-50" },
+                    { icon: "🪻", label: "Flowers", bg: "bg-green-50" },
+                    { icon: "🕯️", label: "Candles", bg: "bg-blue-50" },
+                    { icon: "💐", label: "Bouquet", bg: "bg-pink-50" }
+                  ].map((item, i) => (
+                    <motion.div key={i} variants={staggerItem} className="text-center">
+                      <motion.div 
+                        whileHover={{ scale: 1.1, rotate: 5 }}
+                        className={`w-14 h-14 md:w-16 md:h-16 ${item.bg} rounded-full flex items-center justify-center mb-2`}
+                      >
+                        <span className="text-xl md:text-2xl">{item.icon}</span>
+                      </motion.div>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wide">{item.label}</span>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </motion.div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Luxurious Casket & Urn Section */}
-      <section className="py-16 md:py-20 bg-[#f5f6f8]">
+      <section className="py-16 md:py-20 bg-[#f5f6f8] overflow-hidden">
         <div className="container mx-auto px-4">
-          <motion.div {...fadeInUp} className="max-w-6xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               {/* Left - Text */}
-              <div>
+              <motion.div {...fadeInLeft}>
                 <h2 className="font-display text-2xl md:text-3xl text-foreground italic mb-5">
                   Luxurious Casket & Urn
                 </h2>
@@ -256,49 +341,74 @@ const FuneralService = () => {
                   Each piece is carefully selected and presented with dignity, ensuring 
                   your loved one is honored in the most respectful manner.
                 </p>
-              </div>
+              </motion.div>
 
               {/* Right - Large Casket Image */}
-              <div>
-                <img 
+              <motion.div {...fadeInRight}>
+                <motion.img 
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.5 }}
                   src={landscapeImage} 
                   alt="Luxurious Casket" 
-                  className="w-full h-64 md:h-80 object-cover"
+                  className="w-full h-64 md:h-80 object-cover shadow-lg"
                 />
-              </div>
+              </motion.div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Video Section - The Guardian */}
-      <section className="relative">
+      <section className="relative overflow-hidden">
         <div className="relative h-[50vh] min-h-[350px]">
-          <div 
+          <motion.div 
+            initial={{ scale: 1.1 }}
+            whileInView={{ scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.5, ease: easeOut }}
             className="absolute inset-0 bg-cover bg-center"
             style={{ 
               backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url(${heroParkImage})` 
             }}
           />
           <div className="relative z-10 h-full flex flex-col items-center justify-center text-white px-4">
-            <span className="text-[10px] tracking-[0.3em] uppercase mb-3 text-white/70">W A T C H</span>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl italic mb-6 text-center">
+            <motion.span 
+              {...fadeInUp}
+              className="text-[10px] tracking-[0.3em] uppercase mb-3 text-white/70"
+            >
+              W A T C H
+            </motion.span>
+            <motion.h2 
+              initial={{ opacity: 0, y: 30, letterSpacing: "0.1em" }}
+              whileInView={{ opacity: 1, y: 0, letterSpacing: "0.05em" }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, ease: easeOut }}
+              className="font-display text-3xl md:text-4xl lg:text-5xl italic mb-6 text-center"
+            >
               THE GUARDIAN
-            </h2>
-            <div className="w-16 h-16 md:w-20 md:h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center cursor-pointer hover:bg-white/30 transition-colors">
+            </motion.h2>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, duration: 0.6, ease: easeOut }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-16 h-16 md:w-20 md:h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center cursor-pointer"
+            >
               <Play className="w-6 h-6 md:w-8 md:h-8 text-white ml-1" fill="currentColor" />
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
       {/* 6 Reasons Section */}
-      <section className="py-16 md:py-20 bg-white">
+      <section className="py-16 md:py-20 bg-white overflow-hidden">
         <div className="container mx-auto px-4">
-          <motion.div {...fadeInUp} className="max-w-6xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
               {/* Left - Reasons List */}
-              <div>
+              <motion.div {...fadeInLeft}>
                 <h2 className="font-display text-2xl md:text-3xl text-foreground italic mb-4">
                   6 Reasons
                 </h2>
@@ -306,19 +416,31 @@ const FuneralService = () => {
                   Why customers trust and choose Nirvana's funeral services
                 </p>
 
-                <div className="space-y-4 mb-10">
+                <motion.div 
+                  variants={staggerContainer}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  className="space-y-4 mb-10"
+                >
                   {reasons.map((reason, index) => (
-                    <div key={index} className="flex gap-3">
+                    <motion.div key={index} variants={staggerItem} className="flex gap-3">
                       <div className="flex-shrink-0 w-5 h-5 bg-primary/10 rounded-full flex items-center justify-center mt-0.5">
                         <Check className="w-3 h-3 text-primary" />
                       </div>
                       <p className="text-muted-foreground text-sm leading-relaxed">{reason}</p>
-                    </div>
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
 
                 {/* While Endless Sub-section */}
-                <div className="border-t pt-8">
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4, duration: 0.6, ease: easeOut }}
+                  className="border-t pt-8"
+                >
                   <h3 className="font-display text-xl md:text-2xl text-foreground italic mb-3">
                     While Endless
                   </h3>
@@ -326,21 +448,33 @@ const FuneralService = () => {
                     Creating lasting memories and honoring lives with dignity and grace. 
                     Our commitment extends beyond the service to support families in their journey of remembrance.
                   </p>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
 
               {/* Right - Images */}
-              <div className="space-y-4">
-                <img src={coupleBeachImage} alt="Reason 1" className="w-full h-48 md:h-56 object-cover" />
-                <img src={family1Image} alt="Reason 2" className="w-full h-48 md:h-56 object-cover" />
-              </div>
+              <motion.div {...fadeInRight} className="space-y-4">
+                <motion.img 
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.5 }}
+                  src={coupleBeachImage} 
+                  alt="Reason 1" 
+                  className="w-full h-48 md:h-56 object-cover" 
+                />
+                <motion.img 
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.5 }}
+                  src={family1Image} 
+                  alt="Reason 2" 
+                  className="w-full h-48 md:h-56 object-cover" 
+                />
+              </motion.div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Blue CTA Banner */}
-      <section className="py-12 md:py-16 bg-primary">
+      <section className="py-12 md:py-16 bg-primary overflow-hidden">
         <div className="container mx-auto px-4 text-center">
           <motion.div {...fadeInUp}>
             <span className="text-white/70 text-[10px] tracking-[0.25em] uppercase block mb-3">
@@ -349,25 +483,35 @@ const FuneralService = () => {
             <p className="text-white/80 text-sm mb-6 max-w-lg mx-auto">
               Special offers for comprehensive funeral service packages
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-primary px-6 text-[10px] tracking-[0.15em] h-10">
-                FUNERAL SERVICE PLAN
-              </Button>
-              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-primary px-6 text-[10px] tracking-[0.15em] h-10">
-                NIRVANA LIFE PLAN
-              </Button>
-            </div>
+            <motion.div 
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="flex flex-col sm:flex-row gap-3 justify-center"
+            >
+              <motion.div variants={staggerItem}>
+                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-primary px-6 text-[10px] tracking-[0.15em] h-10">
+                  FUNERAL SERVICE PLAN
+                </Button>
+              </motion.div>
+              <motion.div variants={staggerItem}>
+                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-primary px-6 text-[10px] tracking-[0.15em] h-10">
+                  NIRVANA LIFE PLAN
+                </Button>
+              </motion.div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
 
       {/* Guide Section - Blue Background */}
-      <section className="py-16 md:py-20 bg-primary">
+      <section className="py-16 md:py-20 bg-primary overflow-hidden">
         <div className="container mx-auto px-4">
-          <motion.div {...fadeInUp} className="max-w-6xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
               {/* Left - Guide Card */}
-              <div className="bg-white/10 backdrop-blur-sm p-6 md:p-8">
+              <motion.div {...fadeInLeft} className="bg-white/10 backdrop-blur-sm p-6 md:p-8">
                 <h2 className="font-display text-xl md:text-2xl text-white italic mb-5">
                   Guide to choosing a bereavement care provider
                 </h2>
@@ -375,34 +519,52 @@ const FuneralService = () => {
                   A detailed guide to help you choose the right bereavement care provider 
                   that suits your family's needs and budget.
                 </p>
-                <ul className="space-y-3 mb-6">
-                  <li className="flex items-start gap-2 text-white/80 text-sm">
-                    <ChevronRight className="w-4 h-4 text-white mt-0.5 flex-shrink-0" />
-                    <span>Criteria for evaluating service quality</span>
-                  </li>
-                  <li className="flex items-start gap-2 text-white/80 text-sm">
-                    <ChevronRight className="w-4 h-4 text-white mt-0.5 flex-shrink-0" />
-                    <span>Comparison of popular service packages</span>
-                  </li>
-                  <li className="flex items-start gap-2 text-white/80 text-sm">
-                    <ChevronRight className="w-4 h-4 text-white mt-0.5 flex-shrink-0" />
-                    <span>Questions to ask during consultation</span>
-                  </li>
-                </ul>
-                <Button className="bg-white text-primary hover:bg-white/90 px-6 text-[10px] tracking-[0.15em] h-10">
-                  DOWNLOAD GUIDE
-                </Button>
-              </div>
+                <motion.ul 
+                  variants={staggerContainer}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  className="space-y-3 mb-6"
+                >
+                  {[
+                    "Criteria for evaluating service quality",
+                    "Comparison of popular service packages",
+                    "Questions to ask during consultation"
+                  ].map((item, i) => (
+                    <motion.li key={i} variants={staggerItem} className="flex items-start gap-2 text-white/80 text-sm">
+                      <ChevronRight className="w-4 h-4 text-white mt-0.5 flex-shrink-0" />
+                      <span>{item}</span>
+                    </motion.li>
+                  ))}
+                </motion.ul>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button className="bg-white text-primary hover:bg-white/90 px-6 text-[10px] tracking-[0.15em] h-10">
+                    DOWNLOAD GUIDE
+                  </Button>
+                </motion.div>
+              </motion.div>
 
               {/* Right - Images Grid */}
-              <div className="grid grid-cols-2 gap-3">
-                <img src={familyHugImage} alt="Guide 1" className="w-full h-32 md:h-40 object-cover" />
-                <img src={family1Image} alt="Guide 2" className="w-full h-32 md:h-40 object-cover" />
-                <img src={family2Image} alt="Guide 3" className="w-full h-32 md:h-40 object-cover" />
-                <img src={family3Image} alt="Guide 4" className="w-full h-32 md:h-40 object-cover" />
-              </div>
+              <motion.div 
+                variants={staggerContainer}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                className="grid grid-cols-2 gap-3"
+              >
+                {[familyHugImage, family1Image, family2Image, family3Image].map((img, i) => (
+                  <motion.img 
+                    key={i}
+                    variants={staggerItem}
+                    whileHover={{ scale: 1.05 }}
+                    src={img} 
+                    alt={`Guide ${i + 1}`} 
+                    className="w-full h-32 md:h-40 object-cover" 
+                  />
+                ))}
+              </motion.div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
