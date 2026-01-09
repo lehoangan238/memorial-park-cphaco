@@ -157,42 +157,46 @@ const Columbaria = () => {
         </div>
       </section>
 
-      {/* Columbaria Type 1: Images Left + Blue Right */}
-      <section className="py-8 md:py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-0 overflow-hidden">
-              {/* Left - Two Stacked Images */}
-              <motion.div {...fadeInLeft} className="flex flex-col">
+      {/* Columbaria Type 1: Blue Box with Image Left Overflow */}
+      <section className="py-10 md:py-16 bg-[#e8ecf1]">
+        <div className="container mx-auto px-4 md:px-8 lg:px-16">
+          <motion.div 
+            {...fadeInUp}
+            className="relative bg-primary"
+          >
+            {/* Inner container with padding */}
+            <div className="relative py-10 md:py-14 pr-6 md:pr-12 lg:pr-16 pl-6 md:pl-[45%] lg:pl-[50%] min-h-[350px] md:min-h-[400px] flex flex-col justify-center">
+              {/* Text Content */}
+              <h3 className="font-display text-2xl md:text-3xl text-white italic mb-6">
+                Luxury Columbarium
+              </h3>
+              <p className="text-white/80 text-sm leading-relaxed max-w-md">
+                A sanctuary of eternal peace, our Luxury Columbarium features exquisite marble finishes, 
+                ornate architectural details, and serene ambiance. Each niche is crafted with precision 
+                to honor your loved ones with the dignity they deserve.
+              </p>
+            </div>
+            
+            {/* Image - Positioned to overflow the blue box on LEFT */}
+            <div className="lg:absolute lg:left-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%] lg:-translate-x-4 p-4 lg:p-0">
+              <div className="flex flex-col gap-2">
                 <img 
                   src={columbariumImage} 
                   alt="Luxury Columbarium" 
-                  className="w-full h-56 md:h-72 object-cover"
+                  className="w-full h-48 md:h-[220px] object-cover shadow-2xl"
                 />
                 <img 
                   src={family1Image} 
                   alt="Interior" 
-                  className="w-full h-40 md:h-48 object-cover"
+                  className="w-full h-32 md:h-[140px] object-cover shadow-xl"
                 />
-              </motion.div>
-              
-              {/* Right - Blue Box */}
-              <motion.div {...fadeInRight} className="bg-primary p-8 md:p-12 flex flex-col justify-center">
-                <h3 className="font-display text-2xl md:text-3xl text-white italic mb-6">
-                  Luxury Columbarium
-                </h3>
-                <p className="text-white/80 text-sm leading-relaxed">
-                  A sanctuary of eternal peace, our Luxury Columbarium features exquisite marble finishes, 
-                  ornate architectural details, and serene ambiance. Each niche is crafted with precision 
-                  to honor your loved ones with the dignity they deserve.
-                </p>
-              </motion.div>
+              </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Columbaria Type 2: Blue Box with Image Overlay - Matching Reference */}
+      {/* Columbaria Type 2: Blue Box with Image Right Overflow */}
       <section className="py-10 md:py-16 bg-[#e8ecf1]">
         <div className="container mx-auto px-4 md:px-8 lg:px-16">
           <motion.div 
@@ -219,7 +223,7 @@ const Columbaria = () => {
               </button>
             </div>
             
-            {/* Image - Positioned to overflow the blue box */}
+            {/* Image - Positioned to overflow the blue box on RIGHT */}
             <div className="lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%] lg:translate-x-4 p-4 lg:p-0">
               <div className="relative">
                 <img 
@@ -242,160 +246,161 @@ const Columbaria = () => {
         </div>
       </section>
 
-      {/* Columbaria Type 3: Image Left + White with Pattern Right */}
-      <section className="py-8 md:py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-0 overflow-hidden shadow-sm">
-              {/* Left - Image with decorative frame */}
-              <motion.div 
-                {...fadeInLeft}
-                className="relative bg-[#f0f4f8] p-6 md:p-8"
-              >
-                <div className="relative">
-                  {/* Decorative corner borders */}
-                  <div className="absolute -top-2 -left-2 w-8 h-8 border-t-2 border-l-2 border-primary/30" />
-                  <div className="absolute -top-2 -right-2 w-8 h-8 border-t-2 border-r-2 border-primary/30" />
-                  <div className="absolute -bottom-2 -left-2 w-8 h-8 border-b-2 border-l-2 border-primary/30" />
-                  <div className="absolute -bottom-2 -right-2 w-8 h-8 border-b-2 border-r-2 border-primary/30" />
-                  <img 
-                    src={heroParkImage} 
-                    alt="Ancient Chinese Architecture" 
-                    className="w-full h-56 md:h-72 object-cover"
-                  />
-                </div>
-              </motion.div>
-              
-              {/* Right - White Box with Dotted Pattern */}
-              <motion.div 
-                {...fadeInRight} 
-                className="bg-white p-8 md:p-12 flex flex-col justify-center relative overflow-hidden"
-              >
-                {/* Dotted Pattern */}
-                <div 
-                  className="absolute right-0 top-0 bottom-0 w-1/2 opacity-30"
-                  style={{
-                    backgroundImage: `radial-gradient(circle, #cbd5e1 1.5px, transparent 1.5px)`,
-                    backgroundSize: '12px 12px'
-                  }}
-                />
-                <div className="relative z-10">
-                  <span className="text-muted-foreground text-[10px] tracking-[0.15em] uppercase mb-3 block">
-                    AN OPULENT DESIGN REMINISCENT OF ANCIENT TIMES
-                  </span>
-                  <h3 className="font-display text-2xl md:text-3xl text-foreground italic mb-6">
-                    Ancient Chinese Architecture Columbarium
-                  </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-                    The multi-million ringgit Oriental Villa is a signature masterpiece of Nirvana Memorial Garden. 
-                    Built to house the urns of the departed, its elegant and spacious interiors are designed to 
-                    convey a sense of traditional ancient Chinese opulence.
-                  </p>
-                  <button className="text-foreground text-xs flex items-center gap-2 hover:text-primary transition-colors tracking-[0.1em] uppercase font-medium">
-                    READ MORE <ChevronRight className="w-4 h-4 text-primary" />
-                  </button>
-                </div>
-              </motion.div>
+      {/* Columbaria Type 3: White Box with Image Left Overflow + Dotted Pattern */}
+      <section className="py-10 md:py-16 bg-[#e8ecf1]">
+        <div className="container mx-auto px-4 md:px-8 lg:px-16">
+          <motion.div 
+            {...fadeInUp}
+            className="relative bg-white overflow-visible"
+          >
+            {/* Dotted Pattern on right side */}
+            <div 
+              className="absolute right-0 top-0 bottom-0 w-1/3 opacity-30 hidden lg:block"
+              style={{
+                backgroundImage: `radial-gradient(circle, #cbd5e1 1.5px, transparent 1.5px)`,
+                backgroundSize: '12px 12px'
+              }}
+            />
+            
+            {/* Inner container with padding */}
+            <div className="relative py-10 md:py-14 pr-6 md:pr-12 lg:pr-16 pl-6 md:pl-[45%] lg:pl-[50%] min-h-[350px] md:min-h-[400px] flex flex-col justify-center z-10">
+              {/* Text Content */}
+              <span className="text-muted-foreground text-[10px] tracking-[0.15em] uppercase mb-3 block">
+                AN OPULENT DESIGN REMINISCENT OF ANCIENT TIMES
+              </span>
+              <h3 className="font-display text-2xl md:text-3xl text-foreground italic mb-6">
+                Ancient Chinese Architecture Columbarium
+              </h3>
+              <p className="text-muted-foreground text-sm leading-relaxed mb-6 max-w-md">
+                The multi-million ringgit Oriental Villa is a signature masterpiece of Nirvana Memorial Garden. 
+                Built to house the urns of the departed, its elegant and spacious interiors are designed to 
+                convey a sense of traditional ancient Chinese opulence.
+              </p>
+              <button className="text-foreground text-xs flex items-center gap-2 hover:text-primary transition-colors tracking-[0.1em] uppercase font-medium">
+                READ MORE <ChevronRight className="w-4 h-4 text-primary" />
+              </button>
             </div>
-          </div>
+            
+            {/* Image - Positioned to overflow on LEFT with decorative frame */}
+            <div className="lg:absolute lg:left-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[50%] lg:-translate-x-4 p-4 lg:p-0">
+              <div className="relative p-3 bg-[#f0f4f8]">
+                {/* Decorative corner borders */}
+                <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-primary/30" />
+                <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary/30" />
+                <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-primary/30" />
+                <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-primary/30" />
+                <img 
+                  src={heroParkImage} 
+                  alt="Ancient Chinese Architecture" 
+                  className="w-full h-64 md:h-[320px] object-cover"
+                />
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Columbaria Type 4: Blue Left + Image Right */}
-      <section className="py-8 md:py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-0 overflow-hidden">
-              {/* Left - Blue Box */}
-              <motion.div {...fadeInLeft} className="bg-primary p-8 md:p-12 flex flex-col justify-center order-2 lg:order-1">
-                <span className="text-white/60 text-[10px] tracking-[0.2em] uppercase mb-3">
-                  A PLACE TO CHERISH MEMORIES
-                </span>
-                <h3 className="font-display text-2xl md:text-3xl text-white italic mb-6">
-                  Cherished Columbarium
-                </h3>
-                <p className="text-white/80 text-sm leading-relaxed">
-                  Designed with warmth and comfort in mind, the Cherished Columbarium provides an intimate 
-                  setting for families to gather and remember. Soft lighting and thoughtful design elements 
-                  create a welcoming atmosphere for reflection and peace.
-                </p>
-              </motion.div>
-              
-              {/* Right - Image */}
-              <motion.div {...fadeInRight} className="order-1 lg:order-2">
-                <img 
-                  src={columbariumImage} 
-                  alt="Cherished Columbarium" 
-                  className="w-full h-64 md:h-80 object-cover"
-                />
-              </motion.div>
+      {/* Columbaria Type 4: Blue Box with Image Right Overflow */}
+      <section className="py-10 md:py-16 bg-[#e8ecf1]">
+        <div className="container mx-auto px-4 md:px-8 lg:px-16">
+          <motion.div 
+            {...fadeInUp}
+            className="relative bg-primary"
+          >
+            {/* Inner container with padding */}
+            <div className="relative py-10 md:py-14 pl-6 md:pl-12 lg:pl-16 pr-6 md:pr-[45%] lg:pr-[50%] min-h-[350px] md:min-h-[400px] flex flex-col justify-center">
+              {/* Text Content */}
+              <span className="text-white/60 text-[10px] tracking-[0.2em] uppercase mb-3 block">
+                A PLACE TO CHERISH MEMORIES
+              </span>
+              <h3 className="font-display text-2xl md:text-3xl text-white italic mb-6">
+                Cherished Columbarium
+              </h3>
+              <p className="text-white/80 text-sm leading-relaxed max-w-md">
+                Designed with warmth and comfort in mind, the Cherished Columbarium provides an intimate 
+                setting for families to gather and remember. Soft lighting and thoughtful design elements 
+                create a welcoming atmosphere for reflection and peace.
+              </p>
             </div>
-          </div>
+            
+            {/* Image - Positioned to overflow on RIGHT */}
+            <div className="lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%] lg:translate-x-4 p-4 lg:p-0">
+              <img 
+                src={columbariumImage} 
+                alt="Cherished Columbarium" 
+                className="w-full h-64 md:h-[340px] object-cover shadow-2xl"
+              />
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Columbaria Type 5: Image Left + Blue Right with Button */}
-      <section className="py-8 md:py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-0 overflow-hidden">
-              {/* Left - Image */}
-              <motion.div {...fadeInLeft}>
-                <img 
-                  src={family2Image} 
-                  alt="Shrine of Elite" 
-                  className="w-full h-64 md:h-80 object-cover"
-                />
-              </motion.div>
-              
-              {/* Right - Blue Box with Button */}
-              <motion.div {...fadeInRight} className="bg-primary p-8 md:p-12 flex flex-col justify-center">
-                <h3 className="font-display text-2xl md:text-3xl text-white italic mb-6">
-                  Shrine of Elite
-                </h3>
-                <p className="text-white/80 text-sm leading-relaxed mb-8">
-                  The pinnacle of memorial architecture, the Shrine of Elite offers exclusive niches with 
-                  premium finishes, private viewing areas, and personalized memorial services. A testament 
-                  to lives lived with distinction.
-                </p>
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button className="bg-white text-primary hover:bg-white/90 px-8 text-[10px] tracking-[0.15em] h-10 w-fit">
-                    ENQUIRE NOW
-                  </Button>
-                </motion.div>
+      {/* Columbaria Type 5: Blue Box with Image Left Overflow + Button */}
+      <section className="py-10 md:py-16 bg-[#e8ecf1]">
+        <div className="container mx-auto px-4 md:px-8 lg:px-16">
+          <motion.div 
+            {...fadeInUp}
+            className="relative bg-primary"
+          >
+            {/* Inner container with padding */}
+            <div className="relative py-10 md:py-14 pr-6 md:pr-12 lg:pr-16 pl-6 md:pl-[45%] lg:pl-[50%] min-h-[350px] md:min-h-[400px] flex flex-col justify-center">
+              {/* Text Content */}
+              <h3 className="font-display text-2xl md:text-3xl text-white italic mb-6">
+                Shrine of Elite
+              </h3>
+              <p className="text-white/80 text-sm leading-relaxed mb-8 max-w-md">
+                The pinnacle of memorial architecture, the Shrine of Elite offers exclusive niches with 
+                premium finishes, private viewing areas, and personalized memorial services. A testament 
+                to lives lived with distinction.
+              </p>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button className="bg-white text-primary hover:bg-white/90 px-8 text-[10px] tracking-[0.15em] h-10 w-fit">
+                  ENQUIRE NOW
+                </Button>
               </motion.div>
             </div>
-          </div>
+            
+            {/* Image - Positioned to overflow on LEFT */}
+            <div className="lg:absolute lg:left-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%] lg:-translate-x-4 p-4 lg:p-0">
+              <img 
+                src={family2Image} 
+                alt="Shrine of Elite" 
+                className="w-full h-64 md:h-[340px] object-cover shadow-2xl"
+              />
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Columbaria Type 6: Navy Left + Image Right */}
-      <section className="py-8 md:py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-0 overflow-hidden">
-              {/* Left - Navy Box */}
-              <motion.div {...fadeInLeft} className="bg-[#1e2a4a] p-8 md:p-12 flex flex-col justify-center order-2 lg:order-1">
-                <h3 className="font-display text-2xl md:text-3xl text-white italic mb-6">
-                  Niches
-                </h3>
-                <p className="text-white/70 text-sm leading-relaxed">
-                  Our thoughtfully designed niches come in various sizes and configurations to accommodate 
-                  different needs. Each niche is built with quality materials and can be personalized with 
-                  engravings and memorial plaques to create a lasting tribute.
-                </p>
-              </motion.div>
-              
-              {/* Right - Image */}
-              <motion.div {...fadeInRight} className="order-1 lg:order-2">
-                <img 
-                  src={heroTreesImage} 
-                  alt="Niches" 
-                  className="w-full h-64 md:h-80 object-cover"
-                />
-              </motion.div>
+      {/* Columbaria Type 6: Navy Box with Image Right Overflow */}
+      <section className="py-10 md:py-16 bg-[#e8ecf1]">
+        <div className="container mx-auto px-4 md:px-8 lg:px-16">
+          <motion.div 
+            {...fadeInUp}
+            className="relative bg-[#1e2a4a]"
+          >
+            {/* Inner container with padding */}
+            <div className="relative py-10 md:py-14 pl-6 md:pl-12 lg:pl-16 pr-6 md:pr-[45%] lg:pr-[50%] min-h-[350px] md:min-h-[400px] flex flex-col justify-center">
+              {/* Text Content */}
+              <h3 className="font-display text-2xl md:text-3xl text-white italic mb-6">
+                Niches
+              </h3>
+              <p className="text-white/70 text-sm leading-relaxed max-w-md">
+                Our thoughtfully designed niches come in various sizes and configurations to accommodate 
+                different needs. Each niche is built with quality materials and can be personalized with 
+                engravings and memorial plaques to create a lasting tribute.
+              </p>
             </div>
-          </div>
+            
+            {/* Image - Positioned to overflow on RIGHT */}
+            <div className="lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%] lg:translate-x-4 p-4 lg:p-0">
+              <img 
+                src={heroTreesImage} 
+                alt="Niches" 
+                className="w-full h-64 md:h-[340px] object-cover shadow-2xl"
+              />
+            </div>
+          </motion.div>
         </div>
       </section>
 
