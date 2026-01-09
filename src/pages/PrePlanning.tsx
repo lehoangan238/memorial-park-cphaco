@@ -283,46 +283,55 @@ const PrePlanning = () => {
       </section>
 
       {/* Section 6: 6 Steps Guide */}
-      <section className="py-16 md:py-24 bg-white">
+      <section className="py-16 md:py-24 bg-background">
         <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
-            {/* Left: Image + Text */}
+          {/* Small top divider */}
+          <div className="flex justify-center mb-12">
+            <div className="h-2 w-24 bg-primary" />
+          </div>
+
+          <div className="grid lg:grid-cols-[1fr_1px_1fr] gap-10 lg:gap-16 items-start">
+            {/* Left: Text + Image */}
             <motion.div {...fadeInLeft}>
-              <h2 className="font-display text-2xl md:text-3xl text-foreground mb-6">
+              <h2 className="text-2xl md:text-3xl text-foreground font-light mb-6">
                 6 steps guide to pre-planning
               </h2>
               <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                Pre-planning involves thinking about your preferences in case of 
-                death and what happens after. This guide will take you through the 
-                steps of pre-planning and help you understand the key decisions 
-                involved. A good place to start is to research and compare 
+                Pre-planning involves thinking about your preferences in case of
+                death and what happens after. This guide will take you through the
+                steps of pre-planning and help you understand the key decisions
+                involved. A good place to start is to research and compare
                 bereavement care providers.
               </p>
-              <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-                Having a pre-plan in place. This gives you and family peace, and 
-                eases the emotional stress that often accompanies making 
-                decisions about a loved one. Decide on the type of services you 
-                prefer. Customise, Who to invite, what theyll wear, how you want 
+              <p className="text-muted-foreground text-sm leading-relaxed mb-8">
+                Having a pre-plan in place. This gives you and family peace, and
+                eases the emotional stress that often accompanies making
+                decisions about a loved one. Decide on the type of services you
+                prefer. Customise, Who to invite, what theyll wear, how you want
                 to be remembered.
               </p>
-              <img 
-                src={family2Image} 
-                alt="Family planning" 
+              <img
+                src={family2Image}
+                alt="Family planning"
+                loading="lazy"
                 className="w-full aspect-[16/10] object-cover"
               />
             </motion.div>
 
-            {/* Right: Steps Checklist */}
+            {/* Vertical divider */}
+            <div className="hidden lg:block w-px bg-border self-stretch" aria-hidden="true" />
+
+            {/* Right: Steps list (+) */}
             <motion.div {...fadeInRight}>
               <div className="space-y-0">
                 {guideSteps.map((step, index) => (
-                  <div 
+                  <div
                     key={index}
-                    className="flex items-center justify-between py-4 border-b border-gray-200"
+                    className="flex items-center justify-between py-4 border-b border-border"
                   >
-                    <span className="text-foreground text-sm pr-4">{step}</span>
-                    <div className="w-6 h-6 bg-primary flex items-center justify-center flex-shrink-0">
-                      <Plus className="w-4 h-4 text-white" />
+                    <span className="text-foreground text-sm pr-6">{step}</span>
+                    <div className="w-7 h-7 rounded-full border border-primary flex items-center justify-center flex-shrink-0">
+                      <Plus className="w-4 h-4 text-primary" />
                     </div>
                   </div>
                 ))}
