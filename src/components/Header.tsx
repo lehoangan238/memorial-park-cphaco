@@ -14,7 +14,7 @@ const dropdownMenus = {
     { label: 'Nhà Lưu Trữ Tro Cốt', href: '/columbaria' },
     { label: 'Lô Đất An Táng', href: '/burial-plots' },
     { label: 'Dịch Vụ Tang Lễ', href: '/funeral-service' },
-    { label: 'Dịch Vụ Hỏa Táng', href: '#cremation' },
+    { label: 'Sản Phẩm Khác', href: '/others' },
     { label: 'Khu Mộ Gia Đình', href: '#family-estates' },
     { label: 'Tưởng Niệm Thú Cưng', href: '#pet-memorial' },
   ],
