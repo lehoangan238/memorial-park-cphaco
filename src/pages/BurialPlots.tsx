@@ -222,12 +222,12 @@ const BurialPlots = () => {
           </motion.div>
 
           {/* Staggered Cards Layout */}
-          <motion.div {...fadeInUp} className="grid lg:grid-cols-2 gap-6 lg:gap-10 max-w-6xl mx-auto">
-            {/* Left Column - Card with image on top */}
-            <div className="space-y-8">
+          <motion.div {...fadeInUp} className="grid lg:grid-cols-2 gap-x-10 gap-y-0 max-w-6xl mx-auto">
+            {/* Left Column - Cards with image on top */}
+            <div className="flex flex-col gap-8">
               {plotTypesLeft.map((plot) => (
                 <div key={plot.id} className="bg-white shadow-md overflow-hidden">
-                  <ImageCarousel images={plot.images} className="h-56 md:h-64" />
+                  <ImageCarousel images={plot.images} className="h-56 md:h-72" />
                   <div className="p-6 md:p-8">
                     <span className="text-muted-foreground text-[10px] tracking-[0.2em] uppercase block mb-2">
                       {plot.category}
@@ -249,8 +249,8 @@ const BurialPlots = () => {
               ))}
             </div>
 
-            {/* Right Column - Offset, text on top */}
-            <div className="space-y-8 lg:mt-24">
+            {/* Right Column - Offset down, text on top */}
+            <div className="flex flex-col gap-8 lg:pt-48">
               {plotTypesRight.map((plot) => (
                 <div key={plot.id} className="bg-white shadow-md overflow-hidden">
                   <div className="p-6 md:p-8">
@@ -267,7 +267,7 @@ const BurialPlots = () => {
                       GET QUOTE
                     </Button>
                   </div>
-                  <ImageCarousel images={plot.images} className="h-56 md:h-64" />
+                  <ImageCarousel images={plot.images} className="h-56 md:h-72" />
                 </div>
               ))}
             </div>
