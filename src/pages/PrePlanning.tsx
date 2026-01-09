@@ -1,0 +1,344 @@
+import { motion } from "framer-motion";
+import { ChevronRight, Plus, Check } from "lucide-react";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+
+// Import images
+import familyHugImage from "@/assets/family-hug.jpg";
+import family1Image from "@/assets/family-1.jpg";
+import family2Image from "@/assets/family-2.jpg";
+import family3Image from "@/assets/family-3.jpg";
+import familyGenerationsImage from "@/assets/family-generations.jpg";
+import coupleBeachImage from "@/assets/couple-beach.jpg";
+import columbariumImage from "@/assets/columbarium.jpg";
+import landscapeImage from "@/assets/landscape.jpg";
+import heroBgImage from "@/assets/hero-bg.jpg";
+
+// Animation
+const easeOut = [0.22, 1, 0.36, 1] as const;
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 40 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-100px" },
+  transition: { duration: 0.7, ease: easeOut }
+};
+
+const fadeInLeft = {
+  initial: { opacity: 0, x: -50 },
+  whileInView: { opacity: 1, x: 0 },
+  viewport: { once: true, margin: "-100px" },
+  transition: { duration: 0.7, ease: easeOut }
+};
+
+const fadeInRight = {
+  initial: { opacity: 0, x: 50 },
+  whileInView: { opacity: 1, x: 0 },
+  viewport: { once: true, margin: "-100px" },
+  transition: { duration: 0.7, ease: easeOut }
+};
+
+const forYourselfBenefits = [
+  "You assume financial responsibility for your loved ones",
+  "You will have time and space to consider all factors and concerns",
+  "You can be selective and choose the way you wish to be remembered and memorialized",
+  "You get the option of paying over time through an installment plan",
+  "You will be able to enjoy greater peace of mind and complete financial planning"
+];
+
+const forFamilyBenefits = [
+  "Your family will know who to contact in the event of an emergency",
+  "Your family will not be panicked into making hasty decisions",
+  "Your family can focus on remembering and healing",
+  "Your family can avoid being suddenly required to spend a huge sum of money at once",
+  "Your family can take time to grieve in their own way, in their own time"
+];
+
+const linkCards = [
+  { title: "How does pre-planning work?", image: family1Image },
+  { title: "Why is pre-planning important?", image: family2Image },
+  { title: "What is Nirvana Life Plan?", image: family3Image }
+];
+
+const guideSteps = [
+  "Research and compare bereavement care providers",
+  "Assess your budget and payment options",
+  "Consider key options for different methods for memorialisation",
+  "Decide on how you would like to be laid to rest",
+  "Consider appointing an Executor even",
+  "Ensure you have made arrangements for your other arrangements"
+];
+
+const resources = [
+  { title: "Nirvana Life Plan comparison", image: columbariumImage },
+  { title: "Nirvana Memorial Park Burial Plot", image: landscapeImage },
+  { title: "Know more about Columbaria", image: family1Image }
+];
+
+const PrePlanning = () => {
+  return (
+    <div className="min-h-screen bg-white">
+      <Header />
+      
+      {/* Hero Section - Sky/Cloud Background */}
+      <section className="relative h-[35vh] min-h-[280px] flex items-center justify-center overflow-hidden">
+        <div 
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `url(${heroBgImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center"
+          }}
+        />
+        <div className="absolute inset-0 bg-[#1e2a4a]/40" />
+        <div className="relative z-10 text-center text-white px-4">
+          <motion.h1 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: easeOut }}
+            className="font-display text-4xl md:text-5xl lg:text-6xl italic"
+          >
+            Pre-Planning
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: easeOut }}
+            className="text-white/80 text-sm md:text-base mt-4 italic"
+          >
+            I believe in people and loves
+          </motion.p>
+        </div>
+      </section>
+
+      {/* Section 2: Pre-planning Intro */}
+      <section className="py-16 md:py-24 bg-white">
+        <div className="container mx-auto px-4 md:px-8 lg:px-16">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+            {/* Left: Text Content */}
+            <motion.div {...fadeInLeft}>
+              <h2 className="font-display text-3xl md:text-4xl text-foreground mb-6">
+                Pre-planning
+              </h2>
+              <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                You can help reduce the emotional and financial burden on your family. Pre-planning 
+                your own funeral also takes the burden off loved ones in advance of 
+                a stressful situation and ensures that your preferences and wishes are 
+                adhered to with precision regarding your final farewell. By thinking this 
+                through now, you relieve your loved ones of having to make difficult 
+                arrangements during a time of grief.
+              </p>
+              <a href="#" className="text-primary text-sm flex items-center gap-1 hover:underline">
+                READ MORE <ChevronRight className="w-4 h-4" />
+              </a>
+            </motion.div>
+
+            {/* Right: Image */}
+            <motion.div {...fadeInRight}>
+              <img 
+                src={coupleBeachImage} 
+                alt="Couple planning" 
+                className="w-full aspect-[4/3] object-cover"
+              />
+            </motion.div>
+          </div>
+
+          {/* What is Pre-planning? */}
+          <motion.div {...fadeInUp} className="mt-16 max-w-2xl ml-auto">
+            <h3 className="font-display text-2xl md:text-3xl text-foreground mb-4">
+              What is Pre-planning?
+            </h3>
+            <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+              Pre-planning is pre-planning or making advance funeral arrangements 
+              (also known as pre-need planning). It is the process of making 
+              decisions about what will happen after you pass on. Pre-planning allows 
+              families to pick and choose final resting arrangements that best complies 
+              with preferences and budget. It will allow you to choose what type of 
+              funeral service you want.
+            </p>
+            <a href="#" className="text-primary text-sm flex items-center gap-1 hover:underline">
+              READ MORE <ChevronRight className="w-4 h-4" />
+            </a>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Section 3: 5 main advantages - Blue Background */}
+      <section className="py-16 md:py-24 bg-primary">
+        <div className="container mx-auto px-4 md:px-8 lg:px-16">
+          <motion.div {...fadeInUp} className="mb-12">
+            <h2 className="font-display text-3xl md:text-4xl text-white">
+              5 main advantages<br />
+              of pre-planning
+            </h2>
+          </motion.div>
+
+          {/* For Yourself */}
+          <motion.div {...fadeInUp} className="mb-8">
+            <h3 className="font-display text-2xl text-white italic mb-6">
+              For Yourself
+            </h3>
+            <div className="space-y-4">
+              {forYourselfBenefits.map((benefit, index) => (
+                <div key={index} className="flex items-start gap-3">
+                  <Check className="w-5 h-5 text-white mt-0.5 flex-shrink-0" />
+                  <span className="text-white/90 text-sm">{benefit}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Section 4: For Your Family - White Background */}
+      <section className="py-16 md:py-24 bg-white">
+        <div className="container mx-auto px-4 md:px-8 lg:px-16">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+            {/* Left: Image */}
+            <motion.div {...fadeInLeft}>
+              <img 
+                src={familyGenerationsImage} 
+                alt="Family generations" 
+                className="w-full aspect-[4/3] object-cover"
+              />
+            </motion.div>
+
+            {/* Right: For Your Family Content */}
+            <motion.div {...fadeInRight}>
+              <h3 className="font-display text-2xl md:text-3xl text-foreground italic mb-6">
+                For Your Family
+              </h3>
+              <div className="space-y-4">
+                {forFamilyBenefits.map((benefit, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span className="text-muted-foreground text-sm">{benefit}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 5: Three Link Cards - Gray Background */}
+      <section className="py-16 md:py-20 bg-[#f5f5f5]">
+        <div className="container mx-auto px-4 md:px-8 lg:px-16">
+          <motion.div 
+            {...fadeInUp}
+            className="grid md:grid-cols-3 gap-6"
+          >
+            {linkCards.map((card, index) => (
+              <div 
+                key={index}
+                className="group cursor-pointer"
+              >
+                <div className="overflow-hidden mb-4">
+                  <img 
+                    src={card.image}
+                    alt={card.title}
+                    className="w-full aspect-[4/3] object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+                <p className="text-foreground text-sm font-medium group-hover:text-primary transition-colors">
+                  {card.title}
+                </p>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Section 6: 6 Steps Guide */}
+      <section className="py-16 md:py-24 bg-white">
+        <div className="container mx-auto px-4 md:px-8 lg:px-16">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+            {/* Left: Image + Text */}
+            <motion.div {...fadeInLeft}>
+              <h2 className="font-display text-2xl md:text-3xl text-foreground mb-6">
+                6 steps guide to pre-planning
+              </h2>
+              <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                Pre-planning involves thinking about your preferences in case of 
+                death and what happens after. This guide will take you through the 
+                steps of pre-planning and help you understand the key decisions 
+                involved. A good place to start is to research and compare 
+                bereavement care providers.
+              </p>
+              <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+                Having a pre-plan in place. This gives you and family peace, and 
+                eases the emotional stress that often accompanies making 
+                decisions about a loved one. Decide on the type of services you 
+                prefer. Customise, Who to invite, what theyll wear, how you want 
+                to be remembered.
+              </p>
+              <img 
+                src={family2Image} 
+                alt="Family planning" 
+                className="w-full aspect-[16/10] object-cover"
+              />
+            </motion.div>
+
+            {/* Right: Steps Checklist */}
+            <motion.div {...fadeInRight}>
+              <div className="space-y-0">
+                {guideSteps.map((step, index) => (
+                  <div 
+                    key={index}
+                    className="flex items-center justify-between py-4 border-b border-gray-200"
+                  >
+                    <span className="text-foreground text-sm pr-4">{step}</span>
+                    <div className="w-6 h-6 bg-primary flex items-center justify-center flex-shrink-0">
+                      <Plus className="w-4 h-4 text-white" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 7: Additional Resources */}
+      <section className="py-16 md:py-20 bg-white">
+        <div className="container mx-auto px-4 md:px-8 lg:px-16">
+          <motion.div {...fadeInUp} className="text-center mb-12">
+            <span className="text-primary text-[10px] tracking-[0.4em] uppercase font-medium">
+              R E A D &nbsp; M O R E
+            </span>
+            <h2 className="font-display text-3xl md:text-4xl text-foreground mt-4">
+              Additional Resources
+            </h2>
+          </motion.div>
+
+          <motion.div 
+            {...fadeInUp}
+            className="grid md:grid-cols-3 gap-6"
+          >
+            {resources.map((resource, index) => (
+              <div 
+                key={index}
+                className="relative group cursor-pointer overflow-hidden"
+              >
+                <img 
+                  src={resource.image}
+                  alt={resource.title}
+                  className="w-full aspect-[4/3] object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-primary/70 flex items-center justify-center p-6">
+                  <p className="text-white text-center text-sm font-medium leading-relaxed">
+                    {resource.title}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default PrePlanning;
