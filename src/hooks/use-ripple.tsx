@@ -24,21 +24,17 @@ export function useRipple() {
     }, 600);
   }, []);
 
-  const RippleContainer = useCallback(() => (
-    <>
-      {ripples.map((ripple) => (
-        <span
-          key={ripple.id}
-          className="absolute rounded-full bg-white/30 animate-ripple pointer-events-none"
-          style={{
-            left: ripple.x,
-            top: ripple.y,
-            transform: "translate(-50%, -50%)",
-          }}
-        />
-      ))}
-    </>
-  ), [ripples]);
+  const rippleElements = ripples.map((ripple) => (
+    <span
+      key={ripple.id}
+      className="absolute rounded-full bg-white/30 animate-ripple pointer-events-none"
+      style={{
+        left: ripple.x,
+        top: ripple.y,
+        transform: "translate(-50%, -50%)",
+      }}
+    />
+  ));
 
-  return { createRipple, RippleContainer };
+  return { createRipple, rippleElements };
 }
