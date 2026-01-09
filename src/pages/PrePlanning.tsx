@@ -250,18 +250,20 @@ const PrePlanning = () => {
 
         <div className="container mx-auto px-4 md:px-8 lg:px-16 relative">
           {/* Center badge */}
-          <motion.div
-            {...fadeInUp}
-            className="absolute left-1/2 -top-12 -translate-x-1/2 w-56 h-56 bg-primary text-primary-foreground flex flex-col items-center justify-center text-center"
-          >
-            <p className="text-[10px] tracking-[0.6em] uppercase font-medium">R E A D</p>
-            <p className="mt-2 text-sm tracking-[0.2em]">Pre-Planning</p>
-          </motion.div>
+          <div className="flex justify-center mb-12">
+            <motion.div
+              {...fadeInUp}
+              className="w-56 h-56 bg-primary text-primary-foreground flex flex-col items-center justify-center text-center"
+            >
+              <p className="text-[10px] tracking-[0.6em] uppercase font-medium">R E A D</p>
+              <p className="mt-2 text-sm tracking-[0.2em]">Pre-Planning</p>
+            </motion.div>
+          </div>
 
           {/* Cards */}
           <motion.div
             {...fadeInUp}
-            className="pt-40 grid md:grid-cols-3 gap-8 lg:gap-12"
+            className="grid md:grid-cols-3 gap-8 lg:gap-12"
           >
             {linkCards.map((card, index) => (
               <div key={index} className="group cursor-pointer">
