@@ -11,7 +11,7 @@ const dropdownMenus = {
   ],
   'Tùy Chọn Kế Hoạch': [
     { label: 'Công Viên Tưởng Niệm', href: '#memorial-parks' },
-    { label: 'Nhà Lưu Trữ Tro Cốt', href: '#columbarium' },
+    { label: 'Nhà Lưu Trữ Tro Cốt', href: '/columbaria' },
     { label: 'Lô Đất An Táng', href: '/burial-plots' },
     { label: 'Dịch Vụ Tang Lễ', href: '/funeral-service' },
     { label: 'Dịch Vụ Hỏa Táng', href: '#cremation' },
