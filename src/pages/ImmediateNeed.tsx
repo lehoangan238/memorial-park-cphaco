@@ -1,413 +1,264 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Phone, Users, Eye, Flame, MapPin, Heart, Plus, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
-
-// Import images
-import familyHugImage from "@/assets/family-hug.jpg";
-import family1Image from "@/assets/family-1.jpg";
-import family2Image from "@/assets/family-2.jpg";
-import family3Image from "@/assets/family-3.jpg";
-import columbariumImage from "@/assets/columbarium.jpg";
-import landscapeImage from "@/assets/landscape.jpg";
-
-// Animation
-const easeOut = [0.22, 1, 0.36, 1] as const;
-
-const fadeInUp = {
-  initial: { opacity: 0, y: 40 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-100px" },
-  transition: { duration: 0.7, ease: easeOut }
-};
-
-const steps = [
-  {
-    icon: Phone,
-    step: "Step 1",
-    title: "Contact our agents or call our hotline",
-    description: "Our team is on standby round the clock to assist you and provide guidance every step of the way. We are ready to help you through this difficult time."
-  },
-  {
-    icon: Eye,
-    step: "Step 2",
-    title: "Viewing the Deceased",
-    description: "Once a life has passed away, the family will need to view the deceased. Our team will handle the arrangements to ensure everything is done with dignity and respect."
-  },
-  {
-    icon: Flame,
-    step: "Step 3",
-    title: "Burial or cremation",
-    description: "Consider between the options of burial and cremation. Our team is here to guide the deceased's resting place based on cultural and religious preferences."
-  },
-  {
-    icon: MapPin,
-    step: "Step 4",
-    title: "Complete the final resting place",
-    description: "Upon selection of the final resting place, our team will handle arrangements such as engraving and installation to ensure everything is in place for the final farewell."
-  },
-  {
-    icon: Heart,
-    step: "Step 5",
-    title: "Receive what matters",
-    description: "Receiving urn or ashes for columbarium or scatter and other personal items. Finalizing any outstanding arrangements including legal matters."
-  }
-];
-
-const branches = [
-  {
-    region: "Central Region",
-    locations: "Kuala Lumpur, Seremban, Shah Alam, Klang, Subang"
-  },
-  {
-    region: "Northern Region",
-    locations: "Kepala Batas, Penang, Kulim, Bukit Mertajam, Sungai Petani"
-  },
-  {
-    region: "Southern Region",
-    locations: "Melaka, Johor, Johor Bahru, Muar, Kluang, Batu Pahat, Kulai, Senai, Pasir Gudang, Segamat, Yong Peng, Tangkak"
-  },
-  {
-    region: "East Malaysia",
-    locations: "Kota Kinabalu, Sabah, Sibu, Sarawak"
-  },
-  {
-    region: "International",
-    locations: "Singapore, Jakarta, Surabaya, Thailand"
-  }
-];
-
-const todoSteps = [
-  "Report the death",
-  "Register the death to obtain the Death Certificate",
-  "Arrange the funeral with a bereavement care provider"
-];
-
-const resources = [
-  { title: "Eternal Garden Columbarium", image: columbariumImage },
-  { title: "Nirvana Memorial Park Burial Plot", image: landscapeImage },
-  { title: "Know more about Columbaria", image: family1Image }
-];
+import { useState } from 'react';
+import { Phone, FileText, Users, MapPin, Plus } from 'lucide-react';
+import { Header } from '../components/Header';
+import { Footer } from '../components/Footer';
 
 const ImmediateNeed = () => {
-  const [expandedBranch, setExpandedBranch] = useState<number | null>(null);
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    message: ""
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: ''
   });
+
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const steps = [
+    { icon: Phone, step: 'Step 1', title: 'Engage a funeral agency or call our hotline', desc: 'Contact us immediately for compassionate guidance' },
+    { icon: FileText, step: 'Step 2', title: 'Reporting the death to the authorities', desc: 'We assist with all necessary documentation' },
+    { icon: Users, step: 'Step 3', title: 'Embalming preparation', desc: 'Professional care with dignity and respect' },
+    { icon: MapPin, step: 'Step 4', title: 'Consider the final resting place', desc: 'Explore meaningful memorial options' }
+  ];
+
+  const branches = [
+    { region: 'Northern Region', locations: ['Penang', 'Kedah', 'Perlis', 'Perak'] },
+    { region: 'East Coast Region', locations: ['Kelantan', 'Terengganu', 'Pahang'] },
+    { region: 'Central Region', locations: ['Kuala Lumpur', 'Melaka', 'Selangor', 'Negeri Sembilan'] },
+    { region: 'Southern Region', locations: ['Johor Bahru', 'Muar', 'Kluang', 'Batu Pahat', 'Kulai'] },
+    { region: 'International', locations: ['Singapore', 'Indonesia', 'Thailand'] }
+  ];
+
+  const faqItems = [
+    'Report the death',
+    'Register the death to obtain the Death Certificate',
+    'Arrange the funeral with a bereavement care provider'
+  ];
+
+  const resources = [
+    { title: 'FAQ, Contact, Questions', color: 'bg-slate-400/90' },
+    { title: 'Nirvana Memorial Park Rental Plot', color: 'bg-blue-500/90' },
+    { title: 'Know more about Columbarium', color: 'bg-slate-500/90' }
+  ];
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      
-      {/* Hero Section - Dark Blue with Hands Image */}
-      <section className="relative h-[45vh] min-h-[350px] flex items-center justify-center overflow-hidden bg-[#1e2a4a]">
-        {/* Background image overlay */}
-        <div 
-          className="absolute inset-0 opacity-30"
-          style={{
-            backgroundImage: `url(${familyHugImage})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center"
-          }}
-        />
-        <div className="relative z-10 text-center text-white px-4">
-          <motion.h1 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: easeOut }}
-            className="font-display text-4xl md:text-5xl lg:text-6xl italic"
-          >
+
+      {/* Hero Section - Dark Navy with Hands Image */}
+      <section className="relative min-h-[520px] flex items-center justify-center bg-[#0f1729] overflow-hidden">
+        {/* Background image - hands holding light */}
+        <div className="absolute inset-0">
+          <img 
+            src="https://images.unsplash.com/photo-1518398046578-8cca57782e17?w=1920&h=1080&fit=crop"
+            alt="Hands holding light"
+            className="w-full h-full object-cover opacity-40"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0f1729]/70 via-[#0f1729]/60 to-[#0f1729]/80" />
+        </div>
+
+        <div className="relative z-10 text-center px-4 max-w-3xl mx-auto pt-16">
+          <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-white font-light mb-4 tracking-wide italic">
             Immediate Need
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: easeOut }}
-            className="text-white/80 text-sm md:text-base mt-4"
-          >
+          </h1>
+          <p className="text-white/70 text-base md:text-lg mb-8 italic">
             We are ready to assist 24/7
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: easeOut }}
-            className="mt-6"
-          >
-            <Button className="bg-primary hover:bg-primary/90 text-white px-6 py-2 text-xs tracking-wider">
-              CALL CARELINE 1800-88-1818
-            </Button>
-          </motion.div>
+          </p>
+          <button className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-8 py-3 text-sm font-medium tracking-wider transition-colors cursor-pointer uppercase">
+            Call Careline: 1800-88-1338
+          </button>
         </div>
       </section>
 
-      {/* Section 2: What to do when someone passes away */}
-      <section className="py-16 md:py-24 bg-white relative">
-        {/* Curved top edge */}
-        <div className="absolute top-0 left-0 right-0 h-16 bg-[#1e2a4a] -translate-y-full" />
-        <div 
-          className="absolute -top-8 left-0 right-0 h-16 bg-white"
-          style={{ borderRadius: "50% 50% 0 0" }}
-        />
-        
-        <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          <motion.div {...fadeInUp} className="text-center mb-16">
-            <h2 className="font-display text-3xl md:text-4xl text-foreground">
-              What to do when<br />
-              someone passes away
+      {/* Steps Section - What to do when someone passes away */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl text-[#3b82f6] font-light mb-4">
+              What to do when<br />someone passes away
             </h2>
-            <p className="text-muted-foreground text-sm mt-4 max-w-xl mx-auto">
-              Our little team can guide you through every step of the way. We 
-              assist you every step of the way.
+            <p className="text-slate-500 text-sm max-w-2xl mx-auto">
+              Our team will guide you every step of the way. We'll be here to support you throughout the process.
             </p>
-          </motion.div>
+          </div>
 
-          {/* 5 Steps */}
-          <motion.div 
-            {...fadeInUp}
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 lg:gap-4"
-          >
-            {steps.map((step, index) => (
-              <div key={index} className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                  <step.icon className="w-7 h-7 text-primary" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {steps.map((item, idx) => (
+              <div key={idx} className="text-center group">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full border-2 border-slate-200 flex items-center justify-center group-hover:border-[#3b82f6] group-hover:bg-[#3b82f6]/5 transition-all cursor-pointer">
+                  <item.icon className="w-7 h-7 text-slate-400 group-hover:text-[#3b82f6] transition-colors" strokeWidth={1.5} />
                 </div>
-                <p className="text-primary text-xs font-medium mb-2">{step.step}</p>
-                <h3 className="text-foreground text-sm font-medium mb-2 leading-tight">
-                  {step.title}
-                </h3>
-                <p className="text-muted-foreground text-xs leading-relaxed">
-                  {step.description}
-                </p>
+                <p className="text-[#3b82f6] text-xs font-medium tracking-wider uppercase mb-2">{item.step}</p>
+                <h3 className="text-slate-700 text-sm font-medium mb-2 leading-snug">{item.title}</h3>
+                <p className="text-slate-400 text-xs">{item.desc}</p>
               </div>
             ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Section 3: Our Branches */}
-      <section className="py-16 md:py-20 bg-[#f5f5f5]">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          <motion.div {...fadeInUp} className="text-center mb-10">
-            <span className="text-primary text-[10px] tracking-[0.4em] uppercase font-medium">
-              L O C A T I O N S
-            </span>
-            <h2 className="font-display text-3xl md:text-4xl text-primary mt-4">
-              Our Branches
-            </h2>
-          </motion.div>
-
-          {/* Accordion Branches */}
-          <motion.div {...fadeInUp} className="max-w-3xl mx-auto space-y-3">
-            {branches.map((branch, index) => (
-              <div 
-                key={index}
-                className="bg-primary text-white overflow-hidden"
-              >
-                <button
-                  onClick={() => setExpandedBranch(expandedBranch === index ? null : index)}
-                  className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-primary/90 transition-colors"
-                >
-                  <span className="text-sm">{branch.region}: {branch.locations}</span>
-                  <ChevronDown 
-                    className={`w-5 h-5 transition-transform ${
-                      expandedBranch === index ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-                {expandedBranch === index && (
-                  <div className="px-5 pb-4 text-white/80 text-sm">
-                    <p>Contact our branch for assistance.</p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Section 4: Contact Form */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          <motion.div {...fadeInUp} className="text-center mb-10">
-            <span className="text-primary text-[10px] tracking-[0.4em] uppercase font-medium">
-              M E S S A G E &nbsp; U S
-            </span>
-          </motion.div>
-
-          <motion.form {...fadeInUp} className="max-w-3xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-4 mb-4">
-              <Input
-                name="firstName"
-                placeholder="First Name"
-                value={formData.firstName}
-                onChange={handleInputChange}
-                className="border-gray-300 focus:border-primary"
-              />
-              <Input
-                name="lastName"
-                placeholder="Last Name"
-                value={formData.lastName}
-                onChange={handleInputChange}
-                className="border-gray-300 focus:border-primary"
-              />
-            </div>
-            <div className="grid md:grid-cols-2 gap-4 mb-4">
-              <Input
-                name="email"
-                type="email"
-                placeholder="Email Address"
-                value={formData.email}
-                onChange={handleInputChange}
-                className="border-gray-300 focus:border-primary"
-              />
-              <Input
-                name="phone"
-                placeholder="Contact No."
-                value={formData.phone}
-                onChange={handleInputChange}
-                className="border-gray-300 focus:border-primary"
-              />
-            </div>
-            <Textarea
-              name="message"
-              placeholder="Message"
-              value={formData.message}
-              onChange={handleInputChange}
-              className="border-gray-300 focus:border-primary min-h-[120px] mb-4"
-            />
-            <div className="flex justify-end">
-              <Button className="bg-primary hover:bg-primary/90 text-white px-8 text-xs tracking-wider">
-                SUBMIT
-              </Button>
-            </div>
-          </motion.form>
-        </div>
-      </section>
-
-      {/* Section 5: When a loved one passes away */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          {/* Decorative elements */}
-          <motion.div {...fadeInUp} className="flex justify-center gap-4 mb-6">
-            <span className="text-muted-foreground text-sm"># 8 &lt; 3 &gt;</span>
-          </motion.div>
-
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-            {/* Left: Text Content */}
-            <motion.div {...fadeInUp}>
-              <h2 className="font-display text-2xl md:text-3xl text-foreground mb-6">
-                When a loved one passes away
-              </h2>
-              <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                It is hard to lose a loved one. When a loved one dies, there is a set 
-                of procedures to follow such as taking care of the body, managing 
-                the deceased, and putting your affairs in order. We can help 
-                you through every step and guide you in managing this difficult 
-                time of transition in your life.
-              </p>
-              <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                If an immediate need arises, those relatives beside you will have many 
-                responsibilities to do in the short span of time. Our caring and 
-                knowledgeable staff can help with planning and guide you to make 
-                important decisions. We understand that you need to put your mind and 
-                priorities in order. So rest assured your loved one will be taken care of
-                with respect and dignity while you focus on spending time with family — 
-                healing with your loved ones and gathering.
-              </p>
-              <p className="text-muted-foreground text-sm mb-6 italic">
-                Are you concerned about planning?
-              </p>
-              <Button 
-                variant="outline" 
-                className="border-primary text-primary hover:bg-primary hover:text-white text-xs tracking-wider"
-              >
-                I'M INTERESTED
-              </Button>
-            </motion.div>
-
-            {/* Right: Image */}
-            <motion.div {...fadeInUp}>
-              <img 
-                src={family2Image} 
-                alt="Elderly couple" 
-                className="w-full aspect-[4/3] object-cover"
-              />
-            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Section 6: What to do when someone dies */}
-      <section className="py-12 md:py-16 bg-white">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          <motion.div {...fadeInUp} className="max-w-2xl mx-auto">
-            <h3 className="font-display text-xl md:text-2xl text-primary text-center mb-8">
-              What to do when someone dies
-            </h3>
-            
-            <div className="space-y-0">
-              {todoSteps.map((step, index) => (
-                <div 
-                  key={index}
-                  className="flex items-center justify-between py-4 border-b border-gray-200"
-                >
-                  <span className="text-foreground text-sm">{step}</span>
-                  <div className="w-6 h-6 bg-primary flex items-center justify-center">
-                    <Plus className="w-4 h-4 text-white" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      {/* Branches Section - Navy Background */}
+      <section className="py-16 bg-[#1e3a5f]">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="text-center mb-10">
+            <p className="text-white/60 text-xs tracking-[0.2em] uppercase mb-2">CONTACT US</p>
+            <h2 className="text-3xl text-white font-light">Our Branches</h2>
+          </div>
 
-      {/* Section 7: Additional Resources */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          <motion.div {...fadeInUp} className="text-center mb-12">
-            <span className="text-primary text-[10px] tracking-[0.4em] uppercase font-medium">
-              N E X T &nbsp; S T E P S
-            </span>
-            <h2 className="font-display text-3xl md:text-4xl text-foreground mt-4">
-              Additional Resources
-            </h2>
-          </motion.div>
-
-          <motion.div 
-            {...fadeInUp}
-            className="grid md:grid-cols-3 gap-6"
-          >
-            {resources.map((resource, index) => (
-              <div 
-                key={index}
-                className="relative group cursor-pointer overflow-hidden"
-              >
-                <img 
-                  src={resource.image}
-                  alt={resource.title}
-                  className="w-full aspect-[4/3] object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-primary/70 flex items-center justify-center p-6">
-                  <p className="text-white text-center text-sm font-medium leading-relaxed">
-                    {resource.title}
-                  </p>
+          <div className="space-y-3">
+            {branches.map((branch, idx) => (
+              <div key={idx} className="bg-[#2a4a6f] hover:bg-[#345580] transition-colors cursor-pointer">
+                <div className="px-6 py-4 flex flex-wrap items-center gap-2">
+                  <span className="text-white font-medium text-sm mr-2">{branch.region}:</span>
+                  {branch.locations.map((loc, i) => (
+                    <span key={i} className="text-white/70 text-sm">
+                      {loc}{i < branch.locations.length - 1 ? ',' : ''}
+                    </span>
+                  ))}
                 </div>
               </div>
             ))}
-          </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Message Form Section */}
+      <section className="py-20 bg-slate-50">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <p className="text-slate-400 text-xs tracking-[0.2em] uppercase mb-8">MESSAGE US</p>
+
+          <div className="bg-white p-8 shadow-sm">
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
+              <input
+                type="text"
+                name="firstName"
+                placeholder="First Name *"
+                value={formData.firstName}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-slate-200 text-sm focus:outline-none focus:border-[#3b82f6] transition-colors"
+              />
+              <input
+                type="text"
+                name="lastName"
+                placeholder="Last Name *"
+                value={formData.lastName}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-slate-200 text-sm focus:outline-none focus:border-[#3b82f6] transition-colors"
+              />
+            </div>
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
+              <input
+                type="email"
+                name="email"
+                placeholder="Email Address *"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-slate-200 text-sm focus:outline-none focus:border-[#3b82f6] transition-colors"
+              />
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Phone Number *"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-slate-200 text-sm focus:outline-none focus:border-[#3b82f6] transition-colors"
+              />
+            </div>
+            <div className="mb-6">
+              <textarea
+                name="message"
+                placeholder="Your Message *"
+                rows={4}
+                value={formData.message}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-slate-200 text-sm focus:outline-none focus:border-[#3b82f6] transition-colors resize-none"
+              />
+            </div>
+            <div className="flex justify-end">
+              <button className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-10 py-3 text-sm font-medium tracking-wider transition-colors cursor-pointer">
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section - Image + Content */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <p className="text-slate-400 text-xs tracking-[0.2em] uppercase mb-2">R.S.V.P</p>
+          
+          <div className="grid lg:grid-cols-2 gap-12 items-start mt-8">
+            {/* Left Content */}
+            <div>
+              <h2 className="text-3xl text-slate-700 font-light mb-6 leading-tight">
+                When a loved one<br />passes away
+              </h2>
+              <div className="text-slate-500 text-sm leading-relaxed space-y-4 mb-8">
+                <p>
+                  Losing a loved one is an incredibly painful experience. When someone passes away, there are numerous tasks that need to be handled—such as caring for the deceased, managing funeral arrangements, and organizing personal affairs.
+                </p>
+                <p>
+                  We can assist you at every step and guide you through this difficult time. Our dedicated team can help plan and guide you in making important decisions.
+                </p>
+              </div>
+
+              {/* What to do immediately box */}
+              <div className="bg-slate-100 p-6 mb-8">
+                <h3 className="text-slate-700 font-medium mb-4">What to do when someone dies</h3>
+                <div className="space-y-3">
+                  {faqItems.map((item, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setExpandedFaq(expandedFaq === idx ? null : idx)}
+                      className="w-full flex items-center justify-between py-3 px-4 bg-white hover:bg-slate-50 transition-colors cursor-pointer text-left"
+                    >
+                      <span className="text-slate-600 text-sm">{item}</span>
+                      <Plus className="w-5 h-5 text-[#3b82f6]" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <button className="border-2 border-[#3b82f6] text-[#3b82f6] hover:bg-[#3b82f6] hover:text-white px-8 py-3 text-sm font-medium tracking-wider transition-colors cursor-pointer">
+                PRE-PLANNING
+              </button>
+            </div>
+
+            {/* Right Image */}
+            <div className="relative">
+              <div className="aspect-[4/5] bg-slate-200 overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&h=750&fit=crop" 
+                  alt="Hands together in support"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Additional Resources Section */}
+      <section className="py-20 bg-slate-50">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <p className="text-slate-400 text-xs tracking-[0.2em] uppercase mb-2">NEXT STEPS</p>
+          <h2 className="text-3xl text-slate-700 font-light mb-12">Additional Resources</h2>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {resources.map((item, idx) => (
+              <div key={idx} className="group cursor-pointer">
+                <div className={`relative aspect-[4/3] ${item.color} flex items-center justify-center p-6 transition-all group-hover:opacity-90`}>
+                  <h3 className="text-white text-center text-lg font-medium leading-snug">{item.title}</h3>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

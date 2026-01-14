@@ -1,441 +1,509 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { Play, ChevronRight, Plus, ChevronLeft } from "lucide-react";
-import familyImage from "@/assets/family-generations.jpg";
-import landscapeImage from "@/assets/landscape.jpg";
-import columbariumImage from "@/assets/columbarium.jpg";
-import heroParkImage from "@/assets/hero-park.jpg";
-import heroTreesImage from "@/assets/hero-trees.jpg";
-import coupleBeachImage from "@/assets/couple-beach.jpg";
-import family1Image from "@/assets/family-1.jpg";
-import family2Image from "@/assets/family-2.jpg";
+import { useState } from 'react';
+import { Play, ChevronRight, ChevronDown } from 'lucide-react';
+import { Header } from '../components/Header';
+import { Footer } from '../components/Footer';
+import { ImageCarousel } from '../components/ImageCarousel';
 
-const fadeInUp = {
-  initial: { opacity: 0, y: 30 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
-  transition: { duration: 0.6 }
-};
-
-// Plot types data for the staggered card layout
-const plotTypesLeft = [
-  {
-    id: 1,
-    category: "NƠI GỌI LÀ NHÀ",
-    title: "Lô Đất Gia Đình Hoàng Gia",
-    description: "Lá rụng sẽ luôn rơi gần gốc cây. Trong tư tưởng truyền thống Việt Nam, dù ở đâu, nhà luôn là nơi ấm áp nhất. Sâu trong tâm hồn, trái tim của người lữ khách sẽ luôn khao khát về nhà. Dù đi xa đến đâu, chúng ta sẽ luôn mong chờ ngày sum họp với người thân yêu.",
-    images: [heroParkImage, landscapeImage, columbariumImage],
-    buttonText: "XEM THÊM"
-  },
-  {
-    id: 2,
-    category: "CON NGƯỜI VÀ THIÊN NHIÊN HÒA QUYỆN",
-    title: "Lô Đất Đơn và Đôi",
-    description: "Công viên tưởng niệm Nirvana được thiết kế hài hòa với cảnh quan thiên nhiên. Thanh bình và thơ mộng, nơi đây xoa dịu tâm hồn và làm dịu trái tim. Với những ai tìm được nơi an nghỉ ở đây, đó đơn giản là một chốn bình yên.",
-    images: [landscapeImage, heroParkImage],
-    buttonText: "XEM THÊM"
-  }
+// Import Long Phụng images
+import longPhung1 from '../assets/Khu long phung.jpg';
+import longPhung2 from '../assets/Khu long phung 2.jpg.png';
+import longPhung3 from '../assets/Long Phụng 3.jpg';
+import songThan1 from "@/assets/mo-song-than-1.jpg"
+import songThan2 from "@/assets/mo-song-than-2.jpg"
+import songThan3 from "@/assets/mo-song-than-3.jpg"
+import moDon1 from "@/assets/vinh-hang-dai.jpg"
+import moDoi1 from "@/assets/mo-doi.jpg"
+import khuGiaToc from "@/assets/khu-gia-toc .jpg"
+import trucLamBichThuy1 from "@/assets/truc-lam-bich-thuy-1.jpg"
+import trucLamBichThuy2 from "@/assets/truc-lam-bich-thuy-2.jpg"
+import trucLamBichThuy3 from "@/assets/truc-lam-bich-thuy-3.jpg"
+// Placeholder images - replace with actual images
+const giaTocImages = [
+  khuGiaToc
 ];
 
-const plotTypesRight = [
-  {
-    id: 3,
-    category: "VINH QUANG VỚI NGHỆ THUẬT TINH XẢO",
-    title: "Lô Đất Gia Đình",
-    description: "Mỗi thiết kế cá nhân hóa kể một câu chuyện xứng đáng được tưởng niệm. Có thể ví như một bài thơ đẹp với sự huy hoàng bền vững. Tại đây, bạn được chào đón bởi những kỷ niệm quý giá gợi nhớ sở thích, tính cách và đặc điểm của người thân yêu.",
-    images: [columbariumImage, heroParkImage],
-    buttonText: "NHẬN BÁO GIÁ"
-  },
-  {
-    id: 4,
-    category: "NƠI AN NGHỈ VĨNH HẰNG THIÊN ĐƯỜNG",
-    title: "Khu Tưởng Niệm Công Giáo",
-    description: "Lấy cảm hứng từ \"Vương quốc Thiên đường\", Khu Tưởng Niệm Công Giáo là nơi an nghỉ vĩnh hằng trang nghiêm và tao nhã dành cho người Công giáo. Thiết kế trật tự và thanh bình bao gồm các lô đất đa dạng và nhà lưu trữ tro cốt.",
-    images: [heroTreesImage, landscapeImage],
-    buttonText: "NHẬN BÁO GIÁ"
-  }
+const trucLamImages = [
+  trucLamBichThuy1,
+  trucLamBichThuy2,
+  trucLamBichThuy3
 ];
 
-const considerations = [
-  "Giá cả và khả năng phát sinh phí",
-  "Vị trí chính xác của lô đất",
-  "Bảo trì, tiện ích và tiện nghi",
-  "Cân nhắc cá nhân và gia đình lâu dài",
-  "Mối quan hệ với đơn vị chăm sóc tang lễ",
-  "Các tùy chọn lô đất an táng",
-  "Lắp đặt bia mộ hoặc tượng đài",
-  "Kế hoạch phát triển tương lai"
+const moDoiImages = [
+  moDoi1
 ];
 
-// Image carousel component
-const ImageCarousel = ({ images, className = "" }: { images: string[], className?: string }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+const songThanImages = [
+  songThan1,
+  songThan2,
+  songThan3,
+];
 
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % images.length);
-  };
+const moDonImages = [
+  moDon1
+];
 
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
-
-  return (
-    <div className={`relative group ${className}`}>
-      <img 
-        src={images[currentIndex]} 
-        alt="Gallery" 
-        className="w-full h-full object-cover"
-      />
-      {images.length > 1 && (
-        <>
-          <button 
-            onClick={prevSlide}
-            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <button 
-            onClick={nextSlide}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-            {images.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentIndex(idx)}
-                className={`w-2 h-2 rounded-full transition-colors ${
-                  idx === currentIndex ? 'bg-primary' : 'bg-white/60'
-                }`}
-              />
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
-};
+const longPhungImages = [
+  longPhung1,
+  longPhung2,
+  longPhung3,
+];
 
 const BurialPlots = () => {
+  const [isExpandedMoDon, setIsExpandedMoDon] = useState(false);
+  const [isExpandedLongPhung, setIsExpandedLongPhung] = useState(false);
+  const [isExpandedGiaToc, setIsExpandedGiaToc] = useState(false);
+  const [isExpandedIntro, setIsExpandedIntro] = useState(false);
+  const [expandedConsideration, setExpandedConsideration] = useState<number | null>(null);
+
+  const considerations = [
+    {
+      title: 'Vị trí và khoảng cách',
+      content: 'Ưu tiên khu vực thuận tiện di chuyển từ TP.HCM/Thuận An (thời gian đi lại, đường lớn, dễ tìm). Nên chọn lô mộ ở cung đường nội bộ dễ vào, có bãi đỗ xe gần, người lớn tuổi đi thăm không vất vả.'
+    },
+    {
+      title: 'Phong thủy & không gian',
+      content: 'Lưu ý hướng lô mộ, địa thế cao ráo, thoáng, nhìn ra cây xanh, hồ nước, gần dòng chảy lành giúp vượng khí cho con cháu. Hạn chế vị trí thấp trũng, ẩm, gần chỗ nước tụ hoặc khu vực quá ồn ào, nhiều xe cộ.'
+    },
+    {
+      title: 'Loại hình mộ phù hợp',
+      content: 'Hoa Viên Bình Dương có nhiều loại: mộ đơn, mộ đôi, mộ song thân, mộ phu thê, mộ gia tộc… mỗi loại hợp một nhu cầu và ngân sách khác nhau. Nên xác định trước: an táng một người, vợ chồng, cha mẹ hay cả dòng tộc để chọn khu và diện tích hợp lý, tránh phải đổi chỗ sau này.'
+    },
+    {
+      title: 'Giá bán & chi phí lâu dài',
+      content: 'Cần hỏi rõ giá lô mộ theo khu, diện tích, vị trí (gần trục chính, gần công trình tâm linh sẽ giá cao hơn). Tính thêm: phí xây mộ, bia mộ, trang trí, phí chăm sóc – bảo dưỡng định kỳ (thường tăng theo thị trường) và chi phí thăm viếng mỗi năm.'
+    },
+    {
+      title: 'Pháp lý & thời hạn sử dụng',
+      content: 'Kiểm tra kỹ: dự án được cấp phép, hợp đồng sử dụng đất huyệt mộ rõ ràng, có ghi đầy đủ quyền và nghĩa vụ, điều khoản chuyển nhượng – thừa kế. Hỏi rõ thời hạn sử dụng huyệt mộ (lâu dài theo quy định nhà nước) và quy định nếu sau này nhà nước thay đổi quy hoạch.'
+    },
+    {
+      title: 'Dịch vụ tang lễ & chăm sóc mộ',
+      content: 'Hoa Viên Bình Dương có cung cấp gói trọn: tổ chức lễ tang, hỏa táng, an táng, lưu tro cốt, xe đưa rước, hỗ trợ nghi lễ theo tập quán Nam Bộ, Công giáo, Phật giáo… Hỏi rõ các dịch vụ sau an táng: dọn dẹp, trồng hoa, cắt cỏ, thắp nhang ngày lễ/tết, báo cáo hình ảnh cho gia đình ở xa.'
+    },
+    {
+      title: 'Cơ sở vật chất & công trình tâm linh',
+      content: 'Xem thực tế: đường nội bộ, nhà chờ, nhà vệ sinh, hệ thống chiếu sáng, cây xanh, quy hoạch tổng thể có sạch, thoáng, văn minh không. Nhiều gia đình thích lô gần chùa, nhà nguyện, tượng Phật/chúa, đài tưởng niệm… để tiện cúng viếng và cảm thấy yên tâm về mặt tâm linh.'
+    },
+    {
+      title: 'Uy tín đơn vị & hỗ trợ về sau',
+      content: 'Tìm hiểu đơn vị quản lý: thời gian hoạt động, quy mô (Hoa Viên Bình Dương hiện là một trong những công viên nghĩa trang lớn, quy hoạch lâu dài, pháp lý minh bạch). Hỏi kỹ chế độ chăm sóc khách hàng: sau khi mua còn được tư vấn phong thủy, thiết kế – xây mộ, hỗ trợ khi có thay đổi nhu cầu trong gia đình hay không.'
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-white">
       <Header />
-      
+
       {/* Hero Section */}
-      <section className="relative h-[60vh] min-h-[500px] flex items-center justify-center overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${columbariumImage})` }}
+      <section className="relative min-h-[600px] md:min-h-[700px] flex items-center justify-center overflow-hidden">
+        <img
+          src={moDoi1}
+          alt="Đất Mộ Phần"
+          className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60" />
-        <div className="relative z-10 text-center text-white px-4">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="font-display text-5xl md:text-6xl lg:text-7xl mb-4"
-          >
-            Lô Đất An Táng
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto"
-          >
-            Nơi an nghỉ cuối cùng trong không gian thanh bình và trang trọng
-          </motion.p>
+        <div className="absolute inset-0 bg-black/40" />
+        <div className="relative z-10 text-center px-4 pt-16">
+          <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-white font-light italic">
+            Đất Mộ Phần
+          </h1>
+          <p className="text-white/70 text-base mt-4 italic">
+            Nét yên bình tự nhiên và vẻ đẹp thanh tịnh
+          </p>
         </div>
       </section>
 
-      {/* Intro Section with Gray Background */}
-      <section className="py-16 bg-[#f5f5f5]">
-        <div className="container mx-auto px-4">
-          <motion.div {...fadeInUp} className="text-center max-w-4xl mx-auto mb-12">
-            <span className="text-primary text-sm tracking-[0.2em] uppercase font-medium">NƠI AN NGHỈ</span>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl mt-4 mb-6 text-foreground">
-              Không gian an nghỉ vượt trội với sự khác biệt độc đáo
-            </h2>
-            <p className="text-muted-foreground leading-relaxed">
-              Tại Nirvana, chúng tôi hiểu rằng việc lựa chọn nơi an nghỉ cuối cùng là một quyết định quan trọng. 
-              Các khu vực an táng của chúng tôi được thiết kế với sự tôn trọng và chăm sóc tỉ mỉ.
-            </p>
-            <button className="text-primary text-sm mt-4 flex items-center gap-1 mx-auto hover:gap-2 transition-all">
-              Xem thêm <ChevronRight className="w-4 h-4" />
-            </button>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Video & Commitment Section */}
-      <section className="py-16 bg-[#e8eaed]">
-        <div className="container mx-auto px-4">
-          <motion.div {...fadeInUp} className="flex flex-col lg:flex-row gap-0 items-stretch">
-            {/* Video Thumbnail - Left side, larger */}
-            <div className="lg:w-[65%] relative overflow-hidden shadow-xl">
-              <div className="aspect-[16/10]">
-                <img 
-                  src={coupleBeachImage} 
-                  alt="Video thumbnail" 
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-black/10" />
-                <button className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-20 h-20 rounded-full border-2 border-white flex items-center justify-center bg-transparent hover:bg-white/10 transition-colors">
-                    <Play className="w-8 h-8 text-white fill-white ml-1" />
-                  </div>
-                </button>
-              </div>
-            </div>
-
-            {/* Commitment Card - Right side */}
-            <div className="lg:w-[35%] flex flex-col items-end lg:pl-8">
-              <span className="text-[#4a5aef] text-sm tracking-[0.3em] uppercase font-medium mb-4">W A T C H</span>
-              <div className="bg-[#4a5aef] text-white p-8 lg:p-10 flex-1 flex flex-col justify-center text-center w-full max-w-sm">
-                <h3 className="font-display text-3xl lg:text-4xl italic mb-6">
-                  The<br />Commitment
-                </h3>
-                <p className="text-white/90 leading-relaxed mb-4 text-sm lg:text-base">
-                  A commitment that transcends boundaries is bound by true love.
-                </p>
-                <p className="text-white/80 leading-relaxed text-sm lg:text-base">
-                  At Nirvana, rest assured the fulfillment of that commitment is our promise.
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Burial Plot Types Section */}
-      <section className="py-20 bg-[#f5f6f8]">
-        <div className="container mx-auto px-4">
-          <motion.div {...fadeInUp} className="text-center mb-16">
-            <span className="text-[#4a5aef] text-sm tracking-[0.4em] uppercase font-medium">E X P L O R E</span>
-            <h2 className="font-display text-4xl md:text-5xl mt-4 text-foreground italic">
-              Burial Plot Types
-            </h2>
-          </motion.div>
-
-          {/* Staggered Cards Layout */}
-          <motion.div {...fadeInUp} className="grid lg:grid-cols-2 gap-x-10 gap-y-0 max-w-6xl mx-auto">
-            {/* Left Column - Cards with image on top */}
-            <div className="flex flex-col gap-8">
-              {plotTypesLeft.map((plot) => (
-                <div key={plot.id} className="bg-white shadow-md overflow-hidden">
-                  <ImageCarousel images={plot.images} className="h-56 md:h-72" />
-                  <div className="p-6 md:p-8">
-                    <span className="text-muted-foreground text-[10px] tracking-[0.2em] uppercase block mb-2">
-                      {plot.category}
-                    </span>
-                    <h3 className="font-display text-xl md:text-2xl text-foreground mb-4">
-                      {plot.title}
-                    </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed mb-5">
-                      {plot.description}
-                    </p>
-                    <button className="text-foreground text-xs flex items-center gap-2 mb-6 hover:text-primary transition-colors tracking-[0.15em] uppercase">
-                      READ MORE <ChevronRight className="w-4 h-4 text-[#4a5aef]" />
-                    </button>
-                    <Button variant="outline" className="border-foreground text-foreground hover:bg-foreground hover:text-white px-8 text-xs tracking-[0.15em]">
-                      GET QUOTE
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Right Column - Offset down, text on top */}
-            <div className="flex flex-col gap-8 lg:mt-24">
-              {plotTypesRight.map((plot) => (
-                <div key={plot.id} className="bg-white shadow-md overflow-hidden">
-                  <div className="p-6 md:p-8">
-                    <span className="text-muted-foreground text-[10px] tracking-[0.2em] uppercase block mb-2">
-                      {plot.category}
-                    </span>
-                    <h3 className="font-display text-xl md:text-2xl text-[#4a5aef] mb-4 italic">
-                      {plot.title}
-                    </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed mb-5">
-                      {plot.description}
-                    </p>
-                    <Button variant="outline" className="border-foreground text-foreground hover:bg-foreground hover:text-white px-8 text-xs tracking-[0.15em]">
-                      GET QUOTE
-                    </Button>
-                  </div>
-                  <ImageCarousel images={plot.images} className="h-56 md:h-72" />
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Blue Background Plot Types Section */}
-      <section className="py-20 bg-primary">
-        <div className="container mx-auto px-4">
-          <motion.div {...fadeInUp} className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-            {/* Left Card - Image Top */}
-            <div className="bg-primary border border-white/20 rounded-lg overflow-hidden">
-              <ImageCarousel images={[landscapeImage, heroParkImage]} className="h-64 md:h-72" />
-              <div className="p-6 md:p-8">
-                <span className="text-white/60 text-xs tracking-[0.15em] uppercase">
-                  CON NGƯỜI VÀ THIÊN NHIÊN HÒA QUYỆN
-                </span>
-                <h3 className="font-display text-2xl md:text-3xl text-white mt-2 mb-4">
-                  Lô Đất Đơn và Đôi
-                </h3>
-                <p className="text-white/80 text-sm leading-relaxed mb-6">
-                  Công viên tưởng niệm Nirvana được thiết kế hài hòa với cảnh quan thiên nhiên. 
-                  Thanh bình và thơ mộng, nơi đây xoa dịu tâm hồn. Phong thủy tuyệt vời mang lại 
-                  sự thịnh vượng cho các thế hệ.
-                </p>
-                <button className="text-white text-sm flex items-center gap-2 mb-4 hover:text-white/80 transition-colors">
-                  XEM THÊM <ChevronRight className="w-4 h-4" />
-                </button>
-                <Button variant="secondary" className="bg-white text-primary hover:bg-white/90">
-                  NHẬN BÁO GIÁ
-                </Button>
-              </div>
-            </div>
-
-            {/* Right Card - Text Top */}
-            <div className="bg-primary border border-white/20 rounded-lg overflow-hidden">
-              <div className="p-6 md:p-8">
-                <span className="text-white/60 text-xs tracking-[0.15em] uppercase">
-                  NƠI AN NGHỈ VĨNH HẰNG THIÊN ĐƯỜNG
-                </span>
-                <h3 className="font-display text-2xl md:text-3xl text-white mt-2 mb-4">
-                  Khu Tưởng Niệm Công Giáo
-                </h3>
-                <p className="text-white/80 text-sm leading-relaxed mb-6">
-                  Lấy cảm hứng từ "Vương quốc Thiên đường", Khu Tưởng Niệm Công Giáo là nơi 
-                  an nghỉ vĩnh hằng trang nghiêm và tao nhã dành cho người Công giáo. 
-                  Thiết kế thanh bình bao gồm các lô đất đa dạng và nhà lưu trữ tro cốt.
-                </p>
-                <Button variant="secondary" className="bg-white text-primary hover:bg-white/90">
-                  NHẬN BÁO GIÁ
-                </Button>
-              </div>
-              <ImageCarousel images={[heroTreesImage, columbariumImage]} className="h-64 md:h-72" />
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* 360 View Section */}
-      <section className="py-20 bg-[#8b9dc3]">
-        <div className="container mx-auto px-4">
-          <motion.div {...fadeInUp} className="text-center">
-            <span className="text-white/80 text-sm tracking-[0.3em] uppercase font-medium">XEM</span>
-            <h2 className="font-display text-3xl md:text-4xl text-white mt-3 mb-6 tracking-wider">
-              CÔNG VIÊN TƯỞNG NIỆM NIRVANA
-            </h2>
-            <Button 
-              variant="outline" 
-              className="border-white/50 text-white hover:bg-white/10 mb-10"
-            >
-              Tham Quan 360°
-            </Button>
+      {/* Introduction Section */}
+      <section className="py-16 bg-slate-50">
+        <div className="container mx-auto px-4 max-w-5xl">
+          {/* Title */}
+          <div className="text-center mb-8">
+            <p className="text-slate-400 text-[10px] tracking-[0.25em] uppercase mb-3">GIỚI THIỆU</p>
+            <h2 className="font-serif text-2xl md:text-3xl text-[#5b7cfa] italic mb-6">
             
-            {/* Video Section */}
-            <div className="relative max-w-4xl mx-auto rounded-lg overflow-hidden shadow-2xl aspect-video">
-              <img 
-                src={heroParkImage} 
-                alt="Nirvana Memorial Park" 
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-black/10" />
-              <button className="absolute inset-0 flex items-center justify-center">
-                <div className="w-20 h-20 rounded-full border-2 border-white/80 flex items-center justify-center bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors">
-                  <Play className="w-8 h-8 text-white fill-white/80 ml-1" />
-                </div>
-              </button>
+            </h2>
+            <p className="text-slate-500 text-sm leading-relaxed max-w-4xl mx-auto text-left">
+              Một ngôi nhà yên bình giữa thiên nhiên hài hòa, nơi lưu giữ trọn vẹn tình thân và giá trị cội nguồn. Tại Hoa Viên Nghĩa Trang Bình Dương, mỗi khu mộ được kiến tạo nên từ sự giao hòa của cảnh sắc thanh thoát và tâm huyết gìn giữ truyền thống. Không gian nơi đây mang đến cảm giác an lành, thân thuộc – chốn trở về cho những ai trân quý nét đẹp đoàn viên, muốn vun đắp di sản gia đình bền vững cho mai sau.
+            </p>
+            
+            {/* Expandable content */}
+            <div className={`overflow-hidden transition-all duration-300 ${isExpandedIntro ? 'max-h-[200px] opacity-100' : 'max-h-0 opacity-0'}`}>
+              <p className="text-slate-500 text-sm leading-relaxed max-w-4xl mx-auto text-left mt-4">
+                Từng khuôn viên là sự kết hợp giữa phong thủy thuận lợi và kiến trúc tinh tế, tôn vinh dấu ấn riêng của mỗi gia tộc, để mỗi lần trở về, lòng người luôn tìm thấy sự bình yên và tự hào về nguồn cội.
+              </p>
             </div>
-          </motion.div>
+            
+            <div 
+              className="flex justify-end mt-4"
+              onClick={() => setIsExpandedIntro(!isExpandedIntro)}
+            >
+              <div className="flex items-center gap-2 cursor-pointer group">
+                <span className="text-slate-500 text-[10px] tracking-wider uppercase">
+                  {isExpandedIntro ? 'THU GỌN' : 'XEM THÊM'}
+                </span>
+                <div className="w-5 h-5 rounded-full bg-[#5b7cfa] flex items-center justify-center transition-transform duration-300">
+                  {isExpandedIntro ? (
+                    <ChevronDown className="w-3 h-3 text-white" />
+                  ) : (
+                    <ChevronRight className="w-3 h-3 text-white" />
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Video + Commitment Box */}
+          <div className="flex flex-col lg:flex-row gap-0 mt-12">
+            {/* Video */}
+            <div className="lg:w-[70%] relative">
+              <div className="aspect-video bg-slate-200 relative overflow-hidden">
+                <iframe
+                  src="https://www.youtube.com/embed/jmmw1jmVzQg?rel=0"
+                  title="Hoa Viên Bình Dương"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full"
+                />
+              </div>
+            </div>
+            {/* Commitment Box */}
+            <div className="lg:w-[30%] flex flex-col">
+              <p className="text-slate-400 text-[10px] tracking-[0.2em] uppercase mb-2 text-right pr-4 pt-2">X E M</p>
+              <div className="bg-[#5b7cfa] text-white p-6 flex-1 flex flex-col justify-center text-center">
+                <h3 className="font-serif text-2xl italic mb-4">
+                  Cam Kết<br />Của Chúng Tôi
+                </h3>
+                <p className="text-white/80 text-xs leading-relaxed mb-3">
+                  Một cam kết vượt qua mọi ranh giới được gắn kết bởi tình yêu chân thành.
+                </p>
+                <p className="text-white/70 text-xs leading-relaxed">
+                  Tại Hoa Viên Bình Dương, hãy yên tâm rằng việc thực hiện cam kết đó là lời hứa của chúng tôi.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Burial Plot Types */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4 max-w-5xl">
+          {/* Title */}
+          <div className="text-center mb-12">
+            <p className="text-slate-400 text-[10px] tracking-[0.3em] uppercase mb-2">K H Á M  P H Á</p>
+            <h2 className="font-serif text-3xl text-[#5b7cfa] italic">Các Loại Đất Mộ Phần</h2>
+          </div>
+
+          {/* Two Cards Side by Side */}
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Left Card - Khu Mộ Gia Tộc */}
+            <div className="bg-white shadow-lg p-6">
+              {/* Image Carousel */}
+              <div className="shadow-md mb-6">
+                <ImageCarousel images={giaTocImages} alt="Khu Mộ Gia Tộc" />
+              </div>
+              <p className="text-slate-400 text-[10px] tracking-[0.15em] uppercase mb-2 text-center">UỐNG NƯỚC NHỚ NGUỒN</p>
+              <h3 className="font-serif text-xl text-[#5b7cfa] mb-3 text-center">Khu Mộ Gia Tộc</h3>
+              <p className="text-slate-500 text-sm leading-relaxed mb-4 text-center">
+                Trong hành trình cuộc sống, trái tim của mỗi người Việt luôn hướng về cội nguồn, nơi gia đình và ngôi nhà là biểu tượng của sự gắn kết, lòng hiếu thảo, và tinh thần "uống nước nhớ nguồn". Từ xa xưa đến hiện đại, ngôi nhà không chỉ là chốn trú ngụ mà còn là mái ấm lưu giữ tinh thần, nơi các thế hệ quây quần bên bàn thờ tổ tiên, gìn giữ di sản văn hóa Việt. Dù ở đâu hay đi xa đến đâu, chúng ta luôn khao khát trở về nơi ấy – nơi tình thân mãi trường tồn.
+              </p>
+
+              {/* Expandable content */}
+              <div className={`overflow-hidden transition-all duration-300 ${isExpandedGiaToc ? 'max-h-[300px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                <p className="text-slate-500 text-sm leading-relaxed mb-4 text-center">
+                  Khu Mộ Gia Tộc tại Hoa Viên Nghĩa Trang Bình Dương hiện thực hóa khát vọng ấy. Đây là không gian an nghỉ thanh tịnh, nơi thiên nhiên hòa quyện cùng tâm linh, mang lại bình an cho người đã khuất và phúc lành cho con cháu. Với hơn 300 hecta cây xanh, hồ nước trong lành, các không gian tâm linh vừa hiện đại vừa tôn vinh truyền thống, Khu Mộ Gia Tộc không chỉ là nơi tưởng nhớ mà còn là món quà yêu thương, nơi kết nối gia đình qua các thế hệ.
+                </p>
+              </div>
+
+              <div
+                className="flex items-center gap-2 cursor-pointer mb-4 justify-center"
+                onClick={() => setIsExpandedGiaToc(!isExpandedGiaToc)}
+              >
+                <span className="text-slate-500 text-[10px] tracking-wider uppercase">
+                  {isExpandedGiaToc ? 'THU GỌN' : 'XEM THÊM'}
+                </span>
+                <div className="w-5 h-5 rounded-full bg-[#5b7cfa] flex items-center justify-center transition-transform duration-300">
+                  {isExpandedGiaToc ? (
+                    <ChevronDown className="w-3 h-3 text-white rotate-180" />
+                  ) : (
+                    <ChevronRight className="w-3 h-3 text-white" />
+                  )}
+                </div>
+              </div>
+              <div className="flex justify-center">
+                <button className="border border-slate-700 text-slate-700 px-6 py-2.5 text-[10px] tracking-wider uppercase hover:bg-slate-700 hover:text-white transition-colors cursor-pointer">
+                  NHẬN BÁO GIÁ
+                </button>
+              </div>
+            </div>
+
+            {/* Right Card - Khu Trúc Lâm Bích Thủy & Khu Mộ Gia Tộc */}
+            <div className="bg-white shadow-lg p-6">
+              {/* Khu Trúc Lâm Bích Thủy */}
+              <h3 className="font-serif text-xl text-[#5b7cfa] mb-3 text-center">Khu Trúc Lâm Bích Thủy</h3>
+              <p className="text-slate-500 text-sm leading-relaxed mb-4 text-center">
+                Khu Trúc Lâm Bích Thủy tọa trên thế đất rồng cuộn hổ ngồi, nơi có cây cối xanh mát và dòng suối chảy kết hợp lại, tạo nên một không gian thanh tịnh hài hòa với thiên nhiên. Gợi lên hình ảnh một nơi an nghỉ lý tưởng nơi phúc đức và sự bình an được lưu giữ.
+              </p>
+              <div className="flex justify-center mb-6">
+                <button className="border border-slate-700 text-slate-700 px-6 py-2.5 text-[10px] tracking-wider uppercase hover:bg-slate-700 hover:text-white transition-colors cursor-pointer">
+                  NHẬN BÁO GIÁ
+                </button>
+              </div>
+              {/* Image Carousel */}
+              <div className="shadow-md">
+                <ImageCarousel images={trucLamImages} alt="Khu Trúc Lâm Bích Thủy" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mộ Đôi & Mộ Song Thân Section - Blue Cards */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Left Card - Mộ Đôi */}
+            <div className="bg-[#5b7cfa] shadow-lg p-6">
+              {/* Image Carousel */}
+              <div className="border border-white/40 mb-6">
+                <ImageCarousel images={moDoiImages} alt="Khu Mộ Đôi" />
+              </div>
+              <p className="text-white/70 text-[10px] tracking-[0.15em] uppercase mb-2 text-center">SỢI DÂY GẮN BÓ VĨNH CỬU</p>
+              <h3 className="font-serif text-xl text-white mb-3 text-center">Khu Mộ Đôi</h3>
+              <p className="text-white/80 text-sm leading-relaxed mb-4 text-center">
+                Khu mộ đôi tại Hoa Viên Nghĩa Trang Bình Dương lưu giữ sợi dây gắn bó vĩnh cửu là tình thân và ước nguyện đoàn viên, để mỗi thế hệ đều có thể tìm về nguồn cội trong không gian yên bình, đậm nét truyền thống.
+              </p>
+              <p className="text-white/80 text-sm leading-relaxed mb-4 text-center">
+                Từng khuôn viên được chăm chút như mái nhà sum vầy, gìn giữ hơi ấm đoàn viên để tiếng yêu thương còn vang mãi, trở thành di sản tình thân quý giá cho các thế hệ sau này.
+              </p>
+              <div className="flex justify-center">
+                <button className="border border-white text-white px-6 py-2.5 text-[10px] tracking-wider uppercase hover:bg-white hover:text-[#5b7cfa] transition-colors cursor-pointer">
+                  NHẬN BÁO GIÁ
+                </button>
+              </div>
+            </div>
+
+            {/* Right Card - Mộ Song Thân */}
+            <div className="bg-[#5b7cfa] shadow-lg p-6">
+              <p className="text-white/70 text-[10px] tracking-[0.15em] uppercase mb-2 text-center">HIẾU KÍNH BẬC SINH THÀNH</p>
+              <h3 className="font-serif text-xl text-white italic mb-3 text-center">Khu Mộ Song Thân</h3>
+              <p className="text-white/80 text-sm leading-relaxed mb-4 text-center">
+                Khu Mộ Song Thân là nơi gửi trọn hiếu kính của con cháu đến bậc sinh thành, tọa lạc tại vị trí đắc địa bên những công trình tâm linh thiêng liêng. Từng khuôn viên được thiết kế riêng biệt, hòa quyện cảnh sắc thanh tịnh cùng phong thủy vượng lành.
+              </p>
+              <p className="text-white/80 text-sm leading-relaxed mb-4 text-center">
+                Đây không chỉ là nơi an nghỉ sum vầy, mà còn là di sản trường tồn – lưu giữ dấu ấn gia tộc và tự hào lan tỏa qua bao thế hệ.
+              </p>
+              <div className="flex justify-center mb-6">
+                <button className="border border-white text-white px-6 py-2.5 text-[10px] tracking-wider uppercase hover:bg-white hover:text-[#5b7cfa] transition-colors cursor-pointer">
+                  NHẬN BÁO GIÁ
+                </button>
+              </div>
+              {/* Image Carousel */}
+              <div className="border border-white/40">
+                <ImageCarousel images={songThanImages} alt="Khu Mộ Song Thân" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* White Cards Section - Mộ Đơn & Long Phụng */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Left Card - Mộ Đơn */}
+            <div className="bg-white shadow-lg p-6">
+              {/* Image Carousel */}
+              <div className="shadow-md mb-6">
+                <ImageCarousel images={moDonImages} alt="Khu Mộ Đơn" />
+              </div>
+              <p className="text-slate-400 text-[10px] tracking-[0.2em] uppercase mb-2 text-center">NƠI YÊN NGHỈ VĨNH HẰNG</p>
+              <h3 className="font-serif text-xl text-[#5b7cfa] mb-4 text-center">Mộ Đơn</h3>
+              <p className="text-slate-500 text-sm leading-relaxed mb-4 text-center">
+                Lưu giữ tình sâu nghĩa nặng - Tại Hoa Viên Bình Dương, khu mộ đơn được quy hoạch hài hòa trong không gian xanh mát, yên tĩnh và trang trọng. Mỗi mộ được bố trí theo nguyên tắc phong thủy âm trạch: tọa sơn hướng thủy, lưng tựa núi, mặt hướng dòng nước sinh khí giúp người mất an nghỉ thanh thản, con cháu đời sau hưởng phúc lộc lâu dài.
+              </p>
+
+              {/* Expandable content */}
+              <div className={`overflow-hidden transition-all duration-300 ${isExpandedMoDon ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                <p className="text-slate-500 text-sm leading-relaxed mb-4 text-center">
+                  Vị trí lô huyệt nằm tại các khu đất cao ráo, thông thoáng, không bị đọng nước, có trường khí tốt, bao quanh bởi cây xanh, tạo nên thế "Minh Đường tụ thủy" – tụ khí sinh tài, vượng vận hậu nhân. Các yếu tố như phương vị, long mạch, mạch khí và thế đất đều được khảo sát kỹ lưỡng bởi đội ngũ chuyên gia phong thủy nhiều kinh nghiệm.
+                </p>
+                <p className="text-slate-500 text-sm leading-relaxed mb-4 text-center">
+                  Với thiết kế hài hòa, vật liệu bền vững, và không gian tĩnh lặng, linh thiêng, mỗi lô huyệt mộ đơn không chỉ là nơi an nghỉ vĩnh hằng mà còn là chốn để con cháu tìm về tưởng niệm, báo hiếu và gửi gắm tâm linh. Toàn khu được quy hoạch khoa học, thuận tiện chăm sóc, phù hợp với nhiều điều kiện tài chính khác nhau, mang lại sự yên tâm tuyệt đối cho thân nhân người đã khuất.
+                </p>
+              </div>
+
+              <div
+                className="flex items-center gap-2 cursor-pointer mb-4 justify-center"
+                onClick={() => setIsExpandedMoDon(!isExpandedMoDon)}
+              >
+                <span className="text-slate-500 text-[10px] tracking-wider uppercase">
+                  {isExpandedMoDon ? 'THU GỌN' : 'XEM THÊM'}
+                </span>
+                <div className="w-5 h-5 rounded-full bg-[#5b7cfa] flex items-center justify-center transition-transform duration-300">
+                  {isExpandedMoDon ? (
+                    <ChevronDown className="w-3 h-3 text-white rotate-180" />
+                  ) : (
+                    <ChevronRight className="w-3 h-3 text-white" />
+                  )}
+                </div>
+              </div>
+              <div className="flex justify-center">
+                <button className="border border-slate-700 text-slate-700 px-6 py-2.5 text-[10px] tracking-wider uppercase hover:bg-slate-700 hover:text-white transition-colors cursor-pointer">
+                  NHẬN BÁO GIÁ
+                </button>
+              </div>
+            </div>
+
+            {/* Right Card - Khu Long Phụng */}
+            <div className="bg-white shadow-lg p-6">
+              <p className="text-slate-400 text-[10px] tracking-[0.2em] uppercase mb-2 text-center">VƯỢNG KHÍ TỤ LINH, AN BÌNH HẬU THẾ</p>
+              <h3 className="font-serif text-xl text-[#5b7cfa] mb-4 text-center">Khu Long Phụng</h3>
+              <p className="text-slate-500 text-sm leading-relaxed mb-4 text-center">
+                Khu mộ Long Phụng tại Hoa Viên Nghĩa Trang Bình Dương là một không gian an nghỉ được thiết kế theo phong thủy, tọa lạc ở vị trí đắc địa: tựa lưng vào núi và hướng ra sông. Nơi đây hội tụ năng lượng tốt lành từ các công trình tâm linh xung quanh như Chùa Thiên Phước, Hồn Việt và Linh Hoa Tuệ Đàn, mang lại sự yên bình và phúc đức cho gia đình.
+              </p>
+
+              {/* Expandable content */}
+              <div className={`overflow-hidden transition-all duration-300 ${isExpandedLongPhung ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                <p className="text-slate-500 text-sm leading-relaxed mb-4 text-center">
+                  Khi an táng người quá cố, thì tâm linh quan trọng là chọn hướng gối đầu cho người chết được siêu thoát "tịnh độ". Khu mộ cho phép linh hoạt lựa chọn vị trí và hướng, tôn vinh truyền thống và được xem là nơi gửi gắm niềm tin, mang lại thịnh vượng cho con cháu mai sau.
+                </p>
+              </div>
+
+              <div
+                className="flex items-center gap-2 cursor-pointer mb-4 justify-center"
+                onClick={() => setIsExpandedLongPhung(!isExpandedLongPhung)}
+              >
+                <span className="text-slate-500 text-[10px] tracking-wider uppercase">
+                  {isExpandedLongPhung ? 'THU GỌN' : 'XEM THÊM'}
+                </span>
+                <div className="w-5 h-5 rounded-full bg-[#5b7cfa] flex items-center justify-center transition-transform duration-300">
+                  {isExpandedLongPhung ? (
+                    <ChevronDown className="w-3 h-3 text-white rotate-180" />
+                  ) : (
+                    <ChevronRight className="w-3 h-3 text-white" />
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-center mb-6">
+                <button className="border border-slate-700 text-slate-700 px-6 py-2.5 text-[10px] tracking-wider uppercase hover:bg-slate-700 hover:text-white transition-colors cursor-pointer">
+                  NHẬN BÁO GIÁ
+                </button>
+              </div>
+              {/* Image Carousel */}
+              <div className="shadow-md">
+                <ImageCarousel images={longPhungImages} alt="Khu Long Phụng" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 360° View Section */}
+      <section className="py-16 bg-[#9bb0d4]">
+        <div className="container mx-auto px-4 max-w-4xl text-center">
+          <p className="text-white/80 text-[10px] tracking-[0.25em] uppercase mb-2">X E M</p>
+          <h2 className="text-white text-lg tracking-[0.1em] uppercase mb-4">HOA VIÊN BÌNH DƯƠNG</h2>
+
+          {/* Video */}
+          <div className="relative aspect-video bg-slate-200 shadow-xl">
+            <div className="w-full h-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
+              <span className="text-slate-400 text-sm">Toàn Cảnh Hoa Viên</span>
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full border-2 border-white/80 flex items-center justify-center bg-black/10">
+                <Play className="w-6 h-6 text-white ml-1" fill="currentColor" />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* 8 Considerations Section */}
-      <section className="py-0">
-        {/* Top Half - Blue with Title and Image */}
-        <div className="bg-primary">
-          <div className="container mx-auto px-4">
-            <motion.div {...fadeInUp} className="grid lg:grid-cols-2 gap-8 items-center py-16">
-              <div className="text-white">
-                <h2 className="font-display text-4xl md:text-5xl lg:text-6xl leading-tight">
-                  8 điều cần cân nhắc khi<br />
-                  <span className="text-white/90">chọn nơi an táng</span>
-                </h2>
-              </div>
-              <div className="relative">
-                <img 
-                  src={family1Image} 
-                  alt="Happy family" 
-                  className="w-full h-80 object-cover rounded-lg shadow-xl"
+      <section>
+        {/* Blue Header */}
+        <div className="bg-gradient-to-r from-[#4a5fa8] to-[#5b6db8] py-12 overflow-hidden">
+          <div className="container mx-auto px-4 max-w-6xl">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl text-white font-normal leading-snug max-w-lg">
+                8 điều cần cân nhắc khi<br />chọn nơi an táng
+              </h2>
+              <div className="relative -mr-24 lg:-mr-40">
+                <img
+                  src="https://www.nirvana.com.my/wp-content/uploads/2020/09/1660a.jpg"
+                  alt="Gia Đình Hạnh Phúc"
+                  className="w-[380px] md:w-[480px] lg:w-[560px] aspect-[4/3] object-cover shadow-2xl"
                 />
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
 
-        {/* Bottom Half - White with Considerations List */}
-        <div className="bg-white">
-          <div className="container mx-auto px-4 py-16">
-            <motion.div {...fadeInUp} className="grid md:grid-cols-2 gap-x-12 gap-y-6">
-              {considerations.map((item, index) => (
-                <div 
-                  key={index} 
-                  className="flex items-center justify-between py-4 border-l-4 border-primary pl-4 hover:bg-gray-50 transition-colors cursor-pointer group"
-                >
-                  <span className="text-foreground">{item}</span>
-                  <Plus className="w-5 h-5 text-primary group-hover:rotate-45 transition-transform" />
+        {/* White List Section */}
+        <div className="bg-white py-12">
+          <div className="container mx-auto px-4 max-w-5xl">
+            <div className="grid md:grid-cols-2 gap-x-8 gap-y-4">
+              {considerations.map((item, idx) => (
+                <div key={idx} className="border-l-2 border-[#5b7cfa] pl-4">
+                  <div
+                    className="flex items-center justify-between py-3 cursor-pointer"
+                    onClick={() => setExpandedConsideration(expandedConsideration === idx ? null : idx)}
+                  >
+                    <span className="text-slate-700 text-sm font-medium">{idx + 1}. {item.title}</span>
+                    <div className="w-5 h-5 rounded-full bg-[#5b7cfa] flex items-center justify-center flex-shrink-0 ml-4 transition-transform duration-300">
+                      {expandedConsideration === idx ? (
+                        <ChevronDown className="w-3 h-3 text-white" />
+                      ) : (
+                        <ChevronRight className="w-3 h-3 text-white" />
+                      )}
+                    </div>
+                  </div>
+                  <div className={`overflow-hidden transition-all duration-300 ${expandedConsideration === idx ? 'max-h-[300px] opacity-100 pb-4' : 'max-h-0 opacity-0'}`}>
+                    <p className="text-slate-500 text-sm leading-relaxed">{item.content}</p>
+                  </div>
                 </div>
               ))}
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Difference Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <motion.div {...fadeInUp} className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Image with Border */}
+      { /*   <section className="py-16 bg-white">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+    
             <div className="relative">
-              <div className="absolute left-0 top-0 bottom-0 w-2 bg-primary rounded-full" />
-              <img 
-                src={family2Image} 
-                alt="Family in park" 
-                className="w-full h-[400px] object-cover ml-6 rounded-lg shadow-lg"
-              />
+          
+              <div className="absolute top-4 left-4 right-0 bottom-0 bg-slate-200" />
+        
+              <div className="relative shadow-sm">
+                <div className="aspect-[4/3] bg-slate-100">
+                  <div className="w-full h-full bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
+                    <span className="text-slate-400 text-sm">Gia Đình Trong Công Viên</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Content */}
+         
             <div>
-              <h3 className="font-display text-3xl md:text-4xl text-primary mb-6">
-                Sự khác biệt giữa công viên tưởng niệm và nghĩa trang truyền thống
+              <h3 className="font-serif text-2xl text-[#5b7cfa] mb-6">
+                Sự khác biệt giữa công viên tưởng niệm và nghĩa trang
               </h3>
-              <p className="text-muted-foreground leading-relaxed mb-6">
-                Khi lên kế hoạch trước hoặc tìm kiếm nơi an nghỉ cho người thân, bạn có thể gặp 
-                các thuật ngữ "công viên tưởng niệm" và "nghĩa trang". Đôi khi bạn có thể nghe 
-                hai thuật ngữ này được sử dụng thay thế cho nhau. Hai thuật ngữ này có cùng ý nghĩa không?
+              <p className="text-slate-500 text-sm leading-relaxed mb-6">
+                Khi lập kế hoạch trước hoặc tìm kiếm nơi an nghỉ cho người thân, bạn có thể gặp các thuật ngữ "công viên tưởng niệm" và "nghĩa trang". Đôi khi bạn có thể nghe thấy hai thuật ngữ này được sử dụng thay thế cho nhau. Hai thuật ngữ này có cùng ý nghĩa không? Mặc dù mục đích có thể giống nhau, nhưng công viên tưởng niệm và nghĩa trang thực sự khác biệt rõ rệt.
               </p>
-              <p className="text-muted-foreground leading-relaxed mb-8">
-                Mặc dù mục đích có thể giống nhau, công viên tưởng niệm và nghĩa trang thực sự 
-                có sự khác biệt rõ ràng về cảnh quan, tiện nghi và trải nghiệm thăm viếng.
-              </p>
-              <button className="text-foreground text-sm flex items-center gap-2 hover:text-primary transition-colors font-medium tracking-wide">
-                XEM THÊM <ChevronRight className="w-4 h-4 text-primary" />
-              </button>
+              <div className="flex items-center gap-2 cursor-pointer justify-end">
+                <span className="text-slate-500 text-[10px] tracking-wider uppercase">XEM THÊM</span>
+                <div className="w-5 h-5 rounded-full bg-[#5b7cfa] flex items-center justify-center">
+                  <ChevronRight className="w-3 h-3 text-white" />
+                </div>
+              </div>
             </div>
-          </motion.div>
+          </div>
         </div>
-      </section>
+      </section> */}
 
       <Footer />
     </div>

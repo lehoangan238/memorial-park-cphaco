@@ -11,7 +11,7 @@ export const CarelineBar = () => {
           className="text-white text-base tracking-[0.25em] font-normal"
           style={{ fontFamily: "'Open Sans', sans-serif" }}
         >
-          ĐƯỜNG DÂY NÓNG : 1800-88-1818
+          HOTLINE : 0274 3 555 666
         </span>
       </div>
     </div>

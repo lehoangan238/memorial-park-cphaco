@@ -1,479 +1,336 @@
-import { motion } from "framer-motion";
-import { Play, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
-import ImageCarousel from "@/components/ImageCarousel";
-
-// Import images
-import columbariumImage from "@/assets/columbarium.jpg";
-import landscapeImage from "@/assets/landscape.jpg";
-import heroParkImage from "@/assets/hero-park.jpg";
-import heroTreesImage from "@/assets/hero-trees.jpg";
-import family1Image from "@/assets/family-1.jpg";
-import family2Image from "@/assets/family-2.jpg";
-import family3Image from "@/assets/family-3.jpg";
-import familyHugImage from "@/assets/family-hug.jpg";
-import heroBgImage from "@/assets/hero-bg.jpg";
-
-// Animation
-const easeOut = [0.22, 1, 0.36, 1] as const;
-
-const fadeInUp = {
-  initial: { opacity: 0, y: 40 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-100px" },
-  transition: { duration: 0.7, ease: easeOut }
-};
-
-const fadeInLeft = {
-  initial: { opacity: 0, x: -50 },
-  whileInView: { opacity: 1, x: 0 },
-  viewport: { once: true, margin: "-100px" },
-  transition: { duration: 0.7, ease: easeOut }
-};
-
-const fadeInRight = {
-  initial: { opacity: 0, x: 50 },
-  whileInView: { opacity: 1, x: 0 },
-  viewport: { once: true, margin: "-100px" },
-  transition: { duration: 0.7, ease: easeOut }
-};
-
-const scaleIn = {
-  initial: { opacity: 0, scale: 0.95 },
-  whileInView: { opacity: 1, scale: 1 },
-  viewport: { once: true, margin: "-100px" },
-  transition: { duration: 0.6, ease: easeOut }
-};
-
-const staggerContainer = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.1
-    }
-  }
-};
-
-const staggerItem = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: { duration: 0.5, ease: easeOut }
-  }
-};
-
-const moreColumbaria = [
-  { title: "Columbarium and Cremation Facilities", image: family1Image },
-  { title: "Memorial Suites for Cremation", image: family2Image },
-  { title: "The Difference Between Columbarium and Mausoleum", image: family3Image }
-];
+import { Play, ChevronRight, ChevronLeft } from 'lucide-react';
+import { useState } from 'react';
+import { Header } from '../components/Header';
+import { Footer } from '../components/Footer';
+import chuaThienPhuoc from '../assets/CHUA THIEN PHUOC 4.jpg';
 
 const Columbaria = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const moreColumbaria = [
+    { title: 'Nhà lưu giữ tro cốt và hốc hỏa táng', image: '/placeholder.svg' },
+    { title: 'Các lựa chọn tưởng niệm cho hỏa táng', image: '/placeholder.svg' },
+    { title: 'Sự khác biệt giữa nhà lưu giữ tro cốt và lăng mộ', image: '/placeholder.svg' }
+  ];
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      
-      {/* Hero Section - Navy Background */}
-      <section className="relative bg-[#1e2a4a] h-[40vh] min-h-[300px] flex items-center justify-center overflow-hidden">
-        <motion.div 
-          initial={{ scale: 1.1 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 1.5, ease: easeOut }}
-          className="absolute inset-0 bg-[#1e2a4a]"
+
+      {/* Hero Section - Dotted Pattern Background */}
+      <section className="relative min-h-[400px] flex items-center justify-center overflow-hidden pt-16">
+        {/* Background image */}
+        <img 
+          src={chuaThienPhuoc} 
+          alt="Nhà Lưu Giữ Tro Cốt" 
+          className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="relative z-10 text-center text-white px-4">
-          <motion.h1 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: easeOut }}
-            className="font-display text-4xl md:text-5xl lg:text-6xl italic"
-          >
-            Columbaria
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: easeOut }}
-            className="text-white/70 text-sm md:text-base mt-4 max-w-md mx-auto"
-          >
-            A sacred space for eternal remembrance
-          </motion.p>
+        <div className="absolute inset-0 bg-black/40" />
+        
+        <div className="relative z-10 text-center px-4">
+          <h1 className="font-serif text-4xl md:text-5xl text-white italic font-light">
+            Nhà Lưu Giữ Tro Cốt
+          </h1>
         </div>
       </section>
 
-      {/* Video Section with Marble Table */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <motion.div {...fadeInUp} className="max-w-3xl mx-auto">
-            {/* Video/Image */}
-            <motion.div 
-              {...scaleIn}
-              className="relative aspect-video bg-muted overflow-hidden group cursor-pointer mb-10"
-            >
-              <img 
-                src={columbariumImage} 
-                alt="Columbarium showcase" 
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/30 transition-colors">
-                <motion.div 
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="w-14 h-14 md:w-16 md:h-16 bg-white/90 rounded-full flex items-center justify-center shadow-lg"
-                >
-                  <Play className="w-5 h-5 md:w-6 md:h-6 text-primary ml-1" fill="currentColor" />
-                </motion.div>
+      {/* Video/Intro Section with Blue Overlay */}
+      <section className="py-8 bg-white">
+        <div className="container mx-auto px-4 max-w-4xl">
+          {/* Video thumbnail with blue overlay */}
+          <div className="relative aspect-video bg-[#5b7cfa] overflow-hidden cursor-pointer mb-10">
+            <div className="absolute inset-4 bg-slate-300">
+              <div className="w-full h-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
+                <span className="text-slate-400 text-sm">Nội Thất Nhà Lưu Giữ Tro Cốt</span>
               </div>
-              <span className="absolute bottom-4 left-4 text-white text-[10px] tracking-[0.25em] uppercase font-medium">
-                W A T C H
-              </span>
-            </motion.div>
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                <Play className="w-5 h-5 text-white ml-0.5" fill="currentColor" />
+              </div>
+            </div>
+            <span className="absolute bottom-3 left-4 text-white/80 text-[10px] tracking-[0.2em] uppercase">
+              XEM VIDEO
+            </span>
+          </div>
 
-            {/* Intro Text */}
-            <motion.div {...fadeInUp} className="text-center">
-              <h2 className="font-display text-2xl md:text-3xl lg:text-4xl text-foreground italic mb-6">
-                Redefining reverence through architectural magnificence
-              </h2>
-              <p className="text-muted-foreground text-sm leading-relaxed max-w-2xl mx-auto">
-                Our columbaria are designed with meticulous attention to detail, combining traditional values 
-                with modern aesthetics. Each space is crafted to provide a dignified and peaceful environment 
-                for families to honor and remember their loved ones.
-              </p>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Columbaria Types Header */}
-      <section className="py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <motion.div {...fadeInUp} className="text-center">
-            <span className="text-primary text-[10px] tracking-[0.4em] uppercase font-medium">D I S C O V E R</span>
-            <h2 className="font-display text-3xl md:text-4xl mt-4 text-foreground italic">
-              Columbaria types
+          {/* Intro text */}
+          <div className="text-center max-w-2xl mx-auto">
+            <h2 className="font-serif text-xl md:text-2xl text-slate-700 italic mb-4 leading-relaxed">
+              Tái định nghĩa sự tôn kính qua<br />kiến trúc tinh xảo
             </h2>
-          </motion.div>
+            <p className="text-slate-500 text-sm leading-relaxed">
+              Các công trình lưu giữ tro cốt của chúng tôi được thiết kế với sự chú trọng tỉ mỉ đến từng chi tiết, 
+              kết hợp hài hòa giữa giá trị truyền thống và thẩm mỹ hiện đại. Mỗi không gian được kiến tạo 
+              nhằm mang đến một môi trường trang nghiêm và thanh tịnh.
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* Columbaria Type 1: Blue Box with Image Left Overflow */}
-      <section className="py-10 md:py-16 bg-[#e8ecf1]">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          <motion.div 
-            {...fadeInUp}
-            className="relative bg-primary"
-          >
-            {/* Inner container with padding */}
-            <div className="relative py-10 md:py-14 pr-6 md:pr-12 lg:pr-16 pl-6 md:pl-[45%] lg:pl-[50%] min-h-[350px] md:min-h-[400px] flex flex-col justify-center">
-              {/* Text Content */}
-              <h3 className="font-display text-2xl md:text-3xl text-white italic mb-6">
-                Luxury Columbarium
-              </h3>
-              <p className="text-white/80 text-sm leading-relaxed max-w-md">
-                A sanctuary of eternal peace, our Luxury Columbarium features exquisite marble finishes, 
-                ornate architectural details, and serene ambiance. Each niche is crafted with precision 
-                to honor your loved ones with the dignity they deserve.
-              </p>
-            </div>
-            
-            {/* Image - Positioned to overflow the blue box on LEFT */}
-            <div className="lg:absolute lg:left-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%] lg:-translate-x-4 p-4 lg:p-0">
-              <div className="flex flex-col gap-2">
-                <img 
-                  src={columbariumImage} 
-                  alt="Luxury Columbarium" 
-                  className="w-full h-48 md:h-[220px] object-cover shadow-2xl"
-                />
-                <img 
-                  src={family1Image} 
-                  alt="Interior" 
-                  className="w-full h-32 md:h-[140px] object-cover shadow-xl"
-                />
+      {/* Our Columbaria Title */}
+      <section className="py-6 bg-white">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-slate-400 text-[10px] tracking-[0.3em] uppercase mb-1">KHÁM PHÁ</p>
+          <h2 className="font-serif text-2xl text-slate-700 italic">Các Công Trình Lưu Giữ Tro Cốt</h2>
+        </div>
+      </section>
+
+      {/* Thumbnail Gallery Row */}
+      <section className="py-4 bg-white">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <div className="grid grid-cols-4 gap-3">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="aspect-[4/3] bg-slate-200 cursor-pointer hover:opacity-80 transition-opacity">
+                <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-300" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Section 1: Image Left (with carousel) + White Box Right */}
+      <section className="py-8 bg-white">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="flex flex-col lg:flex-row gap-0 shadow-lg">
+            {/* Image Left with carousel dots */}
+            <div className="lg:w-1/2 relative">
+              <div className="aspect-[4/3] bg-slate-200">
+                <div className="w-full h-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
+                  <span className="text-slate-400 text-sm">Vườn Phương Đông</span>
+                </div>
+              </div>
+              {/* Carousel dots */}
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                {[0, 1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className={`w-1.5 h-1.5 rounded-full ${i === 0 ? 'bg-slate-600' : 'bg-slate-400/50'}`} />
+                ))}
               </div>
             </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Columbaria Type 2: Blue Box with Image Right Overflow */}
-      <section className="py-10 md:py-16 bg-[#e8ecf1]">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          <motion.div 
-            {...fadeInUp}
-            className="relative bg-primary"
-          >
-            {/* Inner container with padding */}
-            <div className="relative py-10 md:py-14 pl-6 md:pl-12 lg:pl-16 pr-6 md:pr-[45%] lg:pr-[50%] min-h-[350px] md:min-h-[400px] flex flex-col justify-center">
-              {/* Text Content */}
-              <span className="text-white/60 text-[10px] tracking-[0.2em] uppercase mb-3 block">
-                SPIRITUAL COMFORT MEETS CONTEMPORARY SENSIBILITIES
-              </span>
-              <h3 className="font-display text-2xl md:text-3xl text-white italic mb-6">
-                Christian Columbarium
-              </h3>
-              <p className="text-white/80 text-sm leading-relaxed mb-6 max-w-md">
-                The artistic Christian Columbarium is a masterpiece of bereavement architecture 
-                that is unlike any other. While its unique style exudes a distinctive Christian 
-                character, the Christian Columbarium presents the best of both worlds: spiritual 
-                comfort and contemporary sensibilities.
+            {/* White Box Right */}
+            <div className="lg:w-1/2 bg-white py-8 px-8 flex flex-col justify-center">
+              <p className="text-slate-400 text-[10px] tracking-[0.15em] uppercase mb-2 text-center">
+                THIẾT KẾ TRÁNG LỆ GỢI NHỚ THỜI CỔ ĐẠI
               </p>
-              <button className="text-white text-xs flex items-center gap-2 hover:text-white/80 transition-colors tracking-[0.1em] uppercase font-medium">
-                READ MORE <span className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center"><ChevronRight className="w-3 h-3" /></span>
-              </button>
-            </div>
-            
-            {/* Image Carousel - Positioned to overflow the blue box on RIGHT */}
-            <div className="lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%] lg:translate-x-4 p-4 lg:p-0 group">
-              <ImageCarousel 
-                images={[columbariumImage, landscapeImage, heroParkImage, family1Image, familyHugImage]}
-                className="w-full h-64 md:h-[340px] shadow-2xl"
-                showDots={true}
-                showArrows={true}
-                dotsColor="white"
-              />
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Columbaria Type 3: White Box with Image Left Overflow + Dotted Pattern */}
-      <section className="py-10 md:py-16 bg-[#e8ecf1]">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          <motion.div 
-            {...fadeInUp}
-            className="relative bg-white overflow-visible"
-          >
-            {/* Dotted Pattern on right side */}
-            <div 
-              className="absolute right-0 top-0 bottom-0 w-1/3 opacity-30 hidden lg:block"
-              style={{
-                backgroundImage: `radial-gradient(circle, #cbd5e1 1.5px, transparent 1.5px)`,
-                backgroundSize: '12px 12px'
-              }}
-            />
-            
-            {/* Inner container with padding */}
-            <div className="relative py-10 md:py-14 pr-6 md:pr-12 lg:pr-16 pl-6 md:pl-[45%] lg:pl-[50%] min-h-[350px] md:min-h-[400px] flex flex-col justify-center z-10">
-              {/* Text Content */}
-              <span className="text-muted-foreground text-[10px] tracking-[0.15em] uppercase mb-3 block">
-                AN OPULENT DESIGN REMINISCENT OF ANCIENT TIMES
-              </span>
-              <h3 className="font-display text-2xl md:text-3xl text-foreground italic mb-6">
-                Ancient Chinese Architecture Columbarium
+              <h3 className="font-serif text-xl text-[#5b7cfa] italic mb-4 text-center">
+                Nhà Lưu Giữ Tro Cốt<br />Kiến Trúc Cổ Trung Hoa
               </h3>
-              <p className="text-muted-foreground text-sm leading-relaxed mb-6 max-w-md">
-                The multi-million ringgit Oriental Villa is a signature masterpiece of Nirvana Memorial Garden. 
-                Built to house the urns of the departed, its elegant and spacious interiors are designed to 
-                convey a sense of traditional ancient Chinese opulence.
+              <p className="text-slate-500 text-xs leading-relaxed mb-4 text-center">
+                Biệt Thự Phương Đông trị giá hàng triệu đô la là kiệt tác đặc trưng của Hoa Viên Nghĩa Trang. 
+                Được xây dựng để lưu giữ tro cốt của người đã khuất, nội thất thanh lịch và rộng rãi 
+                được thiết kế để truyền tải vẻ sang trọng cổ điển Trung Hoa.
               </p>
-              <button className="text-foreground text-xs flex items-center gap-2 hover:text-primary transition-colors tracking-[0.1em] uppercase font-medium">
-                READ MORE <ChevronRight className="w-4 h-4 text-primary" />
-              </button>
-            </div>
-            
-            {/* Image - Positioned to overflow on LEFT with decorative frame */}
-            <div className="lg:absolute lg:left-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[50%] lg:-translate-x-4 p-4 lg:p-0">
-              <div className="relative p-3 bg-[#f0f4f8]">
-                {/* Decorative corner borders */}
-                <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-primary/30" />
-                <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary/30" />
-                <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-primary/30" />
-                <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-primary/30" />
-                <img 
-                  src={heroParkImage} 
-                  alt="Ancient Chinese Architecture" 
-                  className="w-full h-64 md:h-[320px] object-cover"
-                />
+              <div className="flex items-center gap-2 justify-center cursor-pointer group">
+                <span className="text-slate-500 text-[10px] tracking-wider uppercase">XEM THÊM</span>
+                <div className="w-4 h-4 rounded-full bg-[#5b7cfa] flex items-center justify-center">
+                  <ChevronRight className="w-2.5 h-2.5 text-white" />
+                </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Columbaria Type 4: Blue Box with Image Right Overflow */}
-      <section className="py-10 md:py-16 bg-[#e8ecf1]">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          <motion.div 
-            {...fadeInUp}
-            className="relative bg-primary"
-          >
-            {/* Inner container with padding */}
-            <div className="relative py-10 md:py-14 pl-6 md:pl-12 lg:pl-16 pr-6 md:pr-[45%] lg:pr-[50%] min-h-[350px] md:min-h-[400px] flex flex-col justify-center">
-              {/* Text Content */}
-              <span className="text-white/60 text-[10px] tracking-[0.2em] uppercase mb-3 block">
-                A PLACE TO CHERISH MEMORIES
-              </span>
-              <h3 className="font-display text-2xl md:text-3xl text-white italic mb-6">
-                Cherished Columbarium
-              </h3>
-              <p className="text-white/80 text-sm leading-relaxed max-w-md">
-                Designed with warmth and comfort in mind, the Cherished Columbarium provides an intimate 
-                setting for families to gather and remember. Soft lighting and thoughtful design elements 
-                create a welcoming atmosphere for reflection and peace.
+      {/* Section 2: Blue Box Left + Image Right (with carousel) */}
+      <section className="py-8 bg-slate-100">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="flex flex-col lg:flex-row gap-0">
+            {/* Blue Box Left */}
+            <div className="lg:w-[45%] bg-[#5b7cfa] py-8 px-8 flex flex-col justify-center">
+              <p className="text-white/60 text-[10px] tracking-[0.15em] uppercase mb-2">
+                SỰ AN ỦI TÂM LINH HÒA QUYỆN VỚI CẢM THỨC ĐƯƠNG ĐẠI
               </p>
-            </div>
-            
-            {/* Image Carousel - Positioned to overflow on RIGHT */}
-            <div className="lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%] lg:translate-x-4 p-4 lg:p-0 group">
-              <ImageCarousel 
-                images={[columbariumImage, heroParkImage, landscapeImage]}
-                className="w-full h-64 md:h-[340px] shadow-2xl"
-                showDots={true}
-                showArrows={true}
-                dotsColor="white"
-              />
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Columbaria Type 5: Blue Box with Image Left Overflow + Button */}
-      <section className="py-10 md:py-16 bg-[#e8ecf1]">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          <motion.div 
-            {...fadeInUp}
-            className="relative bg-primary"
-          >
-            {/* Inner container with padding */}
-            <div className="relative py-10 md:py-14 pr-6 md:pr-12 lg:pr-16 pl-6 md:pl-[45%] lg:pl-[50%] min-h-[350px] md:min-h-[400px] flex flex-col justify-center">
-              {/* Text Content */}
-              <h3 className="font-display text-2xl md:text-3xl text-white italic mb-6">
-                Shrine of Elite
+              <h3 className="font-serif text-xl text-white italic mb-4">
+                Nhà Lưu Giữ Tro Cốt Công Giáo
               </h3>
-              <p className="text-white/80 text-sm leading-relaxed mb-8 max-w-md">
-                The pinnacle of memorial architecture, the Shrine of Elite offers exclusive niches with 
-                premium finishes, private viewing areas, and personalized memorial services. A testament 
-                to lives lived with distinction.
+              <p className="text-white/80 text-xs leading-relaxed mb-4">
+                Nhà Lưu Giữ Tro Cốt Công Giáo nghệ thuật là kiệt tác kiến trúc tang lễ độc nhất vô nhị. 
+                Với phong cách độc đáo toát lên đặc trưng Công Giáo riêng biệt, công trình này 
+                mang đến sự kết hợp hoàn hảo giữa hai thế giới.
               </p>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button className="bg-white text-primary hover:bg-white/90 px-8 text-[10px] tracking-[0.15em] h-10 w-fit">
-                  ENQUIRE NOW
-                </Button>
-              </motion.div>
-            </div>
-            
-            {/* Image Carousel - Positioned to overflow on LEFT */}
-            <div className="lg:absolute lg:left-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%] lg:-translate-x-4 p-4 lg:p-0 group">
-              <ImageCarousel 
-                images={[family2Image, columbariumImage, family1Image]}
-                className="w-full h-64 md:h-[340px] shadow-2xl"
-                showDots={true}
-                showArrows={true}
-                dotsColor="white"
-              />
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Columbaria Type 6: Navy Box with Image Right Overflow */}
-      <section className="py-10 md:py-16 bg-[#e8ecf1]">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16">
-          <motion.div 
-            {...fadeInUp}
-            className="relative bg-[#1e2a4a]"
-          >
-            {/* Inner container with padding */}
-            <div className="relative py-10 md:py-14 pl-6 md:pl-12 lg:pl-16 pr-6 md:pr-[45%] lg:pr-[50%] min-h-[350px] md:min-h-[400px] flex flex-col justify-center">
-              {/* Text Content */}
-              <h3 className="font-display text-2xl md:text-3xl text-white italic mb-6">
-                Niches
-              </h3>
-              <p className="text-white/70 text-sm leading-relaxed max-w-md">
-                Our thoughtfully designed niches come in various sizes and configurations to accommodate 
-                different needs. Each niche is built with quality materials and can be personalized with 
-                engravings and memorial plaques to create a lasting tribute.
-              </p>
-            </div>
-            
-            {/* Image Carousel - Positioned to overflow on RIGHT */}
-            <div className="lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2 lg:w-[55%] lg:translate-x-4 p-4 lg:p-0 group">
-              <ImageCarousel 
-                images={[heroTreesImage, heroParkImage, landscapeImage]}
-                className="w-full h-64 md:h-[340px] shadow-2xl"
-                showDots={true}
-                showArrows={true}
-                dotsColor="white"
-              />
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Full-width Video Section */}
-      <section className="py-12 md:py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <motion.div {...scaleIn} className="max-w-5xl mx-auto relative">
-            <div className="relative h-[40vh] min-h-[300px] overflow-hidden">
-              <div 
-                className="absolute inset-0 bg-cover bg-center"
-                style={{ 
-                  backgroundImage: `url(${landscapeImage})` 
-                }}
-              />
-              {/* Decorative Pattern Overlay */}
-              <div 
-                className="absolute inset-0 bg-black/20"
-                style={{
-                  backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)`,
-                  backgroundSize: '25px 25px'
-                }}
-              />
-              <div className="relative z-10 h-full flex items-center justify-center">
-                <motion.div 
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="w-14 h-14 md:w-16 md:h-16 bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center cursor-pointer hover:bg-white/30 transition-colors"
-                >
-                  <Play className="w-5 h-5 md:w-6 md:h-6 text-white ml-0.5" fill="currentColor" />
-                </motion.div>
+              <div className="flex items-center gap-2 cursor-pointer group">
+                <span className="text-white/80 text-[10px] tracking-wider uppercase">XEM THÊM</span>
+                <div className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center">
+                  <ChevronRight className="w-2.5 h-2.5 text-white" />
+                </div>
               </div>
             </div>
-          </motion.div>
+            {/* Image Right with carousel */}
+            <div className="lg:w-[55%] relative">
+              <div className="aspect-[4/3] bg-slate-200">
+                <div className="w-full h-full bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center">
+                  <span className="text-slate-400 text-sm">Nội Thất Nhà Lưu Giữ Công Giáo</span>
+                </div>
+              </div>
+              {/* Carousel dots */}
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <div key={i} className={`w-1.5 h-1.5 rounded-full ${i === 0 ? 'bg-white' : 'bg-white/50'}`} />
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* More Columbaria CTA Section */}
-      <section className="py-16 md:py-20 bg-primary">
-        <div className="container mx-auto px-4">
-          <motion.div {...fadeInUp} className="text-center mb-12">
-            <span className="text-white/60 text-[10px] tracking-[0.3em] uppercase block mb-4">MORE</span>
-            <Button variant="outline" className="border-white text-white hover:bg-white hover:text-primary px-10 text-[10px] tracking-[0.2em] h-11">
-              COLUMBARIA
-            </Button>
-          </motion.div>
+      {/* Section 3: Image Left (with carousel) + Blue Box Right */}
+      <section className="py-8 bg-slate-100">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="flex flex-col lg:flex-row gap-0">
+            {/* Image Left with carousel */}
+            <div className="lg:w-[55%] relative">
+              <div className="aspect-[4/3] bg-slate-200">
+                <div className="w-full h-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
+                  <span className="text-slate-400 text-sm">Nội Thất Sang Trọng</span>
+                </div>
+              </div>
+              {/* Carousel dots */}
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className={`w-1.5 h-1.5 rounded-full ${i === 1 ? 'bg-slate-600' : 'bg-slate-400/50'}`} />
+                ))}
+              </div>
+            </div>
+            {/* Blue Box Right */}
+            <div className="lg:w-[45%] bg-[#5b7cfa] py-8 px-8 flex flex-col justify-center">
+              <p className="text-white/60 text-[10px] tracking-[0.15em] uppercase mb-2">
+                SỰ HÒA QUYỆN HÀI HÒA CỦA TRUYỀN THỐNG
+              </p>
+              <h3 className="font-serif text-xl text-white italic mb-4">
+                Nhà Lưu Giữ Tro Cốt Hiện Đại
+              </h3>
+              <p className="text-white/80 text-xs leading-relaxed">
+                Nhà lưu giữ tro cốt hiện đại được thiết kế theo phong cách nghệ thuật sống động, 
+                đặt trong môi trường cát tường thúc đẩy sự thịnh vượng. Thiết kế truyền tải 
+                tinh hoa của một kiệt tác vượt thời gian.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 4: Blue Box Left + Image Right */}
+      <section className="py-8 bg-slate-100">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="flex flex-col lg:flex-row gap-0">
+            {/* Blue Box Left */}
+            <div className="lg:w-[45%] bg-[#5b7cfa] py-8 px-8 flex flex-col justify-center">
+              <p className="text-white/60 text-[10px] tracking-[0.15em] uppercase mb-2">
+                SỰ THỐNG NHẤT CỦA CÁC Ý TƯỞNG
+              </p>
+              <h3 className="font-serif text-xl text-white italic mb-4">
+                Vườn Tro Cốt
+              </h3>
+              <p className="text-white/80 text-xs leading-relaxed mb-4">
+                An táng trong nhà lưu giữ tro cốt không phải là lựa chọn duy nhất cho những ai chọn hỏa táng. 
+                Khu D của Hoa Viên Nghĩa Trang là khu đất chôn cất tro cốt lớn nhất tại Việt Nam.
+              </p>
+              <div className="flex items-center gap-2 cursor-pointer group">
+                <span className="text-white/80 text-[10px] tracking-wider uppercase">XEM THÊM</span>
+                <div className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center">
+                  <ChevronRight className="w-2.5 h-2.5 text-white" />
+                </div>
+              </div>
+            </div>
+            {/* Image Right */}
+            <div className="lg:w-[55%] relative bg-[#5b7cfa] p-4">
+              <div className="aspect-[4/3] bg-slate-200">
+                <div className="w-full h-full bg-gradient-to-br from-green-200 to-green-300 flex items-center justify-center">
+                  <span className="text-slate-500 text-sm">Vườn Tro Cốt</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 5: White Card - Image Left + Text Right */}
+      <section className="py-8 bg-slate-100">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="bg-white shadow-lg flex flex-col lg:flex-row overflow-hidden">
+            {/* Image Left */}
+            <div className="lg:w-1/2 relative">
+              <div className="aspect-[4/3] bg-slate-200">
+                <div className="w-full h-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
+                  <span className="text-slate-400 text-sm">Nội Thất Vần Điệu Cuộc Sống</span>
+                </div>
+              </div>
+            </div>
+            {/* Text Right */}
+            <div className="lg:w-1/2 py-8 px-8 flex flex-col justify-center">
+              <p className="text-slate-400 text-[10px] tracking-[0.15em] uppercase mb-2 text-center">
+                KÝ ỨC ĐƯỢC TRÂN QUÝ LÀ NHỮNG TRÁI TIM ĐƯỢC ĐOÀN TỤ
+              </p>
+              <h3 className="font-serif text-xl text-[#5b7cfa] italic mb-4 text-center">
+                Vần Điệu Cuộc Sống
+              </h3>
+              <p className="text-slate-500 text-xs leading-relaxed mb-4 text-center">
+                Nếu có một nơi mà sự ra đi không có nghĩa là kết thúc – nơi ký ức sống mãi trong tim – 
+                thì nơi đó chính là Vần Điệu Cuộc Sống.
+              </p>
+              <div className="flex flex-col items-center gap-3">
+                <div className="flex items-center gap-2 cursor-pointer">
+                  <span className="text-slate-500 text-[10px] tracking-wider uppercase">XEM THÊM</span>
+                  <div className="w-4 h-4 rounded-full bg-[#5b7cfa] flex items-center justify-center">
+                    <ChevronRight className="w-2.5 h-2.5 text-white" />
+                  </div>
+                </div>
+                <button className="border border-slate-800 text-slate-800 px-6 py-2 text-[10px] tracking-wider uppercase hover:bg-slate-800 hover:text-white transition-colors cursor-pointer">
+                  KHÁM PHÁ THÊM
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Video Play Section */}
+      <section className="py-8 bg-white">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <div className="flex justify-center">
+            <div className="w-12 h-12 border border-slate-300 flex items-center justify-center cursor-pointer hover:bg-slate-50 transition-colors">
+              <Play className="w-4 h-4 text-slate-400 ml-0.5" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section - Dark Navy with Badge and Cards */}
+      <section className="relative py-16 overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-[#1e2a4a]">
+          <div 
+            className="absolute inset-0 opacity-20"
+            style={{
+              backgroundImage: `linear-gradient(to top, rgba(30,42,74,0.9), rgba(30,42,74,0.5))`,
+            }}
+          />
+        </div>
+
+        <div className="container mx-auto px-4 max-w-5xl relative">
+          {/* Badge */}
+          <div className="flex justify-center mb-12">
+            <div className="w-28 h-20 bg-[#5b7cfa] flex flex-col items-center justify-center">
+              <p className="text-white/70 text-[8px] tracking-[0.15em] uppercase">ĐỌC THÊM</p>
+              <p className="text-white text-xs italic">Hỏa Táng</p>
+            </div>
+          </div>
 
           {/* Three Cards */}
-          <motion.div 
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto"
-          >
-            {moreColumbaria.map((item, index) => (
-              <motion.div 
-                key={index} 
-                variants={staggerItem}
-                className="group cursor-pointer"
-              >
-                <div className="overflow-hidden mb-4">
-                  <img 
-                    src={item.image} 
-                    alt={item.title} 
-                    className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
+          <div className="grid md:grid-cols-3 gap-6">
+            {moreColumbaria.map((item, idx) => (
+              <div key={idx} className="group cursor-pointer">
+                <div className="aspect-[4/3] bg-slate-300 mb-3">
+                  <div className="w-full h-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center group-hover:opacity-90 transition-opacity">
+                    <span className="text-slate-400 text-xs">Hình {idx + 1}</span>
+                  </div>
                 </div>
-                <h4 className="text-white text-sm font-medium text-center leading-tight px-2">
+                <h4 className="text-white text-xs leading-tight">
                   {item.title}
                 </h4>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 

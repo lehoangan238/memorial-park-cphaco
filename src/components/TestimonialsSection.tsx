@@ -3,7 +3,6 @@ import { Star } from 'lucide-react';
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
-// Optimized stagger for mobile
 const staggerContainer = {
   hidden: {},
   visible: {
@@ -26,27 +25,21 @@ const staggerItem = {
 const testimonials = [
   {
     title: "Dịch vụ khách hàng xuất sắc và đặc biệt",
-    text: "Chúng tôi xin bày tỏ lòng biết ơn về dịch vụ khách hàng xuất sắc và đặc biệt mà quý vị đã cung cấp trong tang lễ của cha chúng tôi, đặc biệt là ông Chai Teen. Dịch vụ khách hàng xuất sắc và đặc biệt. Thay mặt gia đình, chúng tôi...",
-    link: "xem thêm",
-    isItalic: false,
+    text: "Chúng tôi muốn bày tỏ lòng biết ơn về dịch vụ khách hàng xuất sắc và đặc biệt mà bạn đã cung cấp trong tang lễ của cha tôi, đặc biệt là anh Chai Teen. Dịch vụ khách hàng xuất sắc và đặc biệt. Thay mặt gia đình, chúng tôi đánh giá cao tất cả những nỗ lực và sự tận tâm được thể hiện trong thời gian khó khăn này.",
   },
   {
-    title: '"Tuyệt vời" về sự chuyên nghiệp',
-    text: 'Gia đình cố ông Lee Kai Wa xin gửi lời khen "tuyệt vời" về sự chuyên nghiệp của anh ấy. "Tuyệt vời" về sự chuyên nghiệp của họ. Cái chết để lại nỗi đau mà không ai có thể chữa lành. Tình yêu để lại ký ức mà không ai có thể đánh cắp! Thứ Tư ngày 14 tháng 7 năm 2021...',
-    link: "xem thêm",
-    isItalic: true,
+    title: "Tính chuyên nghiệp \"xuất sắc\"",
+    text: "Gia đình cố ông Lee Kai Wa muốn gửi lời khen ngợi \"xuất sắc\" về tính chuyên nghiệp của họ. Cái chết để lại nỗi đau lòng mà không ai có thể chữa lành. Tình yêu để lại ký ức mà không ai có thể đánh cắp! Chúng tôi vô cùng biết ơn về dịch vụ đầy lòng trắc ẩn và chuyên nghiệp được cung cấp.",
   },
   {
     title: "Chất lượng công việc và kế hoạch tuyệt vời",
-    text: "Chúng tôi, gia đình họ Ooi trân trọng dịch vụ tốt nhất được cung cấp, chất lượng công việc, kế hoạch tuyệt vời trong tang lễ của chồng tôi. Chất lượng công việc và kế hoạch tuyệt vời. Đây là lời cảm ơn đặc biệt dành cho ông ShanZhi, Dịch vụ...",
-    link: "xem thêm",
-    isItalic: true,
+    text: "Chúng tôi, gia đình Ooi, trân trọng dịch vụ tốt nhất được cung cấp, chất lượng công việc tuyệt vời, kế hoạch xuất sắc trong tang lễ của chồng tôi. Đây là lời cảm ơn đặc biệt dành cho anh ShanZhi về dịch vụ xuất sắc và sự chú ý đến từng chi tiết đã làm cho thời gian khó khăn này trở nên dễ chịu hơn.",
   },
 ];
 
 export const TestimonialsSection = () => {
   return (
-    <section className="py-20 bg-white overflow-hidden">
+    <section className="py-20 bg-[#F8FAFC]">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -55,21 +48,11 @@ export const TestimonialsSection = () => {
           transition={{ duration: 0.5, ease: easeOut }}
           className="text-center mb-12"
         >
-          <h2 
-            className="text-4xl text-[#2f3237] mb-4"
-            style={{ fontFamily: "'Cormorant Garamond', serif" }}
-          >
-            Đánh Giá Của Khách Hàng
+          <h2 className="text-4xl lg:text-5xl text-slate-800 mb-6 font-serif font-medium">
+            Lời Chứng Thực Của Khách Hàng
           </h2>
-          <p 
-            className="text-[#5e636e] text-sm max-w-2xl mx-auto mb-6"
-            style={{ fontFamily: "'Open Sans', sans-serif" }}
-          >
-            Khách hàng chia sẻ những trải nghiệm tiếp tục thúc đẩy chúng tôi trên hành trình đầy cảm hứng của sự từ bi và chuyên nghiệp.
-          </p>
           
-          {/* Star Rating - simplified animation */}
-          <div className="flex justify-center gap-1">
+          <div className="flex justify-center gap-1 mb-6">
             {[...Array(5)].map((_, i) => (
               <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
             ))}
@@ -87,45 +70,28 @@ export const TestimonialsSection = () => {
             <motion.div
               key={testimonial.title}
               variants={staggerItem}
-              className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg p-8 shadow-md hover:shadow-lg transition-shadow"
             >
-              <h3 
-                className={`text-[#2f3237] text-sm font-semibold mb-4 ${testimonial.isItalic ? 'italic' : ''}`}
-                style={{ fontFamily: "'Cormorant Garamond', serif" }}
-              >
+              <h3 className="text-slate-800 text-lg font-serif font-medium mb-4">
                 {testimonial.title}
               </h3>
 
-              <p 
-                className={`text-[#5e636e] text-sm leading-relaxed mb-4 ${testimonial.isItalic ? 'italic' : ''}`}
-                style={{ fontFamily: "'Cormorant Garamond', serif" }}
-              >
+              <p className="text-slate-600 text-sm leading-relaxed font-body">
                 {testimonial.text}
               </p>
-              
-              <a 
-                href="#"
-                className="text-[#0693e3] text-sm hover:underline"
-                style={{ fontFamily: "'Open Sans', sans-serif" }}
-              >
-                {testimonial.link}
-              </a>
             </motion.div>
           ))}
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ delay: 0.2, duration: 0.4, ease: easeOut }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3, duration: 0.5, ease: easeOut }}
           className="text-center"
         >
-          <button 
-            className="border border-[#5e636e] text-[#5e636e] px-8 py-2.5 text-sm hover:bg-[#5e636e] hover:text-white transition-all"
-            style={{ fontFamily: "'Open Sans', sans-serif" }}
-          >
-            Xem Thêm
+          <button className="bg-[#3B82F6] text-white px-10 py-3 text-sm tracking-wide hover:bg-[#2563EB] transition-all rounded cursor-pointer">
+            XEM THÊM
           </button>
         </motion.div>
       </div>

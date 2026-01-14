@@ -43,10 +43,10 @@ export const CaringSection = () => {
     <section className="relative">
       {/* Background with family image */}
       <div 
-        className="relative bg-cover bg-center py-20"
+        className="relative bg-cover bg-center py-32 md:py-40"
         style={{ backgroundImage: `url(${familyHug})` }}
       >
-        <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute inset-0 bg-black/50" />
         
         <div className="relative z-10 container mx-auto px-4 text-center">
           <motion.h2
@@ -54,10 +54,9 @@ export const CaringSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5, ease: easeOut }}
-            className="text-5xl md:text-6xl text-white mb-8 will-change-transform"
-            style={{ fontFamily: "'Great Vibes', cursive" }}
+            className="text-4xl md:text-5xl lg:text-6xl text-white mb-6 font-serif font-medium tracking-wide"
           >
-            Chăm Sóc Cuộc Sống
+            Trân Quý Cuộc Sống
           </motion.h2>
           
           <motion.p
@@ -65,47 +64,13 @@ export const CaringSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ delay: 0.1, duration: 0.5, ease: easeOut }}
-            className="text-white/90 text-sm md:text-base max-w-4xl mx-auto leading-relaxed"
-            style={{ fontFamily: "'Open Sans', sans-serif" }}
+            className="text-white/90 text-base md:text-lg max-w-3xl mx-auto leading-relaxed font-body"
           >
-            Với cơ sở vật chất tích hợp và sản phẩm toàn diện, Nirvana cam kết mang đến trải nghiệm an ủi với dịch vụ tang lễ được quốc tế công nhận trong thời điểm cần thiết nhất. "Chăm Sóc Cuộc Sống" là triết lý của chúng tôi và chúng tôi coi mỗi cuộc sống đều có ý nghĩa và quý giá. Hãy yên tâm rằng đội ngũ của chúng tôi sẽ nỗ lực đảm bảo người thân của bạn được tôn vinh và kỷ niệm với sự chuyên nghiệp và tận tâm cao nhất.
+            Với cơ sở vật chất và sản phẩm toàn diện, Hoa Viên Bình Dương cam kết mang đến sự an ủi 
+            và bình yên thông qua các dịch vụ tưởng niệm đạt chuẩn quốc tế trong những khoảnh khắc 
+            quan trọng nhất của cuộc đời. "Trân Quý Cuộc Sống" là triết lý của chúng tôi và chúng tôi 
+            tin rằng mỗi cuộc sống đều có ý nghĩa và giá trị riêng.
           </motion.p>
-        </div>
-      </div>
-
-      {/* Info Cards */}
-      <div className="bg-white py-12">
-        <div className="container mx-auto px-4">
-          <motion.div 
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            className="grid md:grid-cols-3 gap-8"
-          >
-            {infoCards.map((card) => (
-              <motion.div
-                key={card.title}
-                variants={staggerItem}
-                className="group cursor-pointer"
-              >
-                <div className="relative overflow-hidden mb-4">
-                  <img 
-                    src={card.image} 
-                    alt={card.title}
-                    className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                </div>
-                <h3 
-                  className="text-[#2f3237] text-sm group-hover:text-primary transition-colors"
-                  style={{ fontFamily: "'Open Sans', sans-serif" }}
-                >
-                  {card.title}
-                </h3>
-              </motion.div>
-            ))}
-          </motion.div>
         </div>
       </div>
     </section>

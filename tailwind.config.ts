@@ -71,10 +71,11 @@ export default {
         },
       },
       fontFamily: {
-        display: ["'Poppins'", "sans-serif"],
-        body: ["'Poppins'", "sans-serif"],
-        script: ["'Great Vibes'", "cursive"],
-        heading: ["'Poppins'", "sans-serif"],
+        serif: ["'Playfair Display'", "serif"],
+        sans: ["'Inter'", "sans-serif"],
+        display: ["'Playfair Display'", "serif"],
+        body: ["'Inter'", "sans-serif"],
+        heading: ["'Playfair Display'", "serif"],
       },
       fontWeight: {
         light: "300",
