@@ -43,7 +43,7 @@ const INITIAL_VIEW_STATE: {
   longitude: DEFAULT_CENTER[0],
   latitude: DEFAULT_CENTER[1],
   zoom: 17,
-  pitch: 45,
+  pitch: 0,
   bearing: 180
 }
 
