@@ -398,7 +398,6 @@ function MainApp({ onNavigateToLogin }: MainAppProps) {
                   
                   // Prioritize OSRM
                   const distance = osrmRoute?.distance ?? internalRoute?.totalDistance ?? 0
-                  const hasRoute = osrmRoute !== null || (internalRoute !== null && internalRoute.path.length > 0)
                   const direction = getBearingName(startPoint[0], startPoint[1], destCoords[0], destCoords[1])
                   
                   // Format walking time - OSRM gives duration in seconds

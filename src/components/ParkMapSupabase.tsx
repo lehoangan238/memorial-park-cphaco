@@ -32,7 +32,7 @@ import { useMapData } from '@/hooks/useMapData'
 import type { PlotRow, OverlayRow, SpiritualSiteRow, PlotFeatureCollection } from '@/types/database'
 import { cn } from '@/lib/utils'
 import type { ViewStateChangeEvent } from 'react-map-gl/maplibre'
-import { findRoute, getOSRMRoute, type OSRMRoute } from '@/lib/routing'
+import { findRoute, type OSRMRoute } from '@/lib/routing'
 
 // Hoa Viên Nghĩa Trang Bình Dương coordinates (gate entrance)
 const DEFAULT_CENTER = [106.651891, 11.168266] as const
