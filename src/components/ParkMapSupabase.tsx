@@ -229,9 +229,14 @@ export function ParkMapSupabase({
           [nwLng, seLat]  // Bottom Left (SW)
         ]
 
+        // Add cache-busting timestamp to URL to ensure fresh images
+        const imageUrl = overlay.url.includes('?') 
+          ? `${overlay.url}&_t=${Date.now()}` 
+          : `${overlay.url}?_t=${Date.now()}`
+
         map.addSource(sourceId, {
           type: 'image',
-          url: overlay.url,
+          url: imageUrl,
           coordinates: coordinates
         })
 
@@ -280,6 +285,41 @@ export function ParkMapSupabase({
       return () => clearTimeout(timer)
     }
   }, [mapReady, overlays.length, loadVisibleOverlays])
+
+  // Clear loaded overlays when overlay data changes (e.g., image replaced)
+  const overlayUrlsRef = useRef<Record<string, string>>({})
+  
+  useEffect(() => {
+    const mapInstance = mapRef.current?.getMap()
+    if (!mapInstance || !mapReady) return
+
+    // Check if any overlay URLs have changed
+    let hasChanges = false
+    overlays.forEach(overlay => {
+      const prevUrl = overlayUrlsRef.current[overlay.id]
+      if (prevUrl && prevUrl !== overlay.url) {
+        hasChanges = true
+        // Remove old source and layer
+        const layerId = `overlay-layer-${overlay.id}`
+        const sourceId = `overlay-${overlay.id}`
+        if (mapInstance.getLayer(layerId)) mapInstance.removeLayer(layerId)
+        if (mapInstance.getSource(sourceId)) mapInstance.removeSource(sourceId)
+        // Remove from loaded set so it will be reloaded
+        setLoadedOverlayIds(prev => {
+          const newSet = new Set(prev)
+          newSet.delete(overlay.id)
+          return newSet
+        })
+        console.log(`[Overlays] URL changed for ${overlay.name}, will reload`)
+      }
+      overlayUrlsRef.current[overlay.id] = overlay.url
+    })
+
+    if (hasChanges) {
+      // Trigger reload
+      setTimeout(loadVisibleOverlays, 100)
+    }
+  }, [overlays, mapReady, loadVisibleOverlays])
 
   // Toggle overlay visibility for loaded overlays only
   useEffect(() => {

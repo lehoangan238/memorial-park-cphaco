@@ -10,6 +10,7 @@ import { DashboardPage } from './pages/DashboardPage'
 import { MapEditorPage } from './pages/MapEditorPage'
 import { RoadEditorPage } from './pages/RoadEditorPage'
 import { QRGeneratorPage } from './pages/QRGeneratorPage'
+import { OverlayManagerPage } from './pages/OverlayManagerPage'
 import { StaffPage } from './pages/StaffPage'
 import { DataPage } from './pages/DataPage'
 import { SettingsPage } from './pages/SettingsPage'
@@ -27,6 +28,8 @@ export function AdminApp() {
         return <RoadEditorPage />
       case 'qr-generator':
         return <QRGeneratorPage />
+      case 'overlay-manager':
+        return <OverlayManagerPage />
       case 'staff':
         return <StaffPage />
       case 'data':

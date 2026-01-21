@@ -13,10 +13,11 @@ import {
   ChevronRight,
   LogOut,
   GitBranch,
-  QrCode
+  QrCode,
+  Layers
 } from 'lucide-react'
 
-export type AdminPage = 'dashboard' | 'map-editor' | 'road-editor' | 'qr-generator' | 'staff' | 'data' | 'settings'
+export type AdminPage = 'dashboard' | 'map-editor' | 'road-editor' | 'qr-generator' | 'overlay-manager' | 'staff' | 'data' | 'settings'
 
 interface SidebarProps {
   activePage: AdminPage
@@ -26,6 +27,7 @@ interface SidebarProps {
 const navItems: { id: AdminPage; label: string; icon: React.ReactNode }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
   { id: 'map-editor', label: 'Map Editor', icon: <Map className="w-5 h-5" /> },
+  { id: 'overlay-manager', label: 'Overlay', icon: <Layers className="w-5 h-5" /> },
   { id: 'road-editor', label: 'Đường đi', icon: <GitBranch className="w-5 h-5" /> },
   { id: 'qr-generator', label: 'QR Dẫn đường', icon: <QrCode className="w-5 h-5" /> },
   { id: 'staff', label: 'Staff', icon: <Users className="w-5 h-5" /> },
