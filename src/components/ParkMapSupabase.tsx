@@ -184,20 +184,52 @@ export function ParkMapSupabase({
     )
   }, [])
 
+  // Minimum zoom level to load overlays (helps weak mobile devices)
+  const MIN_OVERLAY_ZOOM = 16
+
   // Lazy load overlays based on viewport - runs on map move
   const loadVisibleOverlays = useCallback(() => {
     const map = mapRef.current?.getMap()
     if (!map || !mapReady || overlays.length === 0) return
 
+    const currentZoom = map.getZoom()
     const bounds = map.getBounds()
     if (!bounds) return
 
+    // If zoom is too low, hide all loaded overlays and don't load new ones
+    if (currentZoom < MIN_OVERLAY_ZOOM) {
+      loadedOverlayIds.forEach((overlayId) => {
+        const layerId = `overlay-layer-${overlayId}`
+        if (map.getLayer(layerId)) {
+          map.setLayoutProperty(layerId, 'visibility', 'none')
+        }
+      })
+      return
+    }
+
+    // Show overlays when zoom is high enough
+    if (showOverlays) {
+      loadedOverlayIds.forEach((overlayId) => {
+        const layerId = `overlay-layer-${overlayId}`
+        if (map.getLayer(layerId)) {
+          map.setLayoutProperty(layerId, 'visibility', 'visible')
+        }
+      })
+    }
+
     let newlyLoaded = 0
+
+    // Limit number of overlays loaded at once on mobile to prevent memory issues
+    const isMobile = window.innerWidth < 768
+    const maxOverlaysToLoad = isMobile ? 5 : 20
 
     // Sort overlays by z_index (lower values load first, appear below)
     const sortedOverlays = [...overlays].sort((a, b) => (a.z_index ?? 0) - (b.z_index ?? 0))
 
     sortedOverlays.forEach((overlay: OverlayRow) => {
+      // Stop if we've loaded enough overlays this round (mobile optimization)
+      if (newlyLoaded >= maxOverlaysToLoad) return
+
       const sourceId = `overlay-${overlay.id}`
       const layerId = `overlay-layer-${overlay.id}`
 
