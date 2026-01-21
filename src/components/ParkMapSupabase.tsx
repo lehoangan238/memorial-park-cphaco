@@ -44,7 +44,7 @@ const INITIAL_VIEW_STATE: {
   latitude: DEFAULT_CENTER[1],
   zoom: 17,
   pitch: 45,
-  bearing: 0
+  bearing: 180
 }
 
 // Map style
