@@ -1,9 +1,10 @@
 import { useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { QRCodeSVG } from 'qrcode.react'
 import { 
   X, MapPin, Ruler, Tag, FileText, Navigation, ExternalLink, 
   Copy, Check, Edit3, Save, User, Phone, RefreshCw, AlertCircle, 
-  Loader2, Shield 
+  Loader2, Shield, QrCode, Download
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -34,11 +35,15 @@ export function PlotEditDrawer({ plot, onClose, onUpdate, onStartRouting }: Plot
   const [isSaving, setIsSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [showQR, setShowQR] = useState(false)
   
   // Edit form state
   const [editStatus, setEditStatus] = useState<PlotStatusDb>('Trống')
   const [editCustomerName, setEditCustomerName] = useState('')
   const [editNotes, setEditNotes] = useState('')
+
+  // QR URL
+  const qrUrl = plot ? `${window.location.origin}/qr?plot=${plot.id}` : ''
 
   // Reset form when plot changes
   useEffect(() => {
@@ -48,6 +53,7 @@ export function PlotEditDrawer({ plot, onClose, onUpdate, onStartRouting }: Plot
       setEditNotes(plot.notes || '')
       setIsEditing(false)
       setSaveError(null)
+      setShowQR(false)
     }
   }, [plot])
 
@@ -118,6 +124,42 @@ export function PlotEditDrawer({ plot, onClose, onUpdate, onStartRouting }: Plot
   const handleSyncFromBaseVn = useCallback(() => {
     alert('Tính năng đồng bộ từ Base.vn đang được phát triển.')
   }, [])
+
+  const handleDownloadQR = useCallback(() => {
+    if (!plot) return
+    const svg = document.getElementById('qr-code-svg')
+    if (!svg) return
+
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const size = 300
+    canvas.width = size
+    canvas.height = size + 60
+
+    ctx.fillStyle = 'white'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    const svgData = new XMLSerializer().serializeToString(svg)
+    const img = new Image()
+    img.onload = () => {
+      ctx.drawImage(img, 25, 0, 250, 250)
+      ctx.fillStyle = '#1f2937'
+      ctx.font = 'bold 18px system-ui'
+      ctx.textAlign = 'center'
+      ctx.fillText(plot.name || plot.id, size / 2, size - 30)
+      ctx.font = '14px system-ui'
+      ctx.fillStyle = '#6b7280'
+      ctx.fillText(plot.zone || 'Hoa Viên Nghĩa Trang', size / 2, size - 10)
+
+      const link = document.createElement('a')
+      link.download = `QR-${plot.id}.png`
+      link.href = canvas.toDataURL('image/png')
+      link.click()
+    }
+    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)))
+  }, [plot])
 
   if (!plot) return null
 
@@ -306,6 +348,55 @@ export function PlotEditDrawer({ plot, onClose, onUpdate, onStartRouting }: Plot
                         {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
                       </Button>
                     </div>
+                  </div>
+
+                  {/* QR Code Section */}
+                  <div className="bg-stone-50 rounded-xl p-4">
+                    <button
+                      onClick={() => setShowQR(!showQR)}
+                      className="w-full flex items-center justify-between cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2">
+                        <QrCode className="w-4 h-4 text-stone-500" />
+                        <span className="text-sm font-medium text-stone-700">Mã QR dẫn đường</span>
+                      </div>
+                      <span className="text-xs text-emerald-600">{showQR ? 'Ẩn' : 'Hiện'}</span>
+                    </button>
+                    
+                    <AnimatePresence>
+                      {showQR && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="pt-4 flex flex-col items-center">
+                            <div className="bg-white p-3 rounded-xl shadow-sm">
+                              <QRCodeSVG
+                                id="qr-code-svg"
+                                value={qrUrl}
+                                size={180}
+                                level="H"
+                                includeMargin
+                              />
+                            </div>
+                            <p className="text-xs text-stone-500 mt-3 text-center">
+                              Quét mã để mở Google Maps dẫn đường
+                            </p>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleDownloadQR}
+                              className="mt-3"
+                            >
+                              <Download className="w-3 h-3 mr-1" />
+                              Tải QR
+                            </Button>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
 
                   {/* Edit Button (Admin Only) */}
