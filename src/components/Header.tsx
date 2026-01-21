@@ -1,337 +1,222 @@
-import { motion, AnimatePresence } from 'framer-motion'
-import { Search, MapPin, Menu, X, User } from 'lucide-react'
-import { useState, useMemo, useRef, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import { cn } from '@/lib/utils'
-import { graves } from '@/data/graves_data'
-import type { Grave } from '@/types'
+import { useState, useEffect } from 'react';
+import { Menu, X, ChevronDown } from 'lucide-react';
+import logo from '../assets/logo.png';
 
-interface HeaderProps {
-  onSearch: (query: string) => void
-  onSearchResultSelect: (grave: Grave) => void
-  onMenuToggle: () => void
-  isMenuOpen: boolean
-}
+const dropdownMenus = {
+  'Bắt Đầu': [
+    { label: 'Nhu Cầu Khẩn Cấp', href: '/immediate-need' },
+    { label: 'Lập Kế Hoạch Trước', href: '/pre-planning' },
+    { label: 'Tại Sao Lập Kế Hoạch Trước', href: '#why-preplan' },
+    { label: 'Cách Thức Hoạt Động', href: '#how-it-works' },
+    { label: 'Câu Hỏi Thường Gặp', href: '#faq' },
+    { label: 'Lời Chứng Thực', href: '#testimonials' },
+    { label: 'Liên Hệ', href: '#contact' },
+  ],
+  'Tùy Chọn Kế Hoạch': [
+    { label: 'Công Viên Tưởng Niệm', href: '#memorial-parks' },
+    { label: 'Tháp Cốt', href: '/columbaria' },
+    { label: 'Đất Mộ Phần', href: '/burial-plots' },
+    { label: 'Dịch Vụ Tang Lễ', href: '/funeral-service' },
+    { label: 'Sản Phẩm Khác', href: '/others' },
+    { label: 'Tưởng Niệm Thú Cưng', href: '#pet-memorial' },
+  ],
+  'Tài Nguyên': [
+    { label: 'Blog & Bài Viết', href: '#blog' },
+    { label: 'Hướng Dẫn Kế Hoạch', href: '#guide' },
+    { label: 'Máy Tính', href: '#calculator' },
+    { label: 'Tải Brochure', href: '#brochure' },
+    { label: 'Tin Tức & Sự Kiện', href: '#news' },
+  ],
+};
 
-const statusLabels: Record<string, string> = {
-  available: 'Còn trống',
-  occupied: 'Đã sử dụng',
-  reserved: 'Đã đặt',
-  maintenance: 'Bảo trì',
-}
+const navItems = [
+  { 
+    label: 'Bắt Đầu', 
+    href: '#started',
+    hasDropdown: true
+  },
+  { 
+    label: 'Tùy Chọn Kế Hoạch', 
+    href: '#planning',
+    hasDropdown: true
+  },
+  { 
+    label: 'Tài Nguyên', 
+    href: '#resources',
+    hasDropdown: true
+  },
+  { label: 'Về Chúng Tôi', href: '#about' },
+  { label: 'Liên Hệ', href: '#contact' },
+];
 
-export function Header({ onSearch, onSearchResultSelect, onMenuToggle, isMenuOpen }: HeaderProps) {
-  const [searchValue, setSearchValue] = useState('')
-  const [showResults, setShowResults] = useState(false)
-  const [selectedIndex, setSelectedIndex] = useState(-1)
-  const searchRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+export const Header = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [mobileActiveDropdown, setMobileActiveDropdown] = useState<string | null>(null);
 
-  // Filter graves based on search value
-  const searchResults = useMemo(() => {
-    if (!searchValue.trim()) return []
-    const query = searchValue.toLowerCase()
-    return graves.filter((grave) => 
-      grave.id.toLowerCase().includes(query) ||
-      grave.name?.toLowerCase().includes(query) ||
-      grave.area.toLowerCase().includes(query)
-    ).slice(0, 6) // Limit to 6 results
-  }, [searchValue])
-
-  // Handle click outside to close dropdown
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
-        setShowResults(false)
-      }
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setSearchValue(value)
-    setShowResults(true)
-    setSelectedIndex(-1)
-    onSearch(value) // Filter markers in real-time
-  }
-
-  const handleResultSelect = (grave: Grave) => {
-    setSearchValue(grave.name || grave.id)
-    setShowResults(false)
-    onSearchResultSelect(grave)
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!showResults || searchResults.length === 0) return
-
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault()
-        setSelectedIndex(prev => 
-          prev < searchResults.length - 1 ? prev + 1 : 0
-        )
-        break
-      case 'ArrowUp':
-        e.preventDefault()
-        setSelectedIndex(prev => 
-          prev > 0 ? prev - 1 : searchResults.length - 1
-        )
-        break
-      case 'Enter':
-        e.preventDefault()
-        if (selectedIndex >= 0 && selectedIndex < searchResults.length) {
-          handleResultSelect(searchResults[selectedIndex])
-        }
-        break
-      case 'Escape':
-        setShowResults(false)
-        inputRef.current?.blur()
-        break
-    }
-  }
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (searchResults.length > 0) {
-      handleResultSelect(searchResults[0])
-    }
-  }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
 
   return (
-    <motion.header
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="fixed top-4 left-4 right-4 z-50"
+    <header 
+      className={`fixed top-0 left-0 right-0 z-[9999] transition-all duration-300 ${
+        isScrolled 
+          ? 'bg-white shadow-md' 
+          : 'bg-white/95 backdrop-blur-sm'
+      }`}
     >
-      <div className="glass rounded-2xl shadow-soft">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-stone-800 to-stone-900 flex items-center justify-center">
-                <MapPin className="w-5 h-5 text-gold" />
-              </div>
-              <div className="hidden sm:block">
-                <h1 className="font-serif text-xl font-semibold text-stone-900">
-                  Eternal Gardens
-                </h1>
-                <p className="text-xs text-stone-600">Digital Memorial Park</p>
-              </div>
-            </div>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16">
+          {/* Logo */}
+          <a href="/" className="flex items-center gap-2 flex-shrink-0">
+            <img src={logo} alt="Hoa Viên Bình Dương" className="h-8 sm:h-10 w-auto" />
+          </a>
 
-            {/* Search Bar - Desktop */}
-            <div ref={searchRef} className="hidden md:block relative flex-1 max-w-md mx-8">
-              <form onSubmit={handleSearch}>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-500" />
-                  <Input
-                    ref={inputRef}
-                    type="text"
-                    placeholder="Tìm kiếm mộ phần, tên người..."
-                    value={searchValue}
-                    onChange={handleInputChange}
-                    onFocus={() => searchValue && setShowResults(true)}
-                    onKeyDown={handleKeyDown}
-                    className="pl-10 bg-white/80 border-stone-200"
-                  />
-                </div>
-              </form>
-
-              {/* Search Results Dropdown */}
-              <AnimatePresence>
-                {showResults && searchResults.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-full left-0 right-0 mt-2 glass rounded-xl shadow-lg overflow-hidden z-50"
-                  >
-                    <div className="py-2">
-                      {searchResults.map((grave, index) => (
-                        <button
-                          key={grave.id}
-                          onClick={() => handleResultSelect(grave)}
-                          className={cn(
-                            "w-full px-4 py-3 flex items-center gap-3 text-left transition-colors cursor-pointer",
-                            selectedIndex === index 
-                              ? "bg-stone-100" 
-                              : "hover:bg-stone-50"
-                          )}
-                        >
-                          {/* Avatar/Icon */}
-                          <div className="w-10 h-10 rounded-full bg-stone-200 flex items-center justify-center overflow-hidden flex-shrink-0">
-                            {grave.imageUrl ? (
-                              <img 
-                                src={grave.imageUrl} 
-                                alt={grave.name || 'Grave'}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <User className="w-5 h-5 text-stone-500" />
-                            )}
-                          </div>
-                          {/* Info */}
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-stone-900 truncate">
-                              {grave.name || `Mộ phần ${grave.id}`}
-                            </p>
-                            <p className="text-xs text-stone-500 flex items-center gap-2">
-                              <span>{grave.id}</span>
-                              <span>•</span>
-                              <span>{grave.area}</span>
-                            </p>
-                          </div>
-                          {/* Status Badge */}
-                          <Badge 
-                            variant={grave.status === 'available' ? 'sage' : 'secondary'}
-                            className="text-[10px] flex-shrink-0"
-                          >
-                            {statusLabels[grave.status]}
-                          </Badge>
-                        </button>
-                      ))}
-                    </div>
-                    {searchValue && (
-                      <div className="px-4 py-2 bg-stone-50 border-t border-stone-200">
-                        <p className="text-xs text-stone-500">
-                          Nhấn Enter để chọn • Tìm thấy {searchResults.length} kết quả
-                        </p>
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-
-                {showResults && searchValue && searchResults.length === 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-full left-0 right-0 mt-2 glass rounded-xl shadow-lg overflow-hidden z-50"
-                  >
-                    <div className="px-4 py-6 text-center">
-                      <Search className="w-8 h-8 text-stone-300 mx-auto mb-2" />
-                      <p className="text-sm text-stone-600">Không tìm thấy kết quả</p>
-                      <p className="text-xs text-stone-400 mt-1">Thử tìm với từ khóa khác</p>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* Navigation - Desktop */}
-            <nav className="hidden lg:flex items-center gap-1">
-              {['Map', 'Directory', 'Services', 'About'].map((item) => (
-                <Button
-                  key={item}
-                  variant="ghost"
-                  className={cn(
-                    'text-stone-700 hover:text-stone-900 hover:bg-stone-100/80',
-                    item === 'Map' && 'bg-stone-100/80 text-stone-900'
-                  )}
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-8">
+            {navItems.map((item) => (
+              <div
+                key={item.label}
+                className="relative"
+                onMouseEnter={() => item.hasDropdown && setActiveDropdown(item.label)}
+                onMouseLeave={() => setActiveDropdown(null)}
+              >
+                <a
+                  href={item.href}
+                  className="flex items-center gap-1 text-sm text-slate-600 hover:text-slate-800 transition-colors duration-200 py-6 cursor-pointer font-body"
                 >
-                  {item}
-                </Button>
-              ))}
-            </nav>
-
-            {/* Actions */}
-            <div className="flex items-center gap-2">
-              <Button
-                variant="accent"
-                size="sm"
-                className="hidden sm:flex"
-              >
-                Book Visit
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="lg:hidden"
-                onClick={onMenuToggle}
-                aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-              >
-                {isMenuOpen ? (
-                  <X className="w-5 h-5" />
-                ) : (
-                  <Menu className="w-5 h-5" />
+                  {item.label}
+                  {item.hasDropdown && (
+                    <ChevronDown 
+                      className={`w-4 h-4 transition-transform duration-200 ${
+                        activeDropdown === item.label ? 'rotate-180' : ''
+                      }`} 
+                    />
+                  )}
+                </a>
+                
+                {/* Dropdown Menu */}
+                {item.hasDropdown && activeDropdown === item.label && (
+                  <div 
+                    className="absolute top-full left-0 bg-white shadow-lg rounded-md border border-gray-100 min-w-[220px] py-2 z-50"
+                    style={{ fontFamily: "'Open Sans', sans-serif" }}
+                  >
+                    {dropdownMenus[item.label as keyof typeof dropdownMenus]?.map((subItem) => (
+                      <a
+                        key={subItem.label}
+                        href={subItem.href}
+                        className="block px-5 py-2.5 text-[14px] text-[#2f3237] hover:bg-[#0693e3] hover:text-white transition-colors duration-200 cursor-pointer"
+                      >
+                        {subItem.label}
+                      </a>
+                    ))}
+                  </div>
                 )}
-              </Button>
+              </div>
+            ))}
+            
+            {/* Language Selector */}
+            <div 
+              className="flex items-center gap-2 text-[14px] text-[#2f3237] cursor-pointer hover:text-[#0693e3] transition-colors duration-200"
+              style={{ fontFamily: "'Open Sans', sans-serif" }}
+            >
+              <span className="w-5 h-5 rounded-sm overflow-hidden flex items-center justify-center text-[10px]">
+                🇻🇳
+              </span>
+              Tiếng Việt
+              <ChevronDown className="w-4 h-4" />
             </div>
-          </div>
+          </nav>
+
+          {/* Mobile Menu Toggle */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="lg:hidden p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-[#2f3237] cursor-pointer"
+            aria-label={isMobileMenuOpen ? 'Đóng menu' : 'Mở menu'}
+          >
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          className="glass mt-2 rounded-xl p-4 lg:hidden"
-        >
-          <form onSubmit={handleSearch} className="mb-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-500" />
-              <Input
-                type="text"
-                placeholder="Tìm kiếm mộ phần..."
-                value={searchValue}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-                className="pl-10"
-              />
-            </div>
-            {/* Mobile Search Results */}
-            {searchValue && searchResults.length > 0 && (
-              <div className="mt-2 bg-white rounded-lg border border-stone-200 overflow-hidden">
-                {searchResults.slice(0, 4).map((grave, index) => (
-                  <button
-                    key={grave.id}
-                    onClick={() => handleResultSelect(grave)}
-                    className={cn(
-                      "w-full px-3 py-2 flex items-center gap-2 text-left transition-colors cursor-pointer",
-                      selectedIndex === index ? "bg-stone-100" : "hover:bg-stone-50"
-                    )}
-                  >
-                    <div className="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center overflow-hidden flex-shrink-0">
-                      {grave.imageUrl ? (
-                        <img src={grave.imageUrl} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <User className="w-4 h-4 text-stone-500" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-stone-900 truncate">
-                        {grave.name || grave.id}
-                      </p>
-                      <p className="text-xs text-stone-500">{grave.area}</p>
-                    </div>
-                  </button>
-                ))}
+      {/* Mobile Menu - Full screen overlay */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden fixed inset-0 top-14 sm:top-16 z-[9998] bg-white">
+          <nav className="h-full overflow-y-auto pb-20 bg-white">
+            {navItems.map((item) => (
+              <div key={item.label} className="bg-white">
+                <button
+                  className="flex items-center justify-between w-full px-4 sm:px-6 py-4 text-sm text-[#2f3237] hover:bg-gray-50 border-b border-gray-100 min-h-[52px] cursor-pointer bg-white"
+                  style={{ fontFamily: "'Open Sans', sans-serif" }}
+                  onClick={() => {
+                    if (item.hasDropdown) {
+                      setMobileActiveDropdown(mobileActiveDropdown === item.label ? null : item.label);
+                    } else {
+                      setIsMobileMenuOpen(false);
+                    }
+                  }}
+                >
+                  {item.label}
+                  {item.hasDropdown && (
+                    <ChevronDown 
+                      className={`w-4 h-4 transition-transform duration-200 ${
+                        mobileActiveDropdown === item.label ? 'rotate-180' : ''
+                      }`} 
+                    />
+                  )}
+                </button>
+                
+                {/* Mobile Dropdown */}
+                {item.hasDropdown && mobileActiveDropdown === item.label && (
+                  <div className="bg-gray-50">
+                    {dropdownMenus[item.label as keyof typeof dropdownMenus]?.map((subItem) => (
+                      <a
+                        key={subItem.label}
+                        href={subItem.href}
+                        className="block px-8 sm:px-10 py-3.5 text-sm text-[#2f3237] hover:text-[#0693e3] border-b border-gray-100 last:border-0 min-h-[48px] flex items-center cursor-pointer"
+                        style={{ fontFamily: "'Open Sans', sans-serif" }}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {subItem.label}
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
-          </form>
-          <nav className="flex flex-col gap-1">
-            {['Bản đồ', 'Danh mục', 'Dịch vụ', 'Giới thiệu'].map((item) => (
-              <Button
-                key={item}
-                variant="ghost"
-                className="justify-start cursor-pointer"
-              >
-                {item}
-              </Button>
             ))}
-            <Button variant="accent" className="mt-2 cursor-pointer">
-              Đặt lịch thăm viếng
-            </Button>
+            
+            {/* Mobile Language Selector */}
+            <div 
+              className="flex items-center gap-2 px-4 sm:px-6 py-4 text-sm text-[#2f3237] border-b border-gray-100 min-h-[52px] cursor-pointer bg-white"
+              style={{ fontFamily: "'Open Sans', sans-serif" }}
+            >
+              <span className="w-5 h-5 rounded-sm overflow-hidden flex items-center justify-center text-[10px]">
+                🇻🇳
+              </span>
+              Tiếng Việt
+              <ChevronDown className="w-4 h-4" />
+            </div>
           </nav>
-        </motion.div>
+        </div>
       )}
-    </motion.header>
-  )
-}
+    </header>
+  );
+};
