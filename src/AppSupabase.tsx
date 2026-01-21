@@ -104,12 +104,6 @@ function AppSupabase() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeTab, setActiveTab] = useState('map')
   const [flyToPlot, setFlyToPlot] = useState<PlotRow | null>(null)
-  const [routingDestination, setRoutingDestination] = useState<PlotRow | null>(null)
-  const [userLocation, setUserLocation] = useState<[number, number] | null>(null)
-  const [isRoutingPanelExpanded, setIsRoutingPanelExpanded] = useState(true)
-  const [osrmRoute, setOsrmRoute] = useState<OSRMRoute | null>(null)
-  const [isLoadingRoute, setIsLoadingRoute] = useState(false)
-  const [routeError, setRouteError] = useState<string | null>(null)
 
   // Fetch all map data with real-time subscriptions
   const { plots, isLoading, isError, error, refetch } = useMapData()

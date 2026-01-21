@@ -18,7 +18,6 @@ interface PlotEditDrawerProps {
   plot: PlotRow | null
   onClose: () => void
   onUpdate?: (updatedPlot: PlotRow) => void
-  onStartRouting?: (plot: PlotRow) => void
 }
 
 const STATUS_OPTIONS: { value: PlotStatusDb; label: string; color: string }[] = [
@@ -29,7 +28,7 @@ const STATUS_OPTIONS: { value: PlotStatusDb; label: string; color: string }[] = 
   { value: 'Khác', label: 'Khác', color: '#9CA3AF' }
 ]
 
-export function PlotEditDrawer({ plot, onClose, onUpdate, onStartRouting }: PlotEditDrawerProps) {
+export function PlotEditDrawer({ plot, onClose, onUpdate }: PlotEditDrawerProps) {
   const { isAuthenticated } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
