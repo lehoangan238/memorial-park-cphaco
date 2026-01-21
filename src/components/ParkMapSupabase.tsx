@@ -264,12 +264,15 @@ export function ParkMapSupabase({
         [nwLng, seLat]  // Bottom Left (SW)
       ]
 
+      // Choose URL based on device - use mobile version if available on mobile devices
+      const baseUrl = (isMobile && overlay.url_mobile) ? overlay.url_mobile : overlay.url
+      
       // Add cache-busting timestamp to URL
-      const imageUrl = overlay.url.includes('?') 
-        ? `${overlay.url}&_t=${Date.now()}` 
-        : `${overlay.url}?_t=${Date.now()}`
+      const imageUrl = baseUrl.includes('?') 
+        ? `${baseUrl}&_t=${Date.now()}` 
+        : `${baseUrl}?_t=${Date.now()}`
 
-      // Load overlay image directly (no resize to avoid CORS issues)
+      // Load overlay image
       const loadOverlayImage = async () => {
         try {
           map.addSource(sourceId, {

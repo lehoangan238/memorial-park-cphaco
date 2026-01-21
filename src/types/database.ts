@@ -86,6 +86,7 @@ export interface OverlayRow {
   id: string
   name: string | null
   url: string
+  url_mobile: string | null  // Resized image for mobile (max 2048px)
   nw_lat: number
   nw_lng: number
   se_lat: number
@@ -103,6 +104,7 @@ export interface OverlayInsert {
   id?: string
   name?: string | null
   url: string
+  url_mobile?: string | null
   nw_lat: number
   nw_lng: number
   se_lat: number
@@ -118,6 +120,7 @@ export interface OverlayUpdate {
   id?: string
   name?: string | null
   url?: string
+  url_mobile?: string | null
   nw_lat?: number
   nw_lng?: number
   se_lat?: number

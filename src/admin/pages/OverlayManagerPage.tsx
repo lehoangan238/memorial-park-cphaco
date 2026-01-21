@@ -18,9 +18,63 @@ const OVERLAY_TYPES: { value: OverlayType; label: string }[] = [
   { value: 'other', label: 'Khác' }
 ]
 
+// Image size limits
+const MAX_SIZE_PC = 4096
+const MAX_SIZE_MOBILE = 2048
+
+// Helper function to resize image
+const resizeImage = (file: File, maxSize: number): Promise<Blob> => {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image()
+    img.onload = () => {
+      // Check if resize needed
+      if (img.width <= maxSize && img.height <= maxSize) {
+        resolve(file)
+        return
+      }
+
+      // Calculate new dimensions
+      const ratio = Math.min(maxSize / img.width, maxSize / img.height)
+      const newWidth = Math.floor(img.width * ratio)
+      const newHeight = Math.floor(img.height * ratio)
+
+      // Create canvas and resize
+      const canvas = document.createElement('canvas')
+      canvas.width = newWidth
+      canvas.height = newHeight
+      const ctx = canvas.getContext('2d')
+      if (!ctx) {
+        reject(new Error('Cannot get canvas context'))
+        return
+      }
+
+      // Use high quality scaling
+      ctx.imageSmoothingEnabled = true
+      ctx.imageSmoothingQuality = 'high'
+      ctx.drawImage(img, 0, 0, newWidth, newHeight)
+
+      // Convert to blob
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            resolve(blob)
+          } else {
+            reject(new Error('Failed to create blob'))
+          }
+        },
+        'image/png',
+        0.92
+      )
+    }
+    img.onerror = () => reject(new Error('Failed to load image'))
+    img.src = URL.createObjectURL(file)
+  })
+}
+
 export function OverlayManagerPage() {
   const { overlays, refetch } = useMapData()
   const [isUploading, setIsUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState('')
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState<Partial<OverlayRow>>({})
@@ -60,36 +114,47 @@ export function OverlayManagerPage() {
 
     setIsUploading(true)
     setUploadError(null)
+    setUploadProgress('Đang xử lý ảnh...')
 
     try {
-      // Generate unique filename
-      const ext = file.name.split('.').pop()
-      const fileName = `${newOverlay.name.replace(/\s+/g, '_')}_${Date.now()}.${ext}`
+      const baseName = newOverlay.name.replace(/\s+/g, '_')
+      const timestamp = Date.now()
 
-      // Upload to Supabase Storage
-      const { error: uploadError } = await supabase.storage
+      // 1. Resize for PC (max 4096px)
+      setUploadProgress('Đang resize ảnh cho PC (4096px)...')
+      const pcBlob = await resizeImage(file, MAX_SIZE_PC)
+      const pcFileName = `${baseName}_pc_${timestamp}.png`
+      
+      const { error: pcUploadError } = await supabase.storage
         .from('overlays')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: false
-        })
+        .upload(pcFileName, pcBlob, { cacheControl: '3600', upsert: false })
+      if (pcUploadError) throw pcUploadError
 
-      if (uploadError) throw uploadError
+      const { data: pcUrlData } = supabase.storage.from('overlays').getPublicUrl(pcFileName)
+      const pcUrl = pcUrlData.publicUrl
 
-      // Get public URL
-      const { data: urlData } = supabase.storage
+      // 2. Resize for Mobile (max 2048px)
+      setUploadProgress('Đang resize ảnh cho Mobile (2048px)...')
+      const mobileBlob = await resizeImage(file, MAX_SIZE_MOBILE)
+      const mobileFileName = `${baseName}_mobile_${timestamp}.png`
+      
+      const { error: mobileUploadError } = await supabase.storage
         .from('overlays')
-        .getPublicUrl(fileName)
+        .upload(mobileFileName, mobileBlob, { cacheControl: '3600', upsert: false })
+      if (mobileUploadError) throw mobileUploadError
 
-      const publicUrl = urlData.publicUrl
+      const { data: mobileUrlData } = supabase.storage.from('overlays').getPublicUrl(mobileFileName)
+      const mobileUrl = mobileUrlData.publicUrl
 
-      // Insert into database
+      // 3. Insert into database with both URLs
+      setUploadProgress('Đang lưu vào database...')
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error: dbError } = await (supabase as any)
         .from('overlays')
         .insert({
           name: newOverlay.name.trim(),
-          url: publicUrl,
+          url: pcUrl,
+          url_mobile: mobileUrl,
           nw_lat: parseFloat(newOverlay.nw_lat),
           nw_lng: parseFloat(newOverlay.nw_lng),
           se_lat: parseFloat(newOverlay.se_lat),
@@ -113,6 +178,7 @@ export function OverlayManagerPage() {
         opacity: 85
       })
       if (fileInputRef.current) fileInputRef.current.value = ''
+      setUploadProgress('')
       
       refetch()
     } catch (err: any) {
@@ -173,41 +239,53 @@ export function OverlayManagerPage() {
   }, [])
 
   // Handle replacing image for existing overlay
-  const handleReplaceImage = useCallback(async (e: React.ChangeEvent<HTMLInputElement>, overlayId: string) => {
+  const handleReplaceImage = useCallback(async (e: React.ChangeEvent<HTMLInputElement>, overlayId: string, overlayName: string) => {
     const file = e.target.files?.[0]
     if (!file || !file.type.startsWith('image/')) return
 
     setIsSaving(true)
     try {
-      // Generate filename
-      const ext = file.name.split('.').pop()
-      const fileName = `overlay_${overlayId}_${Date.now()}.${ext}`
+      const baseName = (overlayName || overlayId).replace(/\s+/g, '_')
+      const timestamp = Date.now()
 
-      // Upload new image
-      const { error: uploadError } = await supabase.storage
+      // 1. Resize for PC (max 4096px)
+      const pcBlob = await resizeImage(file, MAX_SIZE_PC)
+      const pcFileName = `${baseName}_pc_${timestamp}.png`
+      
+      const { error: pcUploadError } = await supabase.storage
         .from('overlays')
-        .upload(fileName, file, { cacheControl: '3600', upsert: false })
+        .upload(pcFileName, pcBlob, { cacheControl: '3600', upsert: false })
+      if (pcUploadError) throw pcUploadError
 
-      if (uploadError) throw uploadError
+      const { data: pcUrlData } = supabase.storage.from('overlays').getPublicUrl(pcFileName)
+      const pcUrl = pcUrlData.publicUrl
 
-      // Get public URL
-      const { data: urlData } = supabase.storage
+      // 2. Resize for Mobile (max 2048px)
+      const mobileBlob = await resizeImage(file, MAX_SIZE_MOBILE)
+      const mobileFileName = `${baseName}_mobile_${timestamp}.png`
+      
+      const { error: mobileUploadError } = await supabase.storage
         .from('overlays')
-        .getPublicUrl(fileName)
+        .upload(mobileFileName, mobileBlob, { cacheControl: '3600', upsert: false })
+      if (mobileUploadError) throw mobileUploadError
 
-      // Update database
+      const { data: mobileUrlData } = supabase.storage.from('overlays').getPublicUrl(mobileFileName)
+      const mobileUrl = mobileUrlData.publicUrl
+
+      // Update database with both URLs
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (supabase as any)
         .from('overlays')
-        .update({ url: urlData.publicUrl })
+        .update({ url: pcUrl, url_mobile: mobileUrl })
         .eq('id', overlayId)
 
       // Update edit form if editing this overlay
       if (editingId === overlayId) {
-        setEditForm(prev => ({ ...prev, url: urlData.publicUrl }))
+        setEditForm(prev => ({ ...prev, url: pcUrl }))
       }
 
       refetch()
+      alert('Đã thay ảnh thành công! (PC: 4096px, Mobile: 2048px)')
     } catch (err: any) {
       console.error('Replace image error:', err)
       alert('Lỗi khi thay ảnh: ' + err.message)
@@ -359,9 +437,9 @@ export function OverlayManagerPage() {
             className="bg-emerald-600 hover:bg-emerald-700"
           >
             {isUploading ? (
-              <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Đang upload...</>
+              <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{uploadProgress || 'Đang upload...'}</>
             ) : (
-              <><Upload className="w-4 h-4 mr-2" />Chọn ảnh & Upload</>
+              <><Upload className="w-4 h-4 mr-2" />Chọn ảnh & Upload (auto-resize)</>
             )}
           </Button>
           <p className="text-xs text-stone-500">PNG, JPG - Khuyến nghị resolution cao (4000px+)</p>
@@ -483,7 +561,7 @@ export function OverlayManagerPage() {
                         <input
                           type="file"
                           accept="image/*"
-                          onChange={(e) => handleReplaceImage(e, overlay.id)}
+                          onChange={(e) => handleReplaceImage(e, overlay.id, overlay.name || '')}
                           className="text-sm text-stone-500 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
                         />
                         <p className="text-xs text-stone-400 mt-1">Sau khi thay ảnh, refresh trang bản đồ để thấy thay đổi</p>
