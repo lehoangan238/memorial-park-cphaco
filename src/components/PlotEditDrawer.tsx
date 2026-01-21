@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { QRCodeSVG } from 'qrcode.react'
 import { 
-  X, MapPin, Ruler, Tag, FileText, Navigation, ExternalLink, 
+  X, MapPin, Ruler, Tag, FileText, ExternalLink, 
   Copy, Check, Edit3, Save, User, Phone, RefreshCw, AlertCircle, 
   Loader2, Shield, QrCode, Download
 } from 'lucide-react'
@@ -62,12 +62,6 @@ export function PlotEditDrawer({ plot, onClose, onUpdate, onStartRouting }: Plot
     navigator.clipboard.writeText(`${plot.lat}, ${plot.lng}`)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
-  }, [plot])
-
-  const handleNavigate = useCallback(() => {
-    if (!plot) return
-    // Always use Google Maps for navigation
-    window.open(`https://www.google.com/maps/dir/?api=1&destination=${plot.lat},${plot.lng}`, '_blank')
   }, [plot])
 
   const handleStartEdit = useCallback(() => {
@@ -411,13 +405,9 @@ export function PlotEditDrawer({ plot, onClose, onUpdate, onStartRouting }: Plot
 
             {/* Footer Actions */}
             <div className="flex-shrink-0 p-5 bg-stone-50 border-t space-y-3">
-              {!isAuthenticated && plot.status === 'Trống' ? (
+              {!isAuthenticated && plot.status === 'Trống' && (
                 <Button className="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700">
                   <Phone className="w-4 h-4 mr-2" />Liên hệ tư vấn
-                </Button>
-              ) : (
-                <Button onClick={handleNavigate} className="w-full h-12 rounded-xl bg-stone-900 hover:bg-stone-800">
-                  <Navigation className="w-4 h-4 mr-2" />Dẫn đường đến đây
                 </Button>
               )}
               <Button variant="outline" onClick={() => window.open(`https://www.google.com/maps?q=${plot.lat},${plot.lng}`, '_blank')} className="w-full h-10 rounded-xl">
