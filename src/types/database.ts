@@ -80,6 +80,8 @@ export interface PlotUpdate {
 }
 
 // ==================== OVERLAYS ====================
+export type OverlayType = 'zone_map' | 'satellite' | 'blueprint' | 'decoration' | 'other'
+
 export interface OverlayRow {
   id: string
   name: string | null
@@ -88,7 +90,13 @@ export interface OverlayRow {
   nw_lng: number
   se_lat: number
   se_lng: number
+  z_index: number
+  opacity: number
+  is_visible: boolean
+  type: OverlayType
+  description: string | null
   created_at?: string
+  updated_at?: string
 }
 
 export interface OverlayInsert {
@@ -99,6 +107,11 @@ export interface OverlayInsert {
   nw_lng: number
   se_lat: number
   se_lng: number
+  z_index?: number
+  opacity?: number
+  is_visible?: boolean
+  type?: OverlayType
+  description?: string | null
 }
 
 export interface OverlayUpdate {
@@ -109,6 +122,11 @@ export interface OverlayUpdate {
   nw_lng?: number
   se_lat?: number
   se_lng?: number
+  z_index?: number
+  opacity?: number
+  is_visible?: boolean
+  type?: OverlayType
+  description?: string | null
 }
 
 // ==================== SPIRITUAL SITES ====================

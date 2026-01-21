@@ -194,12 +194,18 @@ export function ParkMapSupabase({
 
     let newlyLoaded = 0
 
-    overlays.forEach((overlay: OverlayRow) => {
+    // Sort overlays by z_index (lower values load first, appear below)
+    const sortedOverlays = [...overlays].sort((a, b) => (a.z_index ?? 0) - (b.z_index ?? 0))
+
+    sortedOverlays.forEach((overlay: OverlayRow) => {
       const sourceId = `overlay-${overlay.id}`
       const layerId = `overlay-layer-${overlay.id}`
 
       // Skip if already loaded
       if (loadedOverlayIds.has(overlay.id)) return
+
+      // Skip if not visible
+      if (overlay.is_visible === false) return
 
       // Check if overlay is in viewport
       if (!isOverlayInViewport(overlay, bounds)) return
@@ -229,12 +235,15 @@ export function ParkMapSupabase({
           coordinates: coordinates
         })
 
+        // Use opacity from database (default 85, convert to 0-1 range)
+        const opacityValue = (overlay.opacity ?? 85) / 100
+
         map.addLayer({
           id: layerId,
           type: 'raster',
           source: sourceId,
           paint: { 
-            'raster-opacity': 0.85,
+            'raster-opacity': opacityValue,
             'raster-fade-duration': 300 // Smooth fade-in
           }
         })
@@ -245,7 +254,7 @@ export function ParkMapSupabase({
         newlyLoaded++
         setLoadedOverlayIds(prev => new Set([...prev, overlay.id]))
 
-        console.log(`[Overlays] Lazy loaded: ${overlay.name || overlay.id}`)
+        console.log(`[Overlays] Lazy loaded: ${overlay.name || overlay.id} (opacity: ${overlay.opacity ?? 85}%)`)
       } catch (err) {
         console.error(`[Overlays] Failed to add overlay ${overlay.id}:`, err)
       }
