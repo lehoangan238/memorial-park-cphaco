@@ -60,14 +60,9 @@ export function PlotEditDrawer({ plot, onClose, onUpdate, onStartRouting }: Plot
 
   const handleNavigate = useCallback(() => {
     if (!plot) return
-    // Use in-app routing if callback provided, otherwise fallback to Google Maps
-    if (onStartRouting) {
-      onStartRouting(plot)
-      onClose() // Close drawer when starting routing
-    } else {
-      window.open(`https://www.google.com/maps/dir/?api=1&destination=${plot.lat},${plot.lng}`, '_blank')
-    }
-  }, [plot, onStartRouting, onClose])
+    // Always use Google Maps for navigation
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${plot.lat},${plot.lng}`, '_blank')
+  }, [plot])
 
   const handleStartEdit = useCallback(() => {
     if (!plot) return

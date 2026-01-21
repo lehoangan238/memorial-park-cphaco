@@ -20,10 +20,7 @@ import {
   Loader2,
   AlertCircle,
   Church,
-  Image,
-  Flag,
-  User,
-  MapPin
+  Image
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -32,7 +29,6 @@ import { useMapData } from '@/hooks/useMapData'
 import type { PlotRow, OverlayRow, SpiritualSiteRow, PlotFeatureCollection } from '@/types/database'
 import { cn } from '@/lib/utils'
 import type { ViewStateChangeEvent } from 'react-map-gl/maplibre'
-import { findRoute, type OSRMRoute } from '@/lib/routing'
 
 // Hoa Viên Nghĩa Trang Bình Dương coordinates (gate entrance)
 const DEFAULT_CENTER = [106.651891, 11.168266] as const
@@ -59,14 +55,7 @@ interface ParkMapProps {
   selectedPlot: PlotRow | null
   filterStatus: string
   flyToPlot?: PlotRow | null
-  routingDestination?: PlotRow | null
-  userLocation?: [number, number] | null
-  onUserLocationChange?: (location: [number, number] | null) => void
-  osrmRoute?: OSRMRoute | null
 }
-
-// Cemetery gate coordinates (entrance) - [lat, lng]
-const CEMETERY_GATE: [number, number] = [11.168266, 106.651891]
 
 // Circle layer paint for plots
 const plotsCirclePaint = {
@@ -105,11 +94,7 @@ export function ParkMapSupabase({
   onPlotSelect, 
   selectedPlot, 
   filterStatus,
-  flyToPlot,
-  routingDestination,
-  userLocation,
-  onUserLocationChange,
-  osrmRoute
+  flyToPlot
 }: ParkMapProps) {
   const mapRef = useRef<MapRef>(null)
   const [viewState, setViewState] = useState(INITIAL_VIEW_STATE)
@@ -125,8 +110,6 @@ export function ParkMapSupabase({
     plotsGeoJSON, 
     overlays, 
     spiritualSites,
-    roadNodes,
-    roadEdges,
     isLoading, 
     isError, 
     error 
@@ -153,60 +136,6 @@ export function ParkMapSupabase({
     return plots.find(p => p.id === hoveredPlotId) || null
   }, [hoveredPlotId, plots])
 
-  // Generate route line GeoJSON - prioritize OSRM route
-  const routeGeoJSON = useMemo(() => {
-    if (!routingDestination) return null
-    
-    const startPoint = userLocation || CEMETERY_GATE
-    const destCoords: [number, number] = [routingDestination.lat, routingDestination.lng]
-    
-    // Use OSRM route if available
-    if (osrmRoute && osrmRoute.geometry) {
-      console.log('🗺️ Using OSRM route with', osrmRoute.geometry.coordinates.length, 'points')
-      return {
-        type: 'Feature' as const,
-        properties: { source: 'osrm', distance: osrmRoute.distance },
-        geometry: osrmRoute.geometry
-      }
-    }
-    
-    // Fallback: Try internal road network
-    if (roadNodes.length > 0 && roadEdges.length > 0) {
-      const route = findRoute(
-        startPoint[0], startPoint[1],
-        destCoords[0], destCoords[1],
-        roadNodes,
-        roadEdges
-      )
-      
-      if (route && route.coordinates.length > 0) {
-        console.log('🛤️ Using internal road network')
-        return {
-          type: 'Feature' as const,
-          properties: { source: 'internal', distance: route.totalDistance },
-          geometry: {
-            type: 'LineString' as const,
-            coordinates: route.coordinates.map(([lat, lng]) => [lng, lat])
-          }
-        }
-      }
-    }
-    
-    // Final fallback: straight line
-    console.log('📍 Using straight line fallback')
-    return {
-      type: 'Feature' as const,
-      properties: { source: 'fallback' },
-      geometry: {
-        type: 'LineString' as const,
-        coordinates: [
-          [startPoint[1], startPoint[0]],
-          [destCoords[1], destCoords[0]]
-        ]
-      }
-    }
-  }, [routingDestination, userLocation, osrmRoute, roadNodes, roadEdges])
-
   // Fly to plot when flyToPlot prop changes
   useEffect(() => {
     if (flyToPlot) {
@@ -220,31 +149,6 @@ export function ParkMapSupabase({
       }))
     }
   }, [flyToPlot])
-
-  // Adjust view when routing starts to show the full route
-  useEffect(() => {
-    if (routingDestination) {
-      const startPoint = userLocation || CEMETERY_GATE
-      const midLat = (startPoint[0] + routingDestination.lat) / 2
-      const midLng = (startPoint[1] + routingDestination.lng) / 2
-      
-      setViewState(prev => ({
-        ...prev,
-        longitude: midLng,
-        latitude: midLat,
-        zoom: 17,
-        pitch: 45,
-        bearing: 0
-      }))
-    }
-  }, [routingDestination, userLocation])
-
-  // Handle geolocate event
-  const handleGeolocate = useCallback((e: { coords: { latitude: number; longitude: number } }) => {
-    if (onUserLocationChange) {
-      onUserLocationChange([e.coords.latitude, e.coords.longitude])
-    }
-  }, [onUserLocationChange])
 
   // Helper function to check if overlay intersects with viewport bounds
   const isOverlayInViewport = useCallback((overlay: OverlayRow, bounds: maplibregl.LngLatBounds) => {
@@ -496,101 +400,9 @@ export function ParkMapSupabase({
         <NavigationControl position="bottom-right" showCompass showZoom={false} />
         <GeolocateControl 
           position="bottom-right" 
-          onGeolocate={handleGeolocate}
           trackUserLocation
         />
         <ScaleControl position="bottom-left" />
-
-        {/* Route Line */}
-        {routeGeoJSON && (
-          <>
-            {/* Route line shadow */}
-            <Source id="route-shadow" type="geojson" data={routeGeoJSON}>
-              <Layer
-                id="route-shadow-layer"
-                type="line"
-                paint={{
-                  'line-color': '#000000',
-                  'line-width': 8,
-                  'line-opacity': 0.15,
-                  'line-blur': 3
-                }}
-              />
-            </Source>
-            {/* Route line */}
-            <Source id="route" type="geojson" data={routeGeoJSON}>
-              <Layer
-                id="route-layer"
-                type="line"
-                paint={{
-                  'line-color': '#10b981',
-                  'line-width': 5,
-                  'line-opacity': 0.9
-                }}
-              />
-            </Source>
-            {/* Route line dashed overlay */}
-            <Source id="route-dash" type="geojson" data={routeGeoJSON}>
-              <Layer
-                id="route-dash-layer"
-                type="line"
-                paint={{
-                  'line-color': '#ffffff',
-                  'line-width': 2,
-                  'line-dasharray': [2, 4],
-                  'line-opacity': 0.8
-                }}
-              />
-            </Source>
-          </>
-        )}
-
-        {/* Start Point Marker (Gate or User Location) */}
-        {routingDestination && (
-          <Marker
-            longitude={userLocation ? userLocation[1] : CEMETERY_GATE[1]}
-            latitude={userLocation ? userLocation[0] : CEMETERY_GATE[0]}
-            anchor="center"
-          >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="relative"
-            >
-              <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg border-2 border-white">
-                {userLocation ? (
-                  <User className="w-5 h-5 text-white" />
-                ) : (
-                  <Flag className="w-5 h-5 text-white" />
-                )}
-              </div>
-            </motion.div>
-          </Marker>
-        )}
-
-        {/* Destination Marker (highlighted) */}
-        {routingDestination && (
-          <Marker
-            longitude={routingDestination.lng}
-            latitude={routingDestination.lat}
-            anchor="center"
-          >
-            <motion.div
-              initial={{ scale: 0, y: -20 }}
-              animate={{ scale: 1, y: 0 }}
-              transition={{ type: 'spring', damping: 15 }}
-              className="relative"
-            >
-              {/* Pulse animation */}
-              <div className="absolute inset-0 -m-2">
-                <div className="w-14 h-14 rounded-full bg-amber-500/30 animate-ping" />
-              </div>
-              <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center shadow-lg border-2 border-white relative z-10">
-                <MapPin className="w-5 h-5 text-white" />
-              </div>
-            </motion.div>
-          </Marker>
-        )}
 
         {/* GeoJSON Source for Plots */}
         {filteredGeoJSON && (
