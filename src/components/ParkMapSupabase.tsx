@@ -57,37 +57,58 @@ interface ParkMapProps {
   flyToPlot?: PlotRow | null
 }
 
-// Circle layer paint for plots
+// Circle layer paint for plots - hide when zoomed out (< 17)
 const plotsCirclePaint = {
   'circle-radius': [
     'interpolate',
     ['linear'],
     ['zoom'],
-    14, 4,
-    17, 8,
+    16, 0,      // Hidden at zoom 16
+    17, 6,      // Start showing at zoom 17
+    18, 8,
     19, 12,
     22, 18
   ],
   'circle-color': ['get', '_statusColor'],
   'circle-stroke-color': '#ffffff',
-  'circle-stroke-width': 2,
-  'circle-opacity': 0.9
+  'circle-stroke-width': [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    16, 0,
+    17, 1.5,
+    19, 2
+  ],
+  'circle-opacity': [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    16, 0,
+    17, 0.9
+  ]
 }
 
-// Circle layer for hover effect
+// Circle layer for hover effect - also hide when zoomed out
 const plotsHoverPaint = {
   'circle-radius': [
     'interpolate',
     ['linear'],
     ['zoom'],
-    14, 8,
-    17, 14,
+    16, 0,
+    17, 12,
+    18, 14,
     19, 20,
     22, 28
   ],
   'circle-color': 'rgba(59, 130, 246, 0.3)',
   'circle-stroke-color': '#3B82F6',
-  'circle-stroke-width': 2
+  'circle-stroke-width': [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    16, 0,
+    17, 2
+  ]
 }
 
 export function ParkMapSupabase({ 
