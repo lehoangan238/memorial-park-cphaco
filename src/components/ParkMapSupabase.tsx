@@ -103,6 +103,26 @@ export function ParkMapSupabase({
   const [hoveredPlotId, setHoveredPlotId] = useState<string | null>(null)
   const [loadedOverlayIds, setLoadedOverlayIds] = useState<Set<string>>(new Set())
   const [mapReady, setMapReady] = useState(false)
+  const [isLowEndDevice, setIsLowEndDevice] = useState(false)
+
+  // Detect low-end mobile devices
+  useEffect(() => {
+    const checkDevice = () => {
+      const isMobile = window.innerWidth < 768
+      // Check for low memory or slow device indicators
+      const hasLowMemory = (navigator as any).deviceMemory && (navigator as any).deviceMemory < 4
+      const hasSlowConnection = (navigator as any).connection?.effectiveType === '2g' || 
+                                (navigator as any).connection?.effectiveType === 'slow-2g'
+      const isLowEnd = isMobile && (hasLowMemory || hasSlowConnection)
+      
+      if (isLowEnd) {
+        console.log('[Device] Low-end device detected, disabling overlays by default')
+        setIsLowEndDevice(true)
+        setShowOverlays(false)
+      }
+    }
+    checkDevice()
+  }, [])
 
   // Fetch data from Supabase
   const { 
@@ -287,6 +307,19 @@ export function ParkMapSupabase({
 
         // Apply current visibility state
         map.setLayoutProperty(layerId, 'visibility', showOverlays ? 'visible' : 'none')
+
+        // Listen for image load errors and remove broken overlays
+        map.on('error', (e) => {
+          if (e.sourceId === sourceId) {
+            console.warn(`[Overlays] Image load error for ${overlay.name || overlay.id}, removing...`)
+            try {
+              if (map.getLayer(layerId)) map.removeLayer(layerId)
+              if (map.getSource(sourceId)) map.removeSource(sourceId)
+            } catch (removeErr) {
+              // Ignore removal errors
+            }
+          }
+        })
 
         newlyLoaded++
         setLoadedOverlayIds(prev => new Set([...prev, overlay.id]))
@@ -717,11 +750,17 @@ export function ParkMapSupabase({
           <p className="text-xs text-stone-500">
             Lớp phủ: <span className="font-medium text-stone-700">{loadedOverlayIds.size}</span> / {overlays.length}
             {loadedOverlayIds.size > 0 && showOverlays && <span className="text-emerald-600"> ✓</span>}
-            {loadedOverlayIds.size < overlays.length && <span className="text-stone-400 text-[10px] ml-1">(lazy)</span>}
+            {!showOverlays && <span className="text-amber-600 text-[10px] ml-1">(tắt)</span>}
+            {loadedOverlayIds.size < overlays.length && showOverlays && <span className="text-stone-400 text-[10px] ml-1">(lazy)</span>}
           </p>
           <p className="text-xs text-stone-500">
             Tâm linh: <span className="font-medium text-stone-700">{spiritualSites.length}</span>
           </p>
+          {isLowEndDevice && (
+            <p className="text-xs text-amber-600 mt-1">
+              📱 Thiết bị yếu - lớp phủ đã tắt
+            </p>
+          )}
         </div>
       </div>
 
