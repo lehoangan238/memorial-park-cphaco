@@ -103,26 +103,7 @@ export function ParkMapSupabase({
   const [hoveredPlotId, setHoveredPlotId] = useState<string | null>(null)
   const [loadedOverlayIds, setLoadedOverlayIds] = useState<Set<string>>(new Set())
   const [mapReady, setMapReady] = useState(false)
-  const [isLowEndDevice, setIsLowEndDevice] = useState(false)
-
-  // Detect low-end mobile devices
-  useEffect(() => {
-    const checkDevice = () => {
-      const isMobile = window.innerWidth < 768
-      // Check for low memory or slow device indicators
-      const hasLowMemory = (navigator as any).deviceMemory && (navigator as any).deviceMemory < 4
-      const hasSlowConnection = (navigator as any).connection?.effectiveType === '2g' || 
-                                (navigator as any).connection?.effectiveType === 'slow-2g'
-      const isLowEnd = isMobile && (hasLowMemory || hasSlowConnection)
-      
-      if (isLowEnd) {
-        console.log('[Device] Low-end device detected, disabling overlays by default')
-        setIsLowEndDevice(true)
-        setShowOverlays(false)
-      }
-    }
-    checkDevice()
-  }, [])
+  const [failedOverlayIds, setFailedOverlayIds] = useState<Set<string>>(new Set())
 
   // Fetch data from Supabase
   const { 
@@ -207,6 +188,49 @@ export function ParkMapSupabase({
   // Minimum zoom level to load overlays (helps weak mobile devices)
   const MIN_OVERLAY_ZOOM = 16
 
+  // Helper to resize image for mobile devices
+  const resizeImageForMobile = useCallback((url: string, maxSize: number): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new window.Image()
+      img.crossOrigin = 'anonymous'
+      img.onload = () => {
+        // If image is small enough, use original
+        if (img.width <= maxSize && img.height <= maxSize) {
+          resolve(url)
+          return
+        }
+
+        // Calculate new dimensions
+        const ratio = Math.min(maxSize / img.width, maxSize / img.height)
+        const newWidth = Math.floor(img.width * ratio)
+        const newHeight = Math.floor(img.height * ratio)
+
+        // Create canvas and resize
+        const canvas = document.createElement('canvas')
+        canvas.width = newWidth
+        canvas.height = newHeight
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          resolve(url) // Fallback to original
+          return
+        }
+
+        ctx.drawImage(img, 0, 0, newWidth, newHeight)
+        
+        // Convert to blob URL
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(URL.createObjectURL(blob))
+          } else {
+            resolve(url)
+          }
+        }, 'image/png', 0.9)
+      }
+      img.onerror = () => reject(new Error('Failed to load image'))
+      img.src = url
+    })
+  }, [])
+
   // Lazy load overlays based on viewport - runs on map move
   const loadVisibleOverlays = useCallback(() => {
     const map = mapRef.current?.getMap()
@@ -241,7 +265,9 @@ export function ParkMapSupabase({
 
     // Limit number of overlays loaded at once on mobile to prevent memory issues
     const isMobile = window.innerWidth < 768
-    const maxOverlaysToLoad = isMobile ? 5 : 20
+    const maxOverlaysToLoad = isMobile ? 3 : 20
+    // Max texture size for mobile (WebGL limit is usually 4096 or 2048 on weak devices)
+    const maxTextureSize = isMobile ? 2048 : 4096
 
     // Sort overlays by z_index (lower values load first, appear below)
     const sortedOverlays = [...overlays].sort((a, b) => (a.z_index ?? 0) - (b.z_index ?? 0))
@@ -255,6 +281,9 @@ export function ParkMapSupabase({
 
       // Skip if already loaded
       if (loadedOverlayIds.has(overlay.id)) return
+
+      // Skip if previously failed
+      if (failedOverlayIds.has(overlay.id)) return
 
       // Skip if not visible
       if (overlay.is_visible === false) return
@@ -272,76 +301,80 @@ export function ParkMapSupabase({
         return
       }
 
-      try {
-        // Image overlay coordinates: [top-left, top-right, bottom-right, bottom-left]
-        const coordinates: [[number, number], [number, number], [number, number], [number, number]] = [
-          [nwLng, nwLat], // Top Left (NW)
-          [seLng, nwLat], // Top Right (NE)
-          [seLng, seLat], // Bottom Right (SE)
-          [nwLng, seLat]  // Bottom Left (SW)
-        ]
+      // Image overlay coordinates: [top-left, top-right, bottom-right, bottom-left]
+      const coordinates: [[number, number], [number, number], [number, number], [number, number]] = [
+        [nwLng, nwLat], // Top Left (NW)
+        [seLng, nwLat], // Top Right (NE)
+        [seLng, seLat], // Bottom Right (SE)
+        [nwLng, seLat]  // Bottom Left (SW)
+      ]
 
-        // Add cache-busting timestamp to URL to ensure fresh images
-        const imageUrl = overlay.url.includes('?') 
-          ? `${overlay.url}&_t=${Date.now()}` 
-          : `${overlay.url}?_t=${Date.now()}`
+      // Add cache-busting timestamp to URL
+      const imageUrl = overlay.url.includes('?') 
+        ? `${overlay.url}&_t=${Date.now()}` 
+        : `${overlay.url}?_t=${Date.now()}`
 
-        map.addSource(sourceId, {
-          type: 'image',
-          url: imageUrl,
-          coordinates: coordinates
-        })
-
-        // Use opacity from database (default 85, convert to 0-1 range)
-        const opacityValue = (overlay.opacity ?? 85) / 100
-
-        map.addLayer({
-          id: layerId,
-          type: 'raster',
-          source: sourceId,
-          paint: { 
-            'raster-opacity': opacityValue,
-            'raster-fade-duration': 300 // Smooth fade-in
-          }
-        })
-
-        // Apply current visibility state
-        map.setLayoutProperty(layerId, 'visibility', showOverlays ? 'visible' : 'none')
-
-        // Listen for image load errors and remove broken overlays
-        map.on('error', (e) => {
-          if (e.sourceId === sourceId) {
-            console.warn(`[Overlays] Image load error for ${overlay.name || overlay.id}, removing...`)
+      // Load and optionally resize image for mobile
+      const loadOverlayImage = async () => {
+        try {
+          let finalUrl = imageUrl
+          
+          // On mobile, resize large images to prevent WebGL texture errors
+          if (isMobile) {
             try {
-              if (map.getLayer(layerId)) map.removeLayer(layerId)
-              if (map.getSource(sourceId)) map.removeSource(sourceId)
-            } catch (removeErr) {
-              // Ignore removal errors
+              finalUrl = await resizeImageForMobile(imageUrl, maxTextureSize)
+              console.log(`[Overlays] Resized image for mobile: ${overlay.name || overlay.id}`)
+            } catch (resizeErr) {
+              console.warn(`[Overlays] Could not resize ${overlay.name}, using original`)
+              finalUrl = imageUrl
             }
           }
-        })
 
-        newlyLoaded++
-        setLoadedOverlayIds(prev => new Set([...prev, overlay.id]))
+          map.addSource(sourceId, {
+            type: 'image',
+            url: finalUrl,
+            coordinates: coordinates
+          })
 
-        console.log(`[Overlays] Lazy loaded: ${overlay.name || overlay.id} (opacity: ${overlay.opacity ?? 85}%)`)
-      } catch (err) {
-        console.error(`[Overlays] Failed to add overlay ${overlay.id}:`, err)
+          // Use opacity from database (default 85, convert to 0-1 range)
+          const opacityValue = (overlay.opacity ?? 85) / 100
+
+          map.addLayer({
+            id: layerId,
+            type: 'raster',
+            source: sourceId,
+            paint: { 
+              'raster-opacity': opacityValue,
+              'raster-fade-duration': 300
+            }
+          })
+
+          // Apply current visibility state
+          map.setLayoutProperty(layerId, 'visibility', showOverlays ? 'visible' : 'none')
+
+          setLoadedOverlayIds(prev => new Set([...prev, overlay.id]))
+          console.log(`[Overlays] Loaded: ${overlay.name || overlay.id}`)
+
+          // Move plot layers to top
+          const plotLayers = ['plots-circle', 'plots-hover', 'plots-selected']
+          plotLayers.forEach(plotLayerId => {
+            if (map.getLayer(plotLayerId)) {
+              map.moveLayer(plotLayerId)
+            }
+          })
+        } catch (err) {
+          console.error(`[Overlays] Failed to load ${overlay.name || overlay.id}:`, err)
+          setFailedOverlayIds(prev => new Set([...prev, overlay.id]))
+        }
       }
+
+      loadOverlayImage()
+      newlyLoaded++
     })
 
-    // Move plot layers to top after loading new overlays
     if (newlyLoaded > 0) {
-      const plotLayers = ['plots-circle', 'plots-hover', 'plots-selected']
-      plotLayers.forEach(layerId => {
-        if (map.getLayer(layerId)) {
-          map.moveLayer(layerId)
-        }
-      })
-      console.log(`[Overlays] Loaded ${newlyLoaded} new overlays, total: ${loadedOverlayIds.size + newlyLoaded}/${overlays.length}`)
+      console.log(`[Overlays] Started loading ${newlyLoaded} overlays`)
     }
-  }, [overlays, loadedOverlayIds, mapReady, isOverlayInViewport, showOverlays])
-
   // Initial load of visible overlays when map is ready
   useEffect(() => {
     if (mapReady && overlays.length > 0) {
@@ -751,16 +784,11 @@ export function ParkMapSupabase({
             Lớp phủ: <span className="font-medium text-stone-700">{loadedOverlayIds.size}</span> / {overlays.length}
             {loadedOverlayIds.size > 0 && showOverlays && <span className="text-emerald-600"> ✓</span>}
             {!showOverlays && <span className="text-amber-600 text-[10px] ml-1">(tắt)</span>}
-            {loadedOverlayIds.size < overlays.length && showOverlays && <span className="text-stone-400 text-[10px] ml-1">(lazy)</span>}
+            {failedOverlayIds.size > 0 && <span className="text-red-500 text-[10px] ml-1">({failedOverlayIds.size} lỗi)</span>}
           </p>
           <p className="text-xs text-stone-500">
             Tâm linh: <span className="font-medium text-stone-700">{spiritualSites.length}</span>
           </p>
-          {isLowEndDevice && (
-            <p className="text-xs text-amber-600 mt-1">
-              📱 Thiết bị yếu - lớp phủ đã tắt
-            </p>
-          )}
         </div>
       </div>
 
