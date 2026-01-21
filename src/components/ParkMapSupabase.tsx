@@ -375,6 +375,8 @@ export function ParkMapSupabase({
     if (newlyLoaded > 0) {
       console.log(`[Overlays] Started loading ${newlyLoaded} overlays`)
     }
+  }, [overlays, loadedOverlayIds, failedOverlayIds, mapReady, isOverlayInViewport, showOverlays, resizeImageForMobile])
+
   // Initial load of visible overlays when map is ready
   useEffect(() => {
     if (mapReady && overlays.length > 0) {
