@@ -186,50 +186,8 @@ export function ParkMapSupabase({
   }, [])
 
   // Minimum zoom level to load overlays (helps weak mobile devices)
-  const MIN_OVERLAY_ZOOM = 16
-
-  // Helper to resize image for mobile devices
-  const resizeImageForMobile = useCallback((url: string, maxSize: number): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const img = new window.Image()
-      img.crossOrigin = 'anonymous'
-      img.onload = () => {
-        // If image is small enough, use original
-        if (img.width <= maxSize && img.height <= maxSize) {
-          resolve(url)
-          return
-        }
-
-        // Calculate new dimensions
-        const ratio = Math.min(maxSize / img.width, maxSize / img.height)
-        const newWidth = Math.floor(img.width * ratio)
-        const newHeight = Math.floor(img.height * ratio)
-
-        // Create canvas and resize
-        const canvas = document.createElement('canvas')
-        canvas.width = newWidth
-        canvas.height = newHeight
-        const ctx = canvas.getContext('2d')
-        if (!ctx) {
-          resolve(url) // Fallback to original
-          return
-        }
-
-        ctx.drawImage(img, 0, 0, newWidth, newHeight)
-        
-        // Convert to blob URL
-        canvas.toBlob((blob) => {
-          if (blob) {
-            resolve(URL.createObjectURL(blob))
-          } else {
-            resolve(url)
-          }
-        }, 'image/png', 0.9)
-      }
-      img.onerror = () => reject(new Error('Failed to load image'))
-      img.src = url
-    })
-  }, [])
+  const isMobile = window.innerWidth < 768
+  const MIN_OVERLAY_ZOOM = isMobile ? 17.5 : 16
 
   // Lazy load overlays based on viewport - runs on map move
   const loadVisibleOverlays = useCallback(() => {
@@ -264,10 +222,7 @@ export function ParkMapSupabase({
     let newlyLoaded = 0
 
     // Limit number of overlays loaded at once on mobile to prevent memory issues
-    const isMobile = window.innerWidth < 768
-    const maxOverlaysToLoad = isMobile ? 3 : 20
-    // Max texture size for mobile (WebGL limit is usually 4096 or 2048 on weak devices)
-    const maxTextureSize = isMobile ? 2048 : 4096
+    const maxOverlaysToLoad = isMobile ? 2 : 20
 
     // Sort overlays by z_index (lower values load first, appear below)
     const sortedOverlays = [...overlays].sort((a, b) => (a.z_index ?? 0) - (b.z_index ?? 0))
@@ -314,25 +269,12 @@ export function ParkMapSupabase({
         ? `${overlay.url}&_t=${Date.now()}` 
         : `${overlay.url}?_t=${Date.now()}`
 
-      // Load and optionally resize image for mobile
+      // Load overlay image directly (no resize to avoid CORS issues)
       const loadOverlayImage = async () => {
         try {
-          let finalUrl = imageUrl
-          
-          // On mobile, resize large images to prevent WebGL texture errors
-          if (isMobile) {
-            try {
-              finalUrl = await resizeImageForMobile(imageUrl, maxTextureSize)
-              console.log(`[Overlays] Resized image for mobile: ${overlay.name || overlay.id}`)
-            } catch (resizeErr) {
-              console.warn(`[Overlays] Could not resize ${overlay.name}, using original`)
-              finalUrl = imageUrl
-            }
-          }
-
           map.addSource(sourceId, {
             type: 'image',
-            url: finalUrl,
+            url: imageUrl,
             coordinates: coordinates
           })
 
@@ -375,7 +317,7 @@ export function ParkMapSupabase({
     if (newlyLoaded > 0) {
       console.log(`[Overlays] Started loading ${newlyLoaded} overlays`)
     }
-  }, [overlays, loadedOverlayIds, failedOverlayIds, mapReady, isOverlayInViewport, showOverlays, resizeImageForMobile])
+  }, [overlays, loadedOverlayIds, failedOverlayIds, mapReady, isOverlayInViewport, showOverlays, isMobile])
 
   // Initial load of visible overlays when map is ready
   useEffect(() => {
