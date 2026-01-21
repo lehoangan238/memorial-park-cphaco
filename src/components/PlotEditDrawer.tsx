@@ -4,7 +4,7 @@ import { QRCodeSVG } from 'qrcode.react'
 import { 
   X, MapPin, Ruler, Tag, FileText, ExternalLink, 
   Copy, Check, Edit3, Save, User, Phone, RefreshCw, AlertCircle, 
-  Loader2, Shield, QrCode, Download
+  Loader2, Shield, QrCode, Download, Share2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -34,6 +34,7 @@ export function PlotEditDrawer({ plot, onClose, onUpdate }: PlotEditDrawerProps)
   const [isSaving, setIsSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [copiedShare, setCopiedShare] = useState(false)
   const [showQR, setShowQR] = useState(false)
   
   // Edit form state
@@ -41,7 +42,9 @@ export function PlotEditDrawer({ plot, onClose, onUpdate }: PlotEditDrawerProps)
   const [editCustomerName, setEditCustomerName] = useState('')
   const [editNotes, setEditNotes] = useState('')
 
-  // QR URL
+  // Share URL (opens map with this plot selected)
+  const shareUrl = plot ? `${window.location.origin}?plot=${plot.id}` : ''
+  // QR URL (opens directions page)
   const qrUrl = plot ? `${window.location.origin}/qr?plot=${plot.id}` : ''
 
   // Reset form when plot changes
@@ -53,6 +56,7 @@ export function PlotEditDrawer({ plot, onClose, onUpdate }: PlotEditDrawerProps)
       setIsEditing(false)
       setSaveError(null)
       setShowQR(false)
+      setCopiedShare(false)
     }
   }, [plot])
 
@@ -62,6 +66,29 @@ export function PlotEditDrawer({ plot, onClose, onUpdate }: PlotEditDrawerProps)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }, [plot])
+
+  const handleShare = useCallback(async () => {
+    if (!plot) return
+    
+    // Try native share API first (mobile)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Vị trí ${plot.name || plot.id}`,
+          text: `Xem vị trí ${plot.name || plot.id} tại ${plot.zone || 'Hoa Viên Nghĩa Trang'}`,
+          url: shareUrl
+        })
+        return
+      } catch {
+        // User cancelled or share failed, fall back to copy
+      }
+    }
+    
+    // Fallback: copy to clipboard
+    navigator.clipboard.writeText(shareUrl)
+    setCopiedShare(true)
+    setTimeout(() => setCopiedShare(false), 2000)
+  }, [plot, shareUrl])
 
   const handleStartEdit = useCallback(() => {
     if (!plot) return
@@ -409,9 +436,26 @@ export function PlotEditDrawer({ plot, onClose, onUpdate }: PlotEditDrawerProps)
                   <Phone className="w-4 h-4 mr-2" />Liên hệ tư vấn
                 </Button>
               )}
-              <Button variant="outline" onClick={() => window.open(`https://www.google.com/maps?q=${plot.lat},${plot.lng}`, '_blank')} className="w-full h-10 rounded-xl">
-                <ExternalLink className="w-4 h-4 mr-2" />Mở trên Google Maps
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={handleShare} 
+                  className="flex-1 h-10 rounded-xl"
+                >
+                  {copiedShare ? (
+                    <><Check className="w-4 h-4 mr-2 text-emerald-600" />Đã copy</>
+                  ) : (
+                    <><Share2 className="w-4 h-4 mr-2" />Chia sẻ</>
+                  )}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => window.open(`https://www.google.com/maps?q=${plot.lat},${plot.lng}`, '_blank')} 
+                  className="flex-1 h-10 rounded-xl"
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" />Google Maps
+                </Button>
+              </div>
             </div>
           </motion.div>
         </>

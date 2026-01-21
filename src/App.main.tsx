@@ -21,8 +21,34 @@ function MainApp({ onNavigateToLogin }: MainAppProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'map' | 'overview'>('map')
   const [flyToPlot, setFlyToPlot] = useState<PlotRow | null>(null)
+  const [initialPlotId, setInitialPlotId] = useState<string | null>(null)
 
   const { plots, isLoading, isError, error, refetch } = useMapData()
+
+  // Check URL for shared plot link on mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const plotId = urlParams.get('plot') || urlParams.get('id')
+    if (plotId) {
+      setInitialPlotId(plotId)
+    }
+  }, [])
+
+  // Open shared plot when data is loaded
+  useEffect(() => {
+    if (initialPlotId && plots.length > 0 && !isLoading) {
+      const plot = plots.find(p => p.id === initialPlotId)
+      if (plot) {
+        setActiveTab('map')
+        setFlyToPlot(plot)
+        setSelectedPlot(plot)
+        setTimeout(() => setFlyToPlot(null), 100)
+        // Clear the URL param after opening
+        window.history.replaceState({}, '', window.location.pathname)
+      }
+      setInitialPlotId(null)
+    }
+  }, [initialPlotId, plots, isLoading])
 
   const handlePlotSelect = useCallback((plot: PlotRow | null) => {
     setSelectedPlot(plot)
