@@ -1,264 +1,282 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  :root {
-    /* Primary brand color #4453c4 */
-    --primary-brand: 232 53% 52%;
-    /* Dark background #1a1d2e */
-    --dark-bg: 229 28% 14%;
-    /* Light gray #f8f9fa */
-    --light-gray: 210 17% 98%;
-    
-    --background: 0 0% 100%;
-    --foreground: 220 20% 20%;
+/* Leaflet CSS for Map Editor */
+@import "leaflet/dist/leaflet.css";
 
-    --card: 0 0% 100%;
-    --card-foreground: 220 20% 20%;
+@theme {
+  /* Memorial Park Theme - Serene & Premium */
+  --color-stone-50: #fafaf9;
+  --color-stone-100: #f5f5f4;
+  --color-stone-200: #e7e5e4;
+  --color-stone-300: #d6d3d1;
+  --color-stone-400: #a8a29e;
+  --color-stone-500: #78716c;
+  --color-stone-600: #57534e;
+  --color-stone-700: #44403c;
+  --color-stone-800: #292524;
+  --color-stone-900: #1c1917;
+  --color-stone-950: #0c0a09;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 20%;
+  /* Primary - Deep Stone */
+  --color-primary: #1c1917;
+  --color-primary-foreground: #fafaf9;
 
-    /* Primary - #4453c4 */
-    --primary: 232 53% 52%;
-    --primary-foreground: 0 0% 100%;
+  /* Secondary - Warm Stone */
+  --color-secondary: #44403c;
+  --color-secondary-foreground: #fafaf9;
 
-    /* Nirvana brand colors - exact from website */
-    --nirvana-cyan-blue: 200 95% 46%; /* #0693e3 */
-    --nirvana-purple: 270 68% 60%; /* #9b51e0 */
-    --nirvana-green: 157 100% 41%; /* #00d084 */
-    --nirvana-light-green: 160 61% 68%; /* #7bdcb5 */
-    
-    /* WordPress preset colors */
-    --wp-cyan-bluish-gray: 204 13% 72%; /* #abb8c3 */
-    --wp-pale-cyan-blue: 201 94% 84%; /* #8ed1fc */
+  /* Accent - Gold */
+  --color-accent: #ca8a04;
+  --color-accent-foreground: #1c1917;
+  --color-gold: #ca8a04;
+  --color-gold-light: #fef3c7;
+  --color-gold-dark: #a16207;
 
-    --secondary: 220 20% 96%;
-    --secondary-foreground: 220 20% 20%;
+  /* Muted */
+  --color-muted: #f5f5f4;
+  --color-muted-foreground: #57534e;
 
-    --muted: 220 15% 96%;
-    --muted-foreground: 220 10% 45%;
+  /* Background & Foreground */
+  --color-background: #fafaf9;
+  --color-foreground: #0c0a09;
 
-    --accent: 200 95% 46%;
-    --accent-foreground: 0 0% 100%;
+  /* Card */
+  --color-card: #ffffff;
+  --color-card-foreground: #0c0a09;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+  /* Border & Ring */
+  --color-border: #e7e5e4;
+  --color-ring: #ca8a04;
 
-    --border: 220 15% 90%;
-    --input: 220 15% 90%;
-    --ring: 200 95% 46%;
+  /* Semantic Colors */
+  --color-success: #16a34a;
+  --color-warning: #ca8a04;
+  --color-error: #dc2626;
+  --color-info: #0284c7;
 
-    --radius: 0.5rem;
+  /* Serene Nature Accents */
+  --color-sage: #84a98c;
+  --color-sage-light: #cad2c5;
+  --color-sage-dark: #52796f;
+  --color-sky: #bae6fd;
+  --color-sky-dark: #0284c7;
 
-    /* Custom gradients - exact from Nirvana */
-    --hero-gradient: linear-gradient(135deg, rgba(6, 147, 227, 0.9) 0%, rgba(155, 81, 224, 0.85) 100%);
-    --nirvana-gradient: linear-gradient(135deg, rgba(6, 147, 227, 1) 0%, rgb(155, 81, 224) 100%);
-    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    --elegant-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  /* Typography */
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
 
-    /* Gold for backup */
-    --gold: 38 70% 50%;
-    --gold-light: 40 75% 65%;
-    --gold-dark: 35 65% 35%;
-  }
+  /* Shadows */
+  --shadow-soft: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
+  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
 
-  .dark {
-    --background: 220 20% 8%;
-    --foreground: 220 15% 95%;
+/* Base Styles */
+* {
+  box-sizing: border-box;
+  border-color: var(--color-border);
+}
 
-    --card: 220 20% 12%;
-    --card-foreground: 220 15% 95%;
+html {
+  scroll-behavior: smooth;
+}
 
-    --popover: 220 20% 12%;
-    --popover-foreground: 220 15% 95%;
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-    --primary: 200 95% 50%;
-    --primary-foreground: 0 0% 100%;
-
-    --nirvana-cyan-blue: 200 95% 50%;
-    --nirvana-purple: 270 68% 65%;
-    --nirvana-green: 157 100% 45%;
-    --nirvana-light-green: 160 61% 72%;
-
-    --secondary: 220 20% 18%;
-    --secondary-foreground: 220 15% 95%;
-
-    --muted: 220 20% 18%;
-    --muted-foreground: 220 15% 60%;
-
-    --accent: 200 95% 50%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 220 20% 22%;
-    --input: 220 20% 22%;
-    --ring: 200 95% 50%;
-
-    --gold: 38 70% 55%;
-    --gold-light: 40 75% 65%;
-    --gold-dark: 35 65% 40%;
-
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
 
+::-webkit-scrollbar-track {
+  background: var(--color-stone-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-stone-400);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-stone-500);
+}
+
+/* Glass Effect Utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(231, 229, 228, 0.5);
+}
+
+.glass-dark {
+  background: rgba(28, 25, 23, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Map Grid Pattern */
+.map-grid {
+  background-image: 
+    linear-gradient(rgba(202, 138, 4, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(202, 138, 4, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Gradient Backgrounds */
+.gradient-serene {
+  background: linear-gradient(135deg, #fafaf9 0%, #f5f5f4 50%, #e7e5e4 100%);
+}
+
+.gradient-gold {
+  background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 50%, #ca8a04 100%);
+}
+
+/* Animation Keyframes */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* ==================== KIOSK MODE - OneTech C50AT (1080x1920 Portrait) ==================== */
+
+/* Kiosk-specific media query for 9:16 portrait displays */
+@media screen and (max-aspect-ratio: 9/16), 
+       screen and (aspect-ratio: 9/16),
+       screen and (width: 1080px) and (height: 1920px) {
+  
+  /* Larger touch targets for kiosk */
+  button, 
+  [role="button"],
+  .cursor-pointer {
+    min-height: 48px;
+    min-width: 48px;
+  }
+  
+  /* Larger fonts for readability at distance */
+  html {
+    font-size: 18px;
+  }
+  
+  /* Hide scrollbars on kiosk */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  
   body {
-    @apply bg-background text-foreground antialiased leading-relaxed;
-    font-family: 'Inter', sans-serif;
-    font-weight: 400;
-    color: hsl(220 20% 40%); /* Darker gray for better readability */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overflow: hidden;
+    /* Prevent pull-to-refresh on Android */
+    overscroll-behavior: none;
   }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', serif;
-    @apply font-medium tracking-tight;
-    color: hsl(220 20% 20%); /* Dark gray instead of blue for elegance */
-    line-height: 1.2;
+  
+  /* Disable text selection on kiosk */
+  * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  
+  /* Allow text selection in inputs */
+  input, textarea {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
   }
 }
 
-@layer utilities {
-  .font-script {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-  }
+/* Kiosk utility classes */
+.kiosk-touch-target {
+  min-height: 56px;
+  min-width: 56px;
+  padding: 16px;
+}
 
-  .font-display {
-    font-family: 'Playfair Display', serif;
-    font-weight: 700;
-  }
+.kiosk-text-lg {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
 
-  .font-body {
-    font-family: 'Inter', sans-serif;
-    font-weight: 400;
-  }
+.kiosk-text-xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
 
-  .font-heading {
-    font-family: 'Playfair Display', serif;
-    font-weight: 600;
-  }
+/* Full height for kiosk without address bar issues */
+.kiosk-full-height {
+  height: 100vh;
+  height: 100dvh;
+}
 
-  .font-subheading {
-    font-family: 'Playfair Display', serif;
-    font-weight: 500;
-  }
+/* Prevent zoom on double tap */
+.kiosk-no-zoom {
+  touch-action: manipulation;
+}
 
-  .font-label {
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
+/* Larger map controls for touch */
+.maplibregl-ctrl-group button {
+  width: 44px !important;
+  height: 44px !important;
+}
 
-  .text-nirvana {
-    color: hsl(var(--nirvana-cyan-blue));
-  }
-
-  .bg-nirvana {
-    background-color: hsl(var(--nirvana-cyan-blue));
-  }
-
-  .bg-nirvana-gradient {
-    background: var(--nirvana-gradient);
-  }
-
-  .bg-nirvana-green {
-    background-color: hsl(var(--nirvana-green));
-  }
-
-  .hero-gradient {
-    background: var(--hero-gradient);
-  }
-
-  .card-shadow {
-    box-shadow: var(--card-shadow);
-  }
-
-  .elegant-shadow {
-    box-shadow: var(--elegant-shadow);
-  }
-
-  /* Decorative swirl pattern */
-  .swirl-pattern {
-    background-image: 
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Cpath d='M50,100 Q150,20 250,100 T450,100' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='1.5'/%3E%3Cpath d='M0,180 Q100,100 200,180 T400,180' fill='none' stroke='rgba(255,255,255,0.12)' stroke-width='1.5'/%3E%3Cpath d='M30,260 Q130,180 230,260 T430,260' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='1.5'/%3E%3Cpath d='M-20,340 Q80,260 180,340 T380,340' fill='none' stroke='rgba(255,255,255,0.08)' stroke-width='1.5'/%3E%3C/svg%3E");
-    background-size: 600px 400px;
-  }
-
-  .animate-fade-up {
-    animation: fadeUp 0.8s ease-out forwards;
-  }
-
-  .animate-fade-in {
-    animation: fadeIn 1s ease-out forwards;
-  }
-
-  @keyframes fadeUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
-  }
-
-  @keyframes ripple {
-    0% {
-      width: 0;
-      height: 0;
-      opacity: 0.5;
-    }
-    100% {
-      width: 500px;
-      height: 500px;
-      opacity: 0;
-    }
-  }
-
-  .animate-ripple {
-    animation: ripple 0.6s ease-out forwards;
-  }
+.maplibregl-ctrl-group button .maplibregl-ctrl-icon {
+  width: 24px !important;
+  height: 24px !important;
 }
