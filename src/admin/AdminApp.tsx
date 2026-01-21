@@ -9,6 +9,7 @@ import { ToastProvider } from './components/Toast'
 import { DashboardPage } from './pages/DashboardPage'
 import { MapEditorPage } from './pages/MapEditorPage'
 import { RoadEditorPage } from './pages/RoadEditorPage'
+import { QRGeneratorPage } from './pages/QRGeneratorPage'
 import { StaffPage } from './pages/StaffPage'
 import { DataPage } from './pages/DataPage'
 import { SettingsPage } from './pages/SettingsPage'
@@ -24,6 +25,8 @@ export function AdminApp() {
         return <MapEditorPage />
       case 'road-editor':
         return <RoadEditorPage />
+      case 'qr-generator':
+        return <QRGeneratorPage />
       case 'staff':
         return <StaffPage />
       case 'data':

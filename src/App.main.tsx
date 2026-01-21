@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ParkMapSupabase } from '@/components/ParkMapSupabase'
 import { PlotEditDrawer } from '@/components/PlotEditDrawer'
@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { AuthProvider, useAuth } from '@/context/AuthContext'
 import { LoginPage } from '@/pages/LoginPage'
+import { QRDirectionsPage } from '@/pages/QRDirectionsPage'
 import { useMapData } from '@/hooks/useMapData'
 import type { PlotRow } from '@/types/database'
 
@@ -173,8 +174,16 @@ function MainApp({ onNavigateToLogin }: MainAppProps) {
 
 // App Router - Simple state-based routing (no react-router needed)
 function AppRouter() {
-  const [currentPage, setCurrentPage] = useState<'main' | 'login'>('main')
+  const [currentPage, setCurrentPage] = useState<'main' | 'login' | 'qr'>('main')
   const { isAuthenticated } = useAuth()
+
+  // Check URL for QR page on mount
+  useEffect(() => {
+    const path = window.location.pathname
+    if (path === '/qr' || path.startsWith('/qr/')) {
+      setCurrentPage('qr')
+    }
+  }, [])
 
   // After successful login, go back to main
   const handleLoginSuccess = useCallback(() => {
@@ -184,6 +193,11 @@ function AppRouter() {
   const handleNavigateToLogin = useCallback(() => {
     setCurrentPage('login')
   }, [])
+
+  // QR Directions page (standalone, no auth needed)
+  if (currentPage === 'qr') {
+    return <QRDirectionsPage />
+  }
 
   if (currentPage === 'login' && !isAuthenticated) {
     return <LoginPage onSuccess={handleLoginSuccess} />
