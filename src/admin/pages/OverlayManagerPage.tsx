@@ -18,9 +18,8 @@ const OVERLAY_TYPES: { value: OverlayType; label: string }[] = [
   { value: 'other', label: 'Khác' }
 ]
 
-// Image size limits
-const MAX_SIZE_PC = 4096
-const MAX_SIZE_MOBILE = 2048
+// Image size limit - single size for all devices
+const MAX_IMAGE_SIZE = 2048
 
 // Helper function to resize image
 const resizeImage = (file: File, maxSize: number): Promise<Blob> => {
@@ -120,41 +119,28 @@ export function OverlayManagerPage() {
       const baseName = newOverlay.name.replace(/\s+/g, '_')
       const timestamp = Date.now()
 
-      // 1. Resize for PC (max 4096px)
-      setUploadProgress('Đang resize ảnh cho PC (4096px)...')
-      const pcBlob = await resizeImage(file, MAX_SIZE_PC)
-      const pcFileName = `${baseName}_pc_${timestamp}.png`
+      // Resize image to max 2048px for all devices
+      setUploadProgress('Đang resize ảnh (max 2048px)...')
+      const resizedBlob = await resizeImage(file, MAX_IMAGE_SIZE)
+      const fileName = `${baseName}_${timestamp}.png`
       
-      const { error: pcUploadError } = await supabase.storage
+      setUploadProgress('Đang upload...')
+      const { error: uploadErr } = await supabase.storage
         .from('overlays')
-        .upload(pcFileName, pcBlob, { cacheControl: '3600', upsert: false })
-      if (pcUploadError) throw pcUploadError
+        .upload(fileName, resizedBlob, { cacheControl: '3600', upsert: false })
+      if (uploadErr) throw uploadErr
 
-      const { data: pcUrlData } = supabase.storage.from('overlays').getPublicUrl(pcFileName)
-      const pcUrl = pcUrlData.publicUrl
+      const { data: urlData } = supabase.storage.from('overlays').getPublicUrl(fileName)
+      const publicUrl = urlData.publicUrl
 
-      // 2. Resize for Mobile (max 2048px)
-      setUploadProgress('Đang resize ảnh cho Mobile (2048px)...')
-      const mobileBlob = await resizeImage(file, MAX_SIZE_MOBILE)
-      const mobileFileName = `${baseName}_mobile_${timestamp}.png`
-      
-      const { error: mobileUploadError } = await supabase.storage
-        .from('overlays')
-        .upload(mobileFileName, mobileBlob, { cacheControl: '3600', upsert: false })
-      if (mobileUploadError) throw mobileUploadError
-
-      const { data: mobileUrlData } = supabase.storage.from('overlays').getPublicUrl(mobileFileName)
-      const mobileUrl = mobileUrlData.publicUrl
-
-      // 3. Insert into database with both URLs
+      // Insert into database
       setUploadProgress('Đang lưu vào database...')
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error: dbError } = await (supabase as any)
         .from('overlays')
         .insert({
           name: newOverlay.name.trim(),
-          url: pcUrl,
-          url_mobile: mobileUrl,
+          url: publicUrl,
           nw_lat: parseFloat(newOverlay.nw_lat),
           nw_lng: parseFloat(newOverlay.nw_lng),
           se_lat: parseFloat(newOverlay.se_lat),
@@ -248,44 +234,32 @@ export function OverlayManagerPage() {
       const baseName = (overlayName || overlayId).replace(/\s+/g, '_')
       const timestamp = Date.now()
 
-      // 1. Resize for PC (max 4096px)
-      const pcBlob = await resizeImage(file, MAX_SIZE_PC)
-      const pcFileName = `${baseName}_pc_${timestamp}.png`
+      // Resize to max 2048px
+      const resizedBlob = await resizeImage(file, MAX_IMAGE_SIZE)
+      const fileName = `${baseName}_${timestamp}.png`
       
-      const { error: pcUploadError } = await supabase.storage
+      const { error: uploadErr } = await supabase.storage
         .from('overlays')
-        .upload(pcFileName, pcBlob, { cacheControl: '3600', upsert: false })
-      if (pcUploadError) throw pcUploadError
+        .upload(fileName, resizedBlob, { cacheControl: '3600', upsert: false })
+      if (uploadErr) throw uploadErr
 
-      const { data: pcUrlData } = supabase.storage.from('overlays').getPublicUrl(pcFileName)
-      const pcUrl = pcUrlData.publicUrl
+      const { data: urlData } = supabase.storage.from('overlays').getPublicUrl(fileName)
+      const publicUrl = urlData.publicUrl
 
-      // 2. Resize for Mobile (max 2048px)
-      const mobileBlob = await resizeImage(file, MAX_SIZE_MOBILE)
-      const mobileFileName = `${baseName}_mobile_${timestamp}.png`
-      
-      const { error: mobileUploadError } = await supabase.storage
-        .from('overlays')
-        .upload(mobileFileName, mobileBlob, { cacheControl: '3600', upsert: false })
-      if (mobileUploadError) throw mobileUploadError
-
-      const { data: mobileUrlData } = supabase.storage.from('overlays').getPublicUrl(mobileFileName)
-      const mobileUrl = mobileUrlData.publicUrl
-
-      // Update database with both URLs
+      // Update database
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (supabase as any)
         .from('overlays')
-        .update({ url: pcUrl, url_mobile: mobileUrl })
+        .update({ url: publicUrl })
         .eq('id', overlayId)
 
       // Update edit form if editing this overlay
       if (editingId === overlayId) {
-        setEditForm(prev => ({ ...prev, url: pcUrl }))
+        setEditForm(prev => ({ ...prev, url: publicUrl }))
       }
 
       refetch()
-      alert('Đã thay ảnh thành công! (PC: 4096px, Mobile: 2048px)')
+      alert('Đã thay ảnh thành công! (max 2048px)')
     } catch (err: any) {
       console.error('Replace image error:', err)
       alert('Lỗi khi thay ảnh: ' + err.message)
@@ -439,7 +413,7 @@ export function OverlayManagerPage() {
             {isUploading ? (
               <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{uploadProgress || 'Đang upload...'}</>
             ) : (
-              <><Upload className="w-4 h-4 mr-2" />Chọn ảnh & Upload (auto-resize)</>
+              <><Upload className="w-4 h-4 mr-2" />Chọn ảnh & Upload (auto-resize 2048px)</>
             )}
           </Button>
           <p className="text-xs text-stone-500">PNG, JPG - Khuyến nghị resolution cao (4000px+)</p>
