@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect } from 'react'
-import { motion } from 'framer-motion'
 import { ParkMapSupabase } from '@/components/ParkMapSupabase'
 import { PlotEditDrawer } from '@/components/PlotEditDrawer'
 import { AuthHeader } from '@/components/AuthHeader'

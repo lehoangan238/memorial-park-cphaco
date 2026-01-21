@@ -208,10 +208,6 @@ function AppSupabase() {
             selectedPlot={selectedPlot}
             filterStatus={filterStatus}
             flyToPlot={flyToPlot}
-            routingDestination={routingDestination}
-            userLocation={userLocation}
-            onUserLocationChange={setUserLocation}
-            osrmRoute={osrmRoute}
           />
         </div>
       )}
