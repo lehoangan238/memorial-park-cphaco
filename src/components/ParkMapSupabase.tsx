@@ -525,6 +525,40 @@ export function ParkMapSupabase({
               type="circle"
               paint={plotsCirclePaint as any}
             />
+            {/* Plot ID labels - show when zoomed in */}
+            <Layer
+              id="plots-labels"
+              type="symbol"
+              layout={{
+                'text-field': ['get', 'id'],
+                'text-size': [
+                  'interpolate',
+                  ['linear'],
+                  ['zoom'],
+                  18, 0,
+                  19, 10,
+                  20, 12,
+                  22, 14
+                ],
+                'text-offset': [0, 1.5],
+                'text-anchor': 'top',
+                'text-allow-overlap': false,
+                'text-ignore-placement': false,
+                'text-optional': true
+              }}
+              paint={{
+                'text-color': '#374151',
+                'text-halo-color': '#ffffff',
+                'text-halo-width': 1.5,
+                'text-opacity': [
+                  'interpolate',
+                  ['linear'],
+                  ['zoom'],
+                  18, 0,
+                  19, 1
+                ]
+              }}
+            />
             {/* Hover highlight layer */}
             {hoveredPlotId && (
               <Layer
