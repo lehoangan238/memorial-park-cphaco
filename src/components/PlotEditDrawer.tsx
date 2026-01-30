@@ -117,7 +117,6 @@ export function PlotEditDrawer({ plot, onClose, onUpdate }: PlotEditDrawerProps)
         notes: editNotes.trim() || null
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase as any)
         .from('plots')
         .update(updates)
@@ -134,7 +133,7 @@ export function PlotEditDrawer({ plot, onClose, onUpdate }: PlotEditDrawerProps)
       if (onUpdate && data) {
         onUpdate(data as PlotRow)
       }
-    } catch (err) {
+    } catch {
       setSaveError('Đã có lỗi xảy ra. Vui lòng thử lại.')
     } finally {
       setIsSaving(false)

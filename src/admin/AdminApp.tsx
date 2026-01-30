@@ -11,6 +11,9 @@ import { MapEditorPage } from './pages/MapEditorPage'
 import { RoadEditorPage } from './pages/RoadEditorPage'
 import { QRGeneratorPage } from './pages/QRGeneratorPage'
 import { OverlayManagerPage } from './pages/OverlayManagerPage'
+import { PlotManagerPage } from './pages/PlotManagerPage'
+import { SpiritualSitesPage } from './pages/SpiritualSitesPage'
+import { ImportExportPage } from './pages/ImportExportPage'
 import { StaffPage } from './pages/StaffPage'
 import { DataPage } from './pages/DataPage'
 import { SettingsPage } from './pages/SettingsPage'
@@ -30,6 +33,12 @@ export function AdminApp() {
         return <QRGeneratorPage />
       case 'overlay-manager':
         return <OverlayManagerPage />
+      case 'plot-manager':
+        return <PlotManagerPage />
+      case 'spiritual-sites':
+        return <SpiritualSitesPage />
+      case 'import-export':
+        return <ImportExportPage />
       case 'staff':
         return <StaffPage />
       case 'data':

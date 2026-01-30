@@ -85,8 +85,9 @@ export type OverlayType = 'zone_map' | 'satellite' | 'blueprint' | 'decoration' 
 export interface OverlayRow {
   id: string
   name: string | null
+  display_name: string | null  // For label grouping (e.g., "B342" for B342-A and B342-B)
   url: string
-  url_mobile: string | null  // Resized image for mobile (max 2048px)
+  url_mobile: string | null
   nw_lat: number
   nw_lng: number
   se_lat: number
@@ -103,6 +104,7 @@ export interface OverlayRow {
 export interface OverlayInsert {
   id?: string
   name?: string | null
+  display_name?: string | null
   url: string
   url_mobile?: string | null
   nw_lat: number
@@ -119,6 +121,7 @@ export interface OverlayInsert {
 export interface OverlayUpdate {
   id?: string
   name?: string | null
+  display_name?: string | null
   url?: string
   url_mobile?: string | null
   nw_lat?: number

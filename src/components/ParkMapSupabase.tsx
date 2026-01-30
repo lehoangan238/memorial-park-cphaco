@@ -158,6 +158,52 @@ export function ParkMapSupabase({
     return plots.find(p => p.id === hoveredPlotId) || null
   }, [hoveredPlotId, plots])
 
+  // Create GeoJSON for overlay labels (zone names) - group by display_name
+  const overlayLabelsGeoJSON = useMemo(() => {
+    if (!overlays || overlays.length === 0) return null
+
+    // Group overlays by display_name using plain object
+    const groups: Record<string, { lngs: number[], lats: number[], name: string }> = {}
+    
+    overlays
+      .filter(overlay => overlay.is_visible !== false)
+      .forEach(overlay => {
+        // Use display_name if available, otherwise use name
+        const labelName = overlay.display_name || overlay.name
+        if (!labelName) return
+
+        if (!groups[labelName]) {
+          groups[labelName] = { lngs: [], lats: [], name: labelName }
+        }
+        
+        // Add center point of this overlay to the group
+        groups[labelName].lngs.push((Number(overlay.nw_lng) + Number(overlay.se_lng)) / 2)
+        groups[labelName].lats.push((Number(overlay.nw_lat) + Number(overlay.se_lat)) / 2)
+      })
+
+    // Create features with averaged center points
+    const features = Object.values(groups).map(group => {
+      const centerLng = group.lngs.reduce((a, b) => a + b, 0) / group.lngs.length
+      const centerLat = group.lats.reduce((a, b) => a + b, 0) / group.lats.length
+
+      return {
+        type: 'Feature' as const,
+        geometry: {
+          type: 'Point' as const,
+          coordinates: [centerLng, centerLat]
+        },
+        properties: {
+          name: group.name
+        }
+      }
+    })
+
+    return {
+      type: 'FeatureCollection' as const,
+      features
+    }
+  }, [overlays])
+
   // Fly to plot when flyToPlot prop changes
   useEffect(() => {
     if (flyToPlot) {
@@ -515,6 +561,45 @@ export function ParkMapSupabase({
           trackUserLocation
         />
         <ScaleControl position="bottom-left" />
+
+        {/* Overlay Zone Labels - show when zoomed out */}
+        {overlayLabelsGeoJSON && (
+          <Source id="overlay-labels" type="geojson" data={overlayLabelsGeoJSON}>
+            <Layer
+              id="overlay-labels-text"
+              type="symbol"
+              layout={{
+                'text-field': ['get', 'name'],
+                'text-size': [
+                  'interpolate',
+                  ['linear'],
+                  ['zoom'],
+                  14, 16,
+                  16, 14,
+                  17, 12,
+                  18, 0
+                ],
+                'text-anchor': 'center',
+                'text-allow-overlap': true,
+                'text-ignore-placement': true,
+                'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold']
+              }}
+              paint={{
+                'text-color': '#1e40af',
+                'text-halo-color': '#ffffff',
+                'text-halo-width': 2,
+                'text-opacity': [
+                  'interpolate',
+                  ['linear'],
+                  ['zoom'],
+                  14, 1,
+                  17, 0.7,
+                  18, 0
+                ]
+              }}
+            />
+          </Source>
+        )}
 
         {/* GeoJSON Source for Plots */}
         {filteredGeoJSON && (

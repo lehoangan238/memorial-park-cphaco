@@ -148,7 +148,6 @@ export function RoadEditorPage() {
     
     setIsSaving(true)
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase as any)
         .from('road_nodes')
         .insert({
@@ -179,7 +178,6 @@ export function RoadEditorPage() {
     
     setIsSaving(true)
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await (supabase as any)
         .from('road_nodes')
         .update({
@@ -239,7 +237,6 @@ export function RoadEditorPage() {
     
     setIsSaving(true)
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase as any)
         .from('road_edges')
         .insert({

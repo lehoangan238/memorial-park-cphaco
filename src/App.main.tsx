@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import { ParkMapSupabase } from '@/components/ParkMapSupabase'
 import { PlotEditDrawer } from '@/components/PlotEditDrawer'
 import { AuthHeader } from '@/components/AuthHeader'
@@ -25,14 +25,18 @@ function MainApp({ onNavigateToLogin }: MainAppProps) {
 
   const { plots, isLoading, isError, error, refetch } = useMapData()
 
-  // Check URL for shared plot link on mount
-  useEffect(() => {
+  // Check URL for shared plot link on mount - use useMemo to avoid setState in effect
+  const initialPlotFromUrl = useMemo(() => {
     const urlParams = new URLSearchParams(window.location.search)
-    const plotId = urlParams.get('plot') || urlParams.get('id')
-    if (plotId) {
-      setInitialPlotId(plotId)
-    }
+    return urlParams.get('plot') || urlParams.get('id')
   }, [])
+
+  // Set initial plot ID from URL (only once)
+  useEffect(() => {
+    if (initialPlotFromUrl && !initialPlotId) {
+      setInitialPlotId(initialPlotFromUrl)
+    }
+  }, [initialPlotFromUrl, initialPlotId])
 
   // Open shared plot when data is loaded
   useEffect(() => {

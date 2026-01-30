@@ -14,10 +14,13 @@ import {
   LogOut,
   GitBranch,
   QrCode,
-  Layers
+  Layers,
+  MapPin,
+  Church,
+  FileSpreadsheet
 } from 'lucide-react'
 
-export type AdminPage = 'dashboard' | 'map-editor' | 'road-editor' | 'qr-generator' | 'overlay-manager' | 'staff' | 'data' | 'settings'
+export type AdminPage = 'dashboard' | 'map-editor' | 'road-editor' | 'qr-generator' | 'overlay-manager' | 'plot-manager' | 'spiritual-sites' | 'import-export' | 'staff' | 'data' | 'settings'
 
 interface SidebarProps {
   activePage: AdminPage
@@ -28,8 +31,11 @@ const navItems: { id: AdminPage; label: string; icon: React.ReactNode }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
   { id: 'map-editor', label: 'Map Editor', icon: <Map className="w-5 h-5" /> },
   { id: 'overlay-manager', label: 'Overlay', icon: <Layers className="w-5 h-5" /> },
+  { id: 'plot-manager', label: 'Quản lý Plot', icon: <MapPin className="w-5 h-5" /> },
+  { id: 'spiritual-sites', label: 'Điểm tâm linh', icon: <Church className="w-5 h-5" /> },
   { id: 'road-editor', label: 'Đường đi', icon: <GitBranch className="w-5 h-5" /> },
   { id: 'qr-generator', label: 'QR Dẫn đường', icon: <QrCode className="w-5 h-5" /> },
+  { id: 'import-export', label: 'Import/Export', icon: <FileSpreadsheet className="w-5 h-5" /> },
   { id: 'staff', label: 'Staff', icon: <Users className="w-5 h-5" /> },
   { id: 'data', label: 'Data', icon: <Database className="w-5 h-5" /> },
   { id: 'settings', label: 'Settings', icon: <Settings className="w-5 h-5" /> }
