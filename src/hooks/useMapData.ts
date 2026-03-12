@@ -1,8 +1,10 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import { saveToCache, getFromCache } from '@/lib/offlineCache'
 import type { PlotRow, OverlayRow, SpiritualSiteRow, PlotFeatureCollection, RoadNodeRow, RoadEdgeRow } from '@/types/database'
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
+import { logger } from '@/lib/logger'
 
 /**
  * Status color mapping for Vietnamese statuses
@@ -25,20 +27,60 @@ function getPlotStatusColor(status: string): string {
 // ==================== PLOTS ====================
 
 /**
- * Fetch all plots from Supabase
+ * Fetch all plots from Supabase with offline cache fallback
  */
 async function fetchPlots(): Promise<PlotRow[]> {
-  const { data, error } = await supabase
-    .from('plots')
-    .select('*')
-    .order('zone', { ascending: true })
+  logger.info('[fetchPlots] Starting fetch...')
+  
+  // Try cache first for faster initial load
+  const cached = await getFromCache<PlotRow[]>('plots').catch(() => null)
+  
+  try {
+    // Fetch from network
+    const { data, error } = await supabase
+      .from('plots')
+      .select('*')
+      .order('zone', { ascending: true })
+      .abortSignal(undefined as unknown as AbortSignal) // Disable abort signal
 
-  if (error) {
-    console.error('Error fetching plots:', error)
-    throw new Error(error.message)
+    if (error) {
+      logger.error('[fetchPlots] Supabase error:', error)
+      // Return cached data if available
+      if (cached && cached.length > 0) {
+        logger.info(`[fetchPlots] Using ${cached.length} cached plots due to error`)
+        return cached
+      }
+      throw error
+    }
+    
+    logger.info(`[fetchPlots] Fetched ${data?.length || 0} plots from network`)
+    
+    // Save to cache for offline use
+    if (data && data.length > 0) {
+      saveToCache('plots', data).catch((error) => logger.error(error))
+    }
+    
+    return data || []
+  } catch (error) {
+    // Check if it's an AbortError - use cached data
+    if (error instanceof Error && error.name === 'AbortError') {
+      logger.warn('[fetchPlots] Request aborted, using cache')
+      if (cached && cached.length > 0) {
+        return cached
+      }
+    }
+    
+    logger.error('[fetchPlots] Network error:', error)
+    
+    // Try to get from cache as fallback
+    if (cached && cached.length > 0) {
+      logger.info(`[fetchPlots] Using ${cached.length} cached plots`)
+      return cached
+    }
+    
+    // Re-throw original error if no cache
+    throw error
   }
-
-  return data || []
 }
 
 /**
@@ -88,27 +130,36 @@ export function usePlotsGeoJSON() {
 // ==================== OVERLAYS ====================
 
 /**
- * Fetch all overlays from Supabase
+ * Fetch all overlays from Supabase with offline cache fallback
  */
 async function fetchOverlays(): Promise<OverlayRow[]> {
-  console.log('[useMapData] Fetching overlays from Supabase...')
+  const cached = await getFromCache<OverlayRow[]>('overlays').catch(() => null)
   
-  const { data, error } = await supabase
-    .from('overlays')
-    .select('*')
-    .order('name', { ascending: true })
+  try {
+    const { data, error } = await supabase
+      .from('overlays')
+      .select('*')
+      .order('name', { ascending: true })
 
-  if (error) {
-    console.error('[useMapData] Error fetching overlays:', error)
-    throw new Error(error.message)
+    if (error) {
+      if (cached && cached.length > 0) return cached
+      throw error
+    }
+    
+    if (data && data.length > 0) {
+      saveToCache('overlays', data).catch((error) => logger.error(error))
+      logger.info(`[useMapData] Fetched ${data.length} overlays from network`)
+    }
+    
+    return data || []
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError' && cached) {
+      return cached
+    }
+    logger.error('[useMapData] Error fetching overlays:', error)
+    if (cached && cached.length > 0) return cached
+    throw error
   }
-
-  console.log(`[useMapData] Fetched ${data?.length || 0} overlays`)
-  if (data && data.length > 0) {
-    console.log('[useMapData] First overlay sample:', data[0])
-  }
-
-  return data || []
 }
 
 /**
@@ -126,20 +177,35 @@ export function useOverlays() {
 // ==================== SPIRITUAL SITES ====================
 
 /**
- * Fetch all spiritual sites from Supabase
+ * Fetch all spiritual sites from Supabase with offline cache fallback
  */
 async function fetchSpiritualSites(): Promise<SpiritualSiteRow[]> {
-  const { data, error } = await supabase
-    .from('spiritual_sites')
-    .select('*')
-    .order('name', { ascending: true })
+  const cached = await getFromCache<SpiritualSiteRow[]>('spiritual_sites').catch(() => null)
+  
+  try {
+    const { data, error } = await supabase
+      .from('spiritual_sites')
+      .select('*')
+      .order('name', { ascending: true })
 
-  if (error) {
-    console.error('Error fetching spiritual sites:', error)
-    throw new Error(error.message)
+    if (error) {
+      if (cached && cached.length > 0) return cached
+      throw error
+    }
+    
+    if (data && data.length > 0) {
+      saveToCache('spiritual_sites', data).catch((error) => logger.error(error))
+    }
+    
+    return data || []
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError' && cached) {
+      return cached
+    }
+    logger.error('Error fetching spiritual sites:', error)
+    if (cached && cached.length > 0) return cached
+    throw error
   }
-
-  return data || []
 }
 
 /**
@@ -159,38 +225,56 @@ export function useSpiritualSites() {
 // ==================== ROAD NETWORK ====================
 
 /**
- * Fetch all road nodes from Supabase
+ * Fetch all road nodes from Supabase with offline cache fallback
  */
 async function fetchRoadNodes(): Promise<RoadNodeRow[]> {
-  const { data, error } = await supabase
-    .from('road_nodes')
-    .select('*')
-    .order('name', { ascending: true })
+  try {
+    const { data, error } = await supabase
+      .from('road_nodes')
+      .select('*')
+      .order('name', { ascending: true })
 
-  if (error) {
-    console.error('Error fetching road nodes:', error)
-    // Return empty array instead of throwing - road network is optional
-    return []
+    if (error) throw error
+    
+    if (data && data.length > 0) {
+      saveToCache('road_nodes', data).catch((error) => logger.error(error))
+    }
+    
+    return data || []
+  } catch (error) {
+    logger.error('Error fetching road nodes:', error)
+    
+    const cached = await getFromCache<RoadNodeRow[]>('road_nodes')
+    if (cached) return cached
+    
+    return [] // Road network is optional
   }
-
-  return data || []
 }
 
 /**
- * Fetch all road edges from Supabase
+ * Fetch all road edges from Supabase with offline cache fallback
  */
 async function fetchRoadEdges(): Promise<RoadEdgeRow[]> {
-  const { data, error } = await supabase
-    .from('road_edges')
-    .select('*')
+  try {
+    const { data, error } = await supabase
+      .from('road_edges')
+      .select('*')
 
-  if (error) {
-    console.error('Error fetching road edges:', error)
-    // Return empty array instead of throwing - road network is optional
-    return []
+    if (error) throw error
+    
+    if (data && data.length > 0) {
+      saveToCache('road_edges', data).catch((error) => logger.error(error))
+    }
+    
+    return data || []
+  } catch (error) {
+    logger.error('Error fetching road edges:', error)
+    
+    const cached = await getFromCache<RoadEdgeRow[]>('road_edges')
+    if (cached) return cached
+    
+    return [] // Road network is optional
   }
-
-  return data || []
 }
 
 /**
@@ -224,7 +308,15 @@ function useRealtimeSubscription() {
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    console.log('[Realtime] Setting up Supabase subscriptions...')
+    // Skip realtime in development to avoid connection issues
+    if (import.meta.env.DEV) {
+      logger.info('[Realtime] Skipping subscriptions in development mode')
+      return
+    }
+    
+    let isActive = true
+    
+    logger.info('[Realtime] Setting up Supabase subscriptions...')
 
     // Subscribe to plots changes
     const plotsChannel = supabase
@@ -233,7 +325,8 @@ function useRealtimeSubscription() {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'plots' },
         (payload: RealtimePostgresChangesPayload<PlotRow>) => {
-          console.log('[Realtime] Plot change detected:', payload.eventType)
+          if (!isActive) return
+          logger.info('[Realtime] Plot change detected:', payload.eventType)
           
           // Optimistically update the cache
           queryClient.setQueryData<PlotRow[]>(['plots'], (old) => {
@@ -255,7 +348,9 @@ function useRealtimeSubscription() {
         }
       )
       .subscribe((status) => {
-        console.log('[Realtime] Plots subscription status:', status)
+        if (isActive) {
+          logger.info('[Realtime] Plots subscription status:', status)
+        }
       })
 
     // Subscribe to overlays changes
@@ -264,13 +359,16 @@ function useRealtimeSubscription() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'overlays' },
-        (payload: RealtimePostgresChangesPayload<OverlayRow>) => {
-          console.log('[Realtime] Overlay change detected:', payload.eventType)
+        () => {
+          if (!isActive) return
+          logger.info('[Realtime] Overlay change detected')
           queryClient.invalidateQueries({ queryKey: ['overlays'] })
         }
       )
       .subscribe((status) => {
-        console.log('[Realtime] Overlays subscription status:', status)
+        if (isActive) {
+          logger.info('[Realtime] Overlays subscription status:', status)
+        }
       })
 
     // Subscribe to spiritual_sites changes
@@ -279,21 +377,25 @@ function useRealtimeSubscription() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'spiritual_sites' },
-        (payload: RealtimePostgresChangesPayload<SpiritualSiteRow>) => {
-          console.log('[Realtime] Spiritual site change detected:', payload.eventType)
+        () => {
+          if (!isActive) return
+          logger.info('[Realtime] Spiritual site change detected')
           queryClient.invalidateQueries({ queryKey: ['spiritual_sites'] })
         }
       )
       .subscribe((status) => {
-        console.log('[Realtime] Spiritual sites subscription status:', status)
+        if (isActive) {
+          logger.info('[Realtime] Spiritual sites subscription status:', status)
+        }
       })
 
     // Cleanup subscriptions on unmount
     return () => {
-      console.log('[Realtime] Cleaning up subscriptions...')
-      supabase.removeChannel(plotsChannel)
-      supabase.removeChannel(overlaysChannel)
-      supabase.removeChannel(sitesChannel)
+      isActive = false
+      logger.info('[Realtime] Cleaning up subscriptions...')
+      supabase.removeChannel(plotsChannel).catch(() => {})
+      supabase.removeChannel(overlaysChannel).catch(() => {})
+      supabase.removeChannel(sitesChannel).catch(() => {})
     }
   }, [queryClient])
 }

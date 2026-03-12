@@ -9,6 +9,7 @@ interface StatCardProps {
   value: string | number
   icon: LucideIcon
   color: 'blue' | 'green' | 'orange' | 'purple' | 'red'
+  subtitle?: string
   trend?: {
     value: number
     isPositive: boolean
@@ -43,7 +44,7 @@ const colorClasses = {
   }
 }
 
-export function StatCard({ title, value, icon: Icon, color, trend }: StatCardProps) {
+export function StatCard({ title, value, icon: Icon, color, subtitle, trend }: StatCardProps) {
   const colors = colorClasses[color]
 
   return (
@@ -55,7 +56,12 @@ export function StatCard({ title, value, icon: Icon, color, trend }: StatCardPro
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm font-medium text-gray-500">{title}</p>
-          <p className="mt-2 text-3xl font-bold text-gray-900">{value}</p>
+          <div className="flex items-baseline gap-2 mt-2">
+            <p className="text-3xl font-bold text-gray-900">{value}</p>
+            {subtitle && (
+              <span className={`text-sm font-medium ${colors.text}`}>{subtitle}</span>
+            )}
+          </div>
           {trend && (
             <p className={`mt-1 text-sm ${trend.isPositive ? 'text-green-600' : 'text-red-600'}`}>
               {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%

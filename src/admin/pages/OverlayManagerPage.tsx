@@ -21,6 +21,7 @@ import { Badge } from '@/components/ui/badge'
 import { supabase } from '@/lib/supabase'
 import { useMapData } from '@/hooks/useMapData'
 import type { OverlayRow, OverlayType, OverlayInsert, OverlayUpdate } from '@/types/database'
+import { useToast } from '@/admin/components/Toast'
 
 const OVERLAY_TYPES: { value: OverlayType; label: string }[] = [
   { value: 'zone_map', label: 'Bản đồ khu vực' },
@@ -54,6 +55,7 @@ const resizeImage = (file: File, maxSize: number): Promise<Blob> => {
 }
 
 export function OverlayManagerPage() {
+  const { showToast } = useToast()
   const { overlays, refetch } = useMapData()
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState('')
@@ -206,8 +208,7 @@ export function OverlayManagerPage() {
         is_visible: true,
         z_index: overlays.length
       }
-      // @ts-ignore
-      const { error: dbError } = await supabase.from('overlays').insert(insertData)
+      const { error: dbError } = await supabase.from('overlays').insert(insertData as never)
       if (dbError) throw dbError
 
       setNewOverlay({ name: '', display_name: '', description: '', nw_lat: '', nw_lng: '', se_lat: '', se_lng: '', type: 'zone_map', opacity: 85 })
@@ -230,14 +231,14 @@ export function OverlayManagerPage() {
       await supabase.storage.from('overlays').remove([fileName])
       await supabase.from('overlays').delete().eq('id', overlay.id)
       refetch()
+      showToast('Đã xóa overlay', 'success')
     } catch {
-      alert('Lỗi khi xóa overlay')
+      showToast('Lỗi khi xóa overlay', 'error')
     }
-  }, [refetch])
+  }, [refetch, showToast])
 
   const handleToggleVisibility = useCallback(async (overlay: OverlayRow) => {
-    // @ts-ignore
-    await supabase.from('overlays').update({ is_visible: !overlay.is_visible }).eq('id', overlay.id)
+    await supabase.from('overlays').update({ is_visible: !overlay.is_visible } as never).eq('id', overlay.id)
     refetch()
   }, [refetch])
 
@@ -257,17 +258,17 @@ export function OverlayManagerPage() {
       const { error: uploadErr } = await supabase.storage.from('overlays').upload(fileName, resizedBlob, { cacheControl: '3600', upsert: false })
       if (uploadErr) throw uploadErr
       const { data: urlData } = supabase.storage.from('overlays').getPublicUrl(fileName)
-      // @ts-ignore
-      await supabase.from('overlays').update({ url: urlData.publicUrl }).eq('id', editingId)
+      await supabase.from('overlays').update({ url: urlData.publicUrl } as never).eq('id', editingId)
       setEditForm(prev => ({ ...prev, url: urlData.publicUrl }))
       refetch()
+      showToast('Đã thay ảnh overlay', 'success')
     } catch (err: any) {
-      alert('Lỗi khi thay ảnh: ' + err.message)
+      showToast('Lỗi khi thay ảnh: ' + err.message, 'error')
     } finally {
       setIsSaving(false)
       if (replaceFileRef.current) replaceFileRef.current.value = ''
     }
-  }, [editingId, editForm.name, refetch])
+  }, [editingId, editForm.name, refetch, showToast])
 
   const handleSaveEdit = useCallback(async () => {
     if (!editingId) return
@@ -278,16 +279,16 @@ export function OverlayManagerPage() {
         nw_lat: editForm.nw_lat, nw_lng: editForm.nw_lng, se_lat: editForm.se_lat, se_lng: editForm.se_lng,
         opacity: editForm.opacity, z_index: editForm.z_index, type: editForm.type, is_visible: editForm.is_visible
       }
-      // @ts-ignore
-      await supabase.from('overlays').update(updateData).eq('id', editingId)
+      await supabase.from('overlays').update(updateData as never).eq('id', editingId)
       setEditingId(null)
       refetch()
+      showToast('Lưu overlay thành công', 'success')
     } catch {
-      alert('Lỗi khi lưu')
+      showToast('Lỗi khi lưu', 'error')
     } finally {
       setIsSaving(false)
     }
-  }, [editingId, editForm, refetch])
+  }, [editingId, editForm, refetch, showToast])
 
   const handleExport = useCallback(() => {
     const data = table.getFilteredRowModel().rows.map(r => r.original)

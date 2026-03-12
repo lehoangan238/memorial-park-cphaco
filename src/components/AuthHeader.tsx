@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { MapPin, RefreshCw, Wifi, LogIn, LogOut, Shield, Map, BarChart3 } from 'lucide-react'
+import { MapPin, RefreshCw, Wifi, LogIn, LogOut, Shield, Map, BarChart3, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { SearchAutocomplete } from '@/components/SearchAutocomplete'
@@ -42,7 +42,7 @@ export function AuthHeader({
   filterStatus,
   onFilterChange
 }: AuthHeaderProps) {
-  const { user, isAuthenticated, signOut, isLoading: authLoading } = useAuth()
+  const { user, isAuthenticated, userRole, signOut, isLoading: authLoading } = useAuth()
 
   const handleLogin = () => {
     onNavigateToLogin()
@@ -50,6 +50,11 @@ export function AuthHeader({
 
   const handleLogout = async () => {
     await signOut()
+  }
+
+  const handleNavigateToAdmin = () => {
+    window.location.hash = '#/admin'
+    window.location.reload()
   }
 
   return (
@@ -110,25 +115,39 @@ export function AuthHeader({
 
             {/* Auth */}
             {isAuthenticated ? (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={handleLogout}
-                      className="h-8 w-8 cursor-pointer hover:bg-red-50 hover:text-red-600"
-                      disabled={authLoading}
-                    >
-                      <LogOut className="w-4 h-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-xs">{user?.email}</p>
-                    <p className="text-[10px] text-stone-400">Đăng xuất</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <>
+                {userRole === 'Admin' && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleNavigateToAdmin}
+                    className="h-8 px-3 rounded-lg text-xs"
+                  >
+                    <Settings className="w-3.5 h-3.5 mr-1" />
+                    <span className="hidden sm:inline">Admin</span>
+                  </Button>
+                )}
+
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleLogout}
+                        className="h-8 w-8 cursor-pointer hover:bg-red-50 hover:text-red-600"
+                        disabled={authLoading}
+                      >
+                        <LogOut className="w-4 h-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs">{user?.email}</p>
+                      <p className="text-[10px] text-stone-400">Đăng xuất</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </>
             ) : (
               <Button
                 variant="outline"
@@ -198,7 +217,7 @@ export function AuthHeader({
           )}
 
           {/* Admin Badge - Show when authenticated */}
-          {isAuthenticated && activeTab === 'map' && (
+          {isAuthenticated && userRole === 'Admin' && activeTab === 'map' && (
             <div className="hidden md:flex items-center gap-1 px-2 py-1 rounded-full bg-amber-50 border border-amber-200">
               <Shield className="w-3 h-3 text-amber-600" />
               <span className="text-[10px] font-medium text-amber-700">Admin</span>

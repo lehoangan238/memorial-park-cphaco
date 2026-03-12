@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useRegisterSW } from 'virtual:pwa-register/react'
 import { useOfflineCacheStore } from '@/store/mapStore'
+import { logger } from '@/lib/logger'
 
 /**
  * Hook to manage PWA service worker registration and updates
@@ -13,28 +14,28 @@ export function usePWA() {
     updateServiceWorker
   } = useRegisterSW({
     onRegistered(r: any) {
-      console.log('[PWA] Service worker registered:', r)
+      logger.info('[PWA] Service worker registered:', r)
     },
     onRegisterError(error: Error) {
-      console.error('[PWA] Service worker registration error:', error)
+      logger.error('[PWA] Service worker registration error:', error)
     },
     onNeedRefresh() {
-      console.log('[PWA] New content available, please refresh')
+      logger.info('[PWA] New content available, please refresh')
     },
     onOfflineReady() {
-      console.log('[PWA] App ready to work offline')
+      logger.info('[PWA] App ready to work offline')
     }
   })
 
   // Monitor online/offline status
   useEffect(() => {
     const handleOnline = () => {
-      console.log('[PWA] Back online')
+        logger.info('[PWA] Back online')
       setOnline(true)
     }
 
     const handleOffline = () => {
-      console.log('[PWA] Gone offline')
+        logger.info('[PWA] Gone offline')
       setOnline(false)
     }
 
@@ -70,8 +71,9 @@ export function usePWA() {
  * Utility to check if app is running in PWA mode (standalone)
  */
 export function isPWA(): boolean {
+  const navigatorWithStandalone = window.navigator as Navigator & { standalone?: boolean }
   return window.matchMedia('(display-mode: standalone)').matches ||
-    (window.navigator as any).standalone === true
+    navigatorWithStandalone.standalone === true
 }
 
 /**

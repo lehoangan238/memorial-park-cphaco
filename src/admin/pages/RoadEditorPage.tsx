@@ -148,14 +148,14 @@ export function RoadEditorPage() {
     
     setIsSaving(true)
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('road_nodes')
         .insert({
           name: editingNode.name || null,
           lat: editingNode.lat,
           lng: editingNode.lng,
           node_type: editingNode.node_type || 'intersection'
-        })
+        } as never)
         .select()
         .single()
       
@@ -178,12 +178,12 @@ export function RoadEditorPage() {
     
     setIsSaving(true)
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('road_nodes')
         .update({
           name: editingNode.name,
           node_type: editingNode.node_type
-        })
+        } as never)
         .eq('id', editingNode.id)
       
       if (error) throw error
@@ -237,14 +237,14 @@ export function RoadEditorPage() {
     
     setIsSaving(true)
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('road_edges')
         .insert({
           from_node_id: fromId,
           to_node_id: toId,
           bidirectional: true,
           road_type: 'main'
-        })
+        } as never)
         .select()
         .single()
       

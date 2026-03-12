@@ -3,7 +3,7 @@
  */
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
-import type { PlotRow, StaffRow, StaffInsert, StaffUpdate, PatrolLogRow } from '@/types/database'
+import type { PlotRow, PlotUpdate, StaffRow, StaffInsert, StaffUpdate, PatrolLogRow } from '@/types/database'
 
 // Dashboard Stats type
 interface DashboardStats {
@@ -39,12 +39,11 @@ export function usePlots() {
     }
   }, [])
 
-  const updatePlot = useCallback(async (name: string, updates: Partial<PlotRow>) => {
+  const updatePlot = useCallback(async (name: string, updates: PlotUpdate) => {
     try {
       const { error: err } = await supabase
         .from('plots')
-        // @ts-expect-error - Supabase types don't match our schema
-        .update(updates)
+        .update(updates as never)
         .eq('name', name)
       
       if (err) throw err
@@ -94,8 +93,7 @@ export function useStaff() {
     try {
       const { error: err } = await supabase
         .from('staff')
-        // @ts-expect-error - Supabase types don't match our schema
-        .insert({ ...newStaff, active: newStaff.active ?? true })
+        .insert({ ...newStaff, active: newStaff.active ?? true } as never)
       
       if (err) throw err
       await fetchStaff()
@@ -109,8 +107,7 @@ export function useStaff() {
     try {
       const { error: err } = await supabase
         .from('staff')
-        // @ts-expect-error - Supabase types don't match our schema
-        .update(updates)
+        .update(updates as never)
         .eq('id', id)
       
       if (err) throw err
@@ -232,4 +229,158 @@ export function useDashboardStats() {
   }, [fetchStats])
 
   return { stats, loading, error, fetchStats }
+}
+
+
+// Import thêm types
+import type { DeceasedRow, DeceasedInsert, DeceasedUpdate, CustomerRow, CustomerInsert, CustomerUpdate } from '@/types/database'
+
+// ==================== DECEASED (Người mất) ====================
+export function useDeceased() {
+  const [deceased, setDeceased] = useState<DeceasedRow[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchDeceased = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const { data, error: err } = await supabase
+        .from('deceased')
+        .select('*')
+        .order('created_at', { ascending: false })
+      
+      if (err) throw err
+      setDeceased((data as DeceasedRow[]) || [])
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to fetch deceased')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const addDeceased = useCallback(async (newItem: DeceasedInsert) => {
+    try {
+      const { error: err } = await supabase
+        .from('deceased')
+        .insert(newItem as never)
+      
+      if (err) throw err
+      await fetchDeceased()
+      return { success: true }
+    } catch (e) {
+      return { success: false, error: e instanceof Error ? e.message : 'Add failed' }
+    }
+  }, [fetchDeceased])
+
+  const updateDeceased = useCallback(async (id: string, updates: DeceasedUpdate) => {
+    try {
+      const { error: err } = await supabase
+        .from('deceased')
+        .update(updates as never)
+        .eq('id', id)
+      
+      if (err) throw err
+      await fetchDeceased()
+      return { success: true }
+    } catch (e) {
+      return { success: false, error: e instanceof Error ? e.message : 'Update failed' }
+    }
+  }, [fetchDeceased])
+
+  const deleteDeceased = useCallback(async (id: string) => {
+    try {
+      const { error: err } = await supabase
+        .from('deceased')
+        .delete()
+        .eq('id', id)
+      
+      if (err) throw err
+      await fetchDeceased()
+      return { success: true }
+    } catch (e) {
+      return { success: false, error: e instanceof Error ? e.message : 'Delete failed' }
+    }
+  }, [fetchDeceased])
+
+  useEffect(() => {
+    fetchDeceased()
+  }, [fetchDeceased])
+
+  return { deceased, loading, error, fetchDeceased, addDeceased, updateDeceased, deleteDeceased }
+}
+
+// ==================== CUSTOMERS (Khách hàng) ====================
+export function useCustomers() {
+  const [customers, setCustomers] = useState<CustomerRow[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchCustomers = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const { data, error: err } = await supabase
+        .from('customers')
+        .select('*')
+        .order('created_at', { ascending: false })
+      
+      if (err) throw err
+      setCustomers((data as CustomerRow[]) || [])
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to fetch customers')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const addCustomer = useCallback(async (newItem: CustomerInsert) => {
+    try {
+      const { error: err } = await supabase
+        .from('customers')
+        .insert(newItem as never)
+      
+      if (err) throw err
+      await fetchCustomers()
+      return { success: true }
+    } catch (e) {
+      return { success: false, error: e instanceof Error ? e.message : 'Add failed' }
+    }
+  }, [fetchCustomers])
+
+  const updateCustomer = useCallback(async (id: string, updates: CustomerUpdate) => {
+    try {
+      const { error: err } = await supabase
+        .from('customers')
+        .update(updates as never)
+        .eq('id', id)
+      
+      if (err) throw err
+      await fetchCustomers()
+      return { success: true }
+    } catch (e) {
+      return { success: false, error: e instanceof Error ? e.message : 'Update failed' }
+    }
+  }, [fetchCustomers])
+
+  const deleteCustomer = useCallback(async (id: string) => {
+    try {
+      const { error: err } = await supabase
+        .from('customers')
+        .delete()
+        .eq('id', id)
+      
+      if (err) throw err
+      await fetchCustomers()
+      return { success: true }
+    } catch (e) {
+      return { success: false, error: e instanceof Error ? e.message : 'Delete failed' }
+    }
+  }, [fetchCustomers])
+
+  useEffect(() => {
+    fetchCustomers()
+  }, [fetchCustomers])
+
+  return { customers, loading, error, fetchCustomers, addCustomer, updateCustomer, deleteCustomer }
 }

@@ -12,7 +12,8 @@ import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import type { PlotRow, PlotStatusDb } from '@/types/database'
-import { cn } from '@/lib/utils'
+import { cn, formatVNCurrency } from '@/lib/utils'
+import { useToast } from '@/admin/components/Toast'
 
 interface PlotEditDrawerProps {
   plot: PlotRow | null
@@ -30,6 +31,7 @@ const STATUS_OPTIONS: { value: PlotStatusDb; label: string; color: string }[] = 
 
 export function PlotEditDrawer({ plot, onClose, onUpdate }: PlotEditDrawerProps) {
   const { isAuthenticated } = useAuth()
+  const { showToast } = useToast()
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
@@ -117,9 +119,9 @@ export function PlotEditDrawer({ plot, onClose, onUpdate }: PlotEditDrawerProps)
         notes: editNotes.trim() || null
       }
 
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('plots')
-        .update(updates)
+        .update(updates as never)
         .eq('id', plot.id)
         .select()
         .single()
@@ -141,8 +143,8 @@ export function PlotEditDrawer({ plot, onClose, onUpdate }: PlotEditDrawerProps)
   }, [plot, editStatus, editCustomerName, editNotes, onUpdate])
 
   const handleSyncFromBaseVn = useCallback(() => {
-    alert('Tính năng đồng bộ từ Base.vn đang được phát triển.')
-  }, [])
+    showToast('Tính năng đồng bộ từ Base.vn đang được phát triển.', 'info')
+  }, [showToast])
 
   const handleDownloadQR = useCallback(() => {
     if (!plot) return
@@ -329,7 +331,7 @@ export function PlotEditDrawer({ plot, onClose, onUpdate }: PlotEditDrawerProps)
                           <Tag className="w-4 h-4 text-amber-500" />
                           <span className="text-xs text-amber-600">Giá</span>
                         </div>
-                        <p className="font-semibold text-amber-700">{plot.price.toLocaleString('vi-VN')}đ</p>
+                        <p className="font-semibold text-amber-700">{formatVNCurrency(plot.price)} VNĐ</p>
                       </div>
                     )}
                   </div>

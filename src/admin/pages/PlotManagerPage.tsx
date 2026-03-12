@@ -21,6 +21,7 @@ import { Badge } from '@/components/ui/badge'
 import { supabase } from '@/lib/supabase'
 import { useMapData } from '@/hooks/useMapData'
 import type { PlotRow, PlotStatusDb, PlotInsert, PlotUpdate } from '@/types/database'
+import { useToast } from '@/admin/components/Toast'
 
 const PLOT_STATUSES: { value: PlotStatusDb; label: string; color: string }[] = [
   { value: 'Trống', label: 'Trống', color: 'bg-emerald-500' },
@@ -31,6 +32,7 @@ const PLOT_STATUSES: { value: PlotStatusDb; label: string; color: string }[] = [
 ]
 
 export function PlotManagerPage() {
+  const { showToast } = useToast()
   const { plots, refetch, isLoading } = useMapData()
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -159,7 +161,7 @@ export function PlotManagerPage() {
 
   const handleAdd = useCallback(async () => {
     if (!newPlot.id || !newPlot.lat || !newPlot.lng) {
-      alert('Vui lòng nhập ID, Lat và Lng')
+      showToast('Vui lòng nhập ID, Lat và Lng', 'error')
       return
     }
     setIsSaving(true)
@@ -176,27 +178,29 @@ export function PlotManagerPage() {
         customer_name: newPlot.customer_name.trim() || null,
         notes: newPlot.notes.trim() || null
       }
-      const { error } = await supabase.from('plots').insert(insertData as any)
+      const { error } = await supabase.from('plots').insert(insertData as never)
       if (error) throw error
       setNewPlot({ id: '', name: '', zone: '', lat: '', lng: '', status: 'Trống', price: '', area: '', customer_name: '', notes: '' })
       setShowAddForm(false)
       refetch()
+      showToast('Thêm plot thành công', 'success')
     } catch (err: any) {
-      alert('Lỗi: ' + err.message)
+      showToast('Lỗi: ' + err.message, 'error')
     } finally {
       setIsSaving(false)
     }
-  }, [newPlot, refetch])
+  }, [newPlot, refetch, showToast])
 
   const handleDelete = useCallback(async (plot: PlotRow) => {
     if (!confirm(`Xóa plot "${plot.id}"?`)) return
     try {
       await supabase.from('plots').delete().eq('id', plot.id)
       refetch()
+      showToast('Đã xóa plot', 'success')
     } catch {
-      alert('Lỗi khi xóa')
+      showToast('Lỗi khi xóa', 'error')
     }
-  }, [refetch])
+  }, [refetch, showToast])
 
   const handleStartEdit = useCallback((plot: PlotRow) => {
     setEditingId(plot.id)
@@ -218,17 +222,17 @@ export function PlotManagerPage() {
         customer_name: editForm.customer_name,
         notes: editForm.notes
       }
-      // @ts-ignore - Supabase types issue
-      const { error } = await supabase.from('plots').update(updateData).eq('id', editingId)
+      const { error } = await supabase.from('plots').update(updateData as never).eq('id', editingId)
       if (error) throw error
       setEditingId(null)
       refetch()
+      showToast('Cập nhật plot thành công', 'success')
     } catch (err: any) {
-      alert('Lỗi: ' + err.message)
+      showToast('Lỗi: ' + err.message, 'error')
     } finally {
       setIsSaving(false)
     }
-  }, [editingId, editForm, refetch])
+  }, [editingId, editForm, refetch, showToast])
 
   const handleExport = useCallback(() => {
     const data = table.getFilteredRowModel().rows.map(r => r.original)

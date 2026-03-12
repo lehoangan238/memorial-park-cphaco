@@ -10,8 +10,13 @@ export { StatCard } from './components/StatCard'
 export { DashboardPage } from './pages/DashboardPage'
 export { MapEditorPage } from './pages/MapEditorPage'
 export { StaffPage } from './pages/StaffPage'
-export { DataPage } from './pages/DataPage'
 export { SettingsPage } from './pages/SettingsPage'
+export { PlotManagerPage } from './pages/PlotManagerPage'
+export { OverlayManagerPage } from './pages/OverlayManagerPage'
+export { SpiritualSitesPage } from './pages/SpiritualSitesPage'
+export { ImportExportPage } from './pages/ImportExportPage'
+export { RoadEditorPage } from './pages/RoadEditorPage'
+export { QRGeneratorPage } from './pages/QRGeneratorPage'
 
 // Hooks
 export {

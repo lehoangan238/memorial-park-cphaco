@@ -4,6 +4,7 @@
  */
 
 import type { RoadNodeRow, RoadEdgeRow, RouteResult } from '@/types/database'
+import { logger } from '@/lib/logger'
 
 // OSRM Public Demo Server (for production, host your own or use paid service)
 const OSRM_BASE_URL = 'https://router.project-osrm.org'
@@ -60,27 +61,27 @@ export async function getOSRMRoute(
     const osrmProfile = profile === 'walking' ? 'foot' : profile
     const url = `${OSRM_BASE_URL}/route/v1/${osrmProfile}/${startLng},${startLat};${endLng},${endLat}?overview=full&geometries=geojson&steps=true`
     
-    console.log('🗺️ OSRM Request:', url)
+    logger.info('🗺️ OSRM Request:', url)
     
     const response = await fetch(url)
     
     if (!response.ok) {
-      console.error('❌ OSRM API error:', response.status)
+      logger.error('❌ OSRM API error:', response.status)
       return null
     }
     
     const data: OSRMResponse = await response.json()
-    console.log('📍 OSRM Response:', data)
+    logger.info('📍 OSRM Response:', data)
     
     if (data.code !== 'Ok' || !data.routes.length) {
-      console.error('❌ OSRM no route found:', data.code)
+      logger.error('❌ OSRM no route found:', data.code)
       return null
     }
     
-    console.log('✅ OSRM Route found:', data.routes[0].distance, 'm')
+    logger.info('✅ OSRM Route found:', data.routes[0].distance, 'm')
     return data.routes[0]
   } catch (error) {
-    console.error('❌ OSRM fetch error:', error)
+    logger.error('❌ OSRM fetch error:', error)
     return null
   }
 }

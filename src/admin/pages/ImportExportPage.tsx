@@ -1,9 +1,12 @@
 import { useState, useCallback, useRef } from 'react'
 import { 
   Upload, Download, FileSpreadsheet, Loader2, CheckCircle, 
-  AlertCircle, Database, MapPin, Church, Layers
+  AlertCircle, Database, MapPin, Church, Layers, HardDrive, History
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import type { AuditLogRow, PlotInsert, SpiritualSiteInsert, OverlayInsert } from '@/types/database'
+import { useToast } from '@/admin/components/Toast'
+import { logger } from '@/lib/logger'
 
 type DataType = 'plots' | 'spiritual_sites' | 'overlays'
 
@@ -13,12 +16,89 @@ interface ImportResult {
   errors: string[]
 }
 
+function upsertByType(type: DataType, row: Record<string, unknown>) {
+  switch (type) {
+    case 'plots':
+      return supabase.from('plots').upsert(row as unknown as PlotInsert as never, { onConflict: 'id' })
+    case 'spiritual_sites':
+      return supabase.from('spiritual_sites').upsert(row as unknown as SpiritualSiteInsert as never, { onConflict: 'id' })
+    case 'overlays':
+      return supabase.from('overlays').upsert(row as unknown as OverlayInsert as never, { onConflict: 'id' })
+    default:
+      return Promise.resolve({ error: new Error('Unsupported data type') })
+  }
+}
+
 export function ImportExportPage() {
+  const { showToast } = useToast()
   const [isExporting, setIsExporting] = useState<DataType | null>(null)
   const [isImporting, setIsImporting] = useState(false)
+  const [isBackingUp, setIsBackingUp] = useState(false)
   const [importResult, setImportResult] = useState<ImportResult | null>(null)
   const [selectedType, setSelectedType] = useState<DataType>('plots')
+  const [auditLogs, setAuditLogs] = useState<AuditLogRow[]>([])
+  const [showAuditLogs, setShowAuditLogs] = useState(false)
+  const [loadingLogs, setLoadingLogs] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Full database backup
+  const exportFullBackup = useCallback(async () => {
+    setIsBackingUp(true)
+    try {
+      const tables = ['plots', 'spiritual_sites', 'overlays', 'staff', 'road_nodes', 'road_edges']
+      const backup: Record<string, unknown[]> = {}
+      
+      for (const table of tables) {
+        const { data, error } = await supabase.from(table).select('*')
+        if (error) {
+          logger.warn(`Warning: Could not backup ${table}:`, error.message)
+          backup[table] = []
+        } else {
+          backup[table] = data || []
+        }
+      }
+
+      const backupData = {
+        version: '1.0',
+        created_at: new Date().toISOString(),
+        tables: backup
+      }
+
+      const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `hoavien_backup_${new Date().toISOString().split('T')[0]}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error'
+      showToast('Lỗi backup: ' + message, 'error')
+    } finally {
+      setIsBackingUp(false)
+    }
+  }, [showToast])
+
+  // Fetch audit logs
+  const fetchAuditLogs = useCallback(async () => {
+    setLoadingLogs(true)
+    try {
+      const { data, error } = await supabase
+        .from('audit_logs')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(100)
+      
+      if (error) throw error
+      setAuditLogs((data as AuditLogRow[]) || [])
+      setShowAuditLogs(true)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error'
+      showToast('Lỗi tải audit logs: ' + message, 'error')
+    } finally {
+      setLoadingLogs(false)
+    }
+  }, [showToast])
 
   // Export functions
   const exportToCSV = useCallback(async (type: DataType) => {
@@ -27,7 +107,7 @@ export function ImportExportPage() {
       const { data, error } = await supabase.from(type).select('*')
       if (error) throw error
       if (!data || data.length === 0) {
-        alert('Không có dữ liệu để xuất')
+        showToast('Không có dữ liệu để xuất', 'info')
         return
       }
 
@@ -51,15 +131,16 @@ export function ImportExportPage() {
       a.download = `${type}_${new Date().toISOString().split('T')[0]}.csv`
       a.click()
       URL.revokeObjectURL(url)
-    } catch (err: any) {
-      alert('Lỗi xuất dữ liệu: ' + err.message)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error'
+      showToast('Lỗi xuất dữ liệu: ' + message, 'error')
     } finally {
       setIsExporting(null)
     }
-  }, [])
+  }, [showToast])
 
   // Import functions
-  const parseCSV = (text: string): Record<string, any>[] => {
+  const parseCSV = (text: string): Record<string, unknown>[] => {
     const lines = text.split('\n').filter(l => l.trim())
     if (lines.length < 2) return []
     
@@ -83,7 +164,7 @@ export function ImportExportPage() {
       }
       values.push(current.trim())
       
-      const row: Record<string, any> = {}
+      const row: Record<string, unknown> = {}
       headers.forEach((h, idx) => {
         let val = values[idx] || ''
         val = val.replace(/^"|"$/g, '').replace(/""/g, '"')
@@ -137,22 +218,24 @@ export function ImportExportPage() {
       // Upsert data
       for (const row of cleanRows) {
         try {
-          const { error } = await supabase.from(selectedType).upsert(row as any, { onConflict: 'id' })
+          const { error } = await upsertByType(selectedType, row)
           if (error) {
             failed++
-            errors.push(`Row ${row.id || row.name}: ${error.message}`)
+            errors.push(`Row ${(row.id as string) || (row.name as string)}: ${error.message}`)
           } else {
             success++
           }
-        } catch (err: any) {
+        } catch (err: unknown) {
           failed++
-          errors.push(`Row ${row.id || row.name}: ${err.message}`)
+          const message = err instanceof Error ? err.message : 'Unknown error'
+          errors.push(`Row ${(row.id as string) || (row.name as string)}: ${message}`)
         }
       }
 
       setImportResult({ success, failed, errors: errors.slice(0, 10) })
-    } catch (err: any) {
-      setImportResult({ success: 0, failed: 0, errors: [err.message] })
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error'
+      setImportResult({ success: 0, failed: 0, errors: [message] })
     } finally {
       setIsImporting(false)
       if (fileInputRef.current) fileInputRef.current.value = ''
@@ -290,6 +373,113 @@ export function ImportExportPage() {
             <li>• Các cột <code className="bg-stone-200 px-1 rounded">created_at</code>, <code className="bg-stone-200 px-1 rounded">updated_at</code> sẽ bị bỏ qua</li>
           </ul>
         </div>
+      </div>
+
+      {/* Full Backup Section */}
+      <div className="bg-white rounded-xl border border-stone-200 p-6 mb-6">
+        <h2 className="text-lg font-semibold text-stone-900 mb-4 flex items-center gap-2">
+          <HardDrive className="w-5 h-5 text-purple-600" />
+          Sao lưu toàn bộ (Full Backup)
+        </h2>
+        <p className="text-sm text-stone-500 mb-4">
+          Tải xuống toàn bộ dữ liệu dưới dạng file JSON. Bao gồm: plots, spiritual_sites, overlays, staff, road_nodes, road_edges.
+        </p>
+        
+        <button
+          onClick={exportFullBackup}
+          disabled={isBackingUp}
+          className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-50"
+        >
+          {isBackingUp ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <Download className="w-5 h-5" />
+          )}
+          {isBackingUp ? 'Đang sao lưu...' : 'Tải Full Backup'}
+        </button>
+      </div>
+
+      {/* Audit Logs Section */}
+      <div className="bg-white rounded-xl border border-stone-200 p-6">
+        <h2 className="text-lg font-semibold text-stone-900 mb-4 flex items-center gap-2">
+          <History className="w-5 h-5 text-indigo-600" />
+          Lịch sử thay đổi (Audit Logs)
+        </h2>
+        <p className="text-sm text-stone-500 mb-4">
+          Xem lịch sử các thay đổi dữ liệu trong hệ thống.
+        </p>
+        
+        <button
+          onClick={fetchAuditLogs}
+          disabled={loadingLogs}
+          className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 mb-4"
+        >
+          {loadingLogs ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <History className="w-5 h-5" />
+          )}
+          {loadingLogs ? 'Đang tải...' : 'Xem Audit Logs'}
+        </button>
+
+        {showAuditLogs && (
+          <div className="border border-stone-200 rounded-xl overflow-hidden">
+            <div className="max-h-96 overflow-y-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-stone-50 sticky top-0">
+                  <tr>
+                    <th className="px-4 py-2 text-left font-medium text-stone-600">Thời gian</th>
+                    <th className="px-4 py-2 text-left font-medium text-stone-600">Bảng</th>
+                    <th className="px-4 py-2 text-left font-medium text-stone-600">Hành động</th>
+                    <th className="px-4 py-2 text-left font-medium text-stone-600">Record ID</th>
+                    <th className="px-4 py-2 text-left font-medium text-stone-600">User</th>
+                    <th className="px-4 py-2 text-left font-medium text-stone-600">Thay đổi</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-stone-100">
+                  {auditLogs.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="px-4 py-8 text-center text-stone-500">
+                        Chưa có dữ liệu audit logs
+                      </td>
+                    </tr>
+                  ) : (
+                    auditLogs.map((log) => (
+                      <tr key={log.id} className="hover:bg-stone-50">
+                        <td className="px-4 py-2 text-stone-600">
+                          {new Date(log.created_at).toLocaleString('vi-VN')}
+                        </td>
+                        <td className="px-4 py-2">
+                          <span className="px-2 py-1 bg-stone-100 rounded text-xs font-medium">
+                            {log.table_name}
+                          </span>
+                        </td>
+                        <td className="px-4 py-2">
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            log.action === 'INSERT' ? 'bg-green-100 text-green-700' :
+                            log.action === 'UPDATE' ? 'bg-blue-100 text-blue-700' :
+                            'bg-red-100 text-red-700'
+                          }`}>
+                            {log.action}
+                          </span>
+                        </td>
+                        <td className="px-4 py-2 text-stone-600 font-mono text-xs">
+                          {log.record_id?.substring(0, 8)}...
+                        </td>
+                        <td className="px-4 py-2 text-stone-600 text-xs">
+                          {log.user_email || 'System'}
+                        </td>
+                        <td className="px-4 py-2 text-stone-500 text-xs">
+                          {log.changed_fields?.join(', ') || '-'}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

@@ -3,7 +3,7 @@
  */
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Save, MapPin, Building, Key, RefreshCw } from 'lucide-react'
+import { Save, MapPin, Building, RefreshCw, Info } from 'lucide-react'
 import { useToast } from '../components/Toast'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -13,17 +13,13 @@ interface Settings {
   mapCenterLng: string
   mapZoom: string
   companyName: string
-  supabaseUrl: string
-  supabaseAnonKey: string
 }
 
 const DEFAULT_SETTINGS: Settings = {
-  mapCenterLat: '11.0283',
-  mapCenterLng: '106.6167',
-  mapZoom: '16',
-  companyName: 'Hoa Viên Nghĩa Trang Bình Dương',
-  supabaseUrl: '',
-  supabaseAnonKey: ''
+  mapCenterLat: '11.168266',
+  mapCenterLng: '106.651891',
+  mapZoom: '17',
+  companyName: 'Hoa Viên Nghĩa Trang Bình Dương'
 }
 
 export function SettingsPage() {
@@ -156,7 +152,7 @@ export function SettingsPage() {
         </div>
       </motion.div>
 
-      {/* API Settings */}
+      {/* API Info (Read-only) */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -164,49 +160,33 @@ export function SettingsPage() {
         className="bg-white rounded-xl border border-gray-200 shadow-sm p-6"
       >
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-orange-100 rounded-lg">
-            <Key className="w-5 h-5 text-orange-600" />
+          <div className="p-2 bg-blue-100 rounded-lg">
+            <Info className="w-5 h-5 text-blue-600" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">API Configuration</h2>
-            <p className="text-sm text-gray-500">Supabase connection settings (stored in .env)</p>
+            <h2 className="text-lg font-semibold text-gray-900">Thông tin kết nối</h2>
+            <p className="text-sm text-gray-500">Cấu hình API được quản lý qua file .env</p>
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Supabase URL
-            </label>
-            <Input
-              value={settings.supabaseUrl}
-              onChange={(e) => setSettings({ ...settings, supabaseUrl: e.target.value })}
-              placeholder="https://your-project.supabase.co"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Set VITE_SUPABASE_URL in your .env file
-            </p>
+        <div className="p-4 bg-gray-50 rounded-lg space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-600">Supabase Status:</span>
+            <span className="text-sm font-medium text-green-600 flex items-center gap-1">
+              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+              Đã kết nối
+            </span>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Supabase Anon Key
-            </label>
-            <Input
-              type="password"
-              value={settings.supabaseAnonKey}
-              onChange={(e) => setSettings({ ...settings, supabaseAnonKey: e.target.value })}
-              placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Set VITE_SUPABASE_ANON_KEY in your .env file
-            </p>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-600">Database:</span>
+            <span className="text-sm text-gray-900">PostgreSQL</span>
           </div>
         </div>
 
-        <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-          <p className="text-sm text-amber-800">
-            <strong>Note:</strong> API keys should be stored in environment variables (.env file) 
-            for security. The values entered here are for reference only.
+        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-800">
+            <strong>Lưu ý:</strong> API keys được cấu hình trong file <code className="bg-blue-100 px-1 rounded">.env</code> để đảm bảo bảo mật. 
+            Liên hệ quản trị viên nếu cần thay đổi.
           </p>
         </div>
       </motion.div>

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useFavoritesStore, useMapStore } from '@/store/mapStore'
 import type { PlotRow } from '@/types/database'
-import { cn } from '@/lib/utils'
+import { cn, formatVNCurrency } from '@/lib/utils'
 
 // Status color mapping
 const STATUS_COLORS: Record<string, string> = {
@@ -166,20 +166,17 @@ export function FavoritesPanel({ isOpen, onClose, plots, onSelectPlot }: Favorit
                         >
                           <div className="flex items-center gap-2">
                             <MapPin className="w-4 h-4 text-stone-400" />
-                            <span className="font-medium text-stone-900">{plot.id}</span>
+                            <span className="font-medium text-stone-900">{plot.name || 'Chưa đặt tên'}</span>
                             <Badge className={cn('text-[10px]', STATUS_COLORS[plot.status])}>
                               {plot.status}
                             </Badge>
                           </div>
-                          {plot.name && (
-                            <p className="text-sm text-stone-600 mt-1 ml-6">{plot.name}</p>
+                          {plot.zone && (
+                            <p className="text-xs text-stone-500 mt-1 ml-6">Khu {plot.zone}</p>
                           )}
-                          <p className="text-xs text-stone-400 mt-0.5 ml-6">
-                            {plot.zone || 'Khu vực chung'}
-                          </p>
                           {plot.price && (
                             <p className="text-sm font-semibold text-amber-600 mt-1 ml-6">
-                              {plot.price.toLocaleString('vi-VN')} VNĐ
+                              {formatVNCurrency(plot.price)} VNĐ
                             </p>
                           )}
                         </button>

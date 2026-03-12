@@ -7,10 +7,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { supabase } from '@/lib/supabase'
 import type { SpiritualSiteRow, SpiritualSiteInsert, SpiritualSiteUpdate } from '@/types/database'
+import { useToast } from '@/admin/components/Toast'
 
 const SITE_TYPES = ['Chùa', 'Miếu', 'Đền', 'Nhà thờ', 'Tượng', 'Khác']
 
 export function SpiritualSitesPage() {
+  const { showToast } = useToast()
   const [sites, setSites] = useState<SpiritualSiteRow[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -39,7 +41,7 @@ export function SpiritualSitesPage() {
 
   const handleAdd = useCallback(async () => {
     if (!newSite.name || !newSite.lat || !newSite.lng) {
-      alert('Vui lòng nhập tên, Lat và Lng')
+      showToast('Vui lòng nhập tên, Lat và Lng', 'error')
       return
     }
     setIsSaving(true)
@@ -51,23 +53,25 @@ export function SpiritualSitesPage() {
         lng: parseFloat(newSite.lng),
         image_url: newSite.image_url.trim() || null
       }
-      const { error } = await supabase.from('spiritual_sites').insert(insertData as any)
+      const { error } = await supabase.from('spiritual_sites').insert(insertData as never)
       if (error) throw error
       setNewSite({ name: '', type: 'Chùa', lat: '', lng: '', image_url: '' })
       setShowAddForm(false)
       fetchSites()
+      showToast('Thêm điểm tâm linh thành công', 'success')
     } catch (err: any) {
-      alert('Lỗi: ' + err.message)
+      showToast('Lỗi: ' + err.message, 'error')
     } finally {
       setIsSaving(false)
     }
-  }, [newSite, fetchSites])
+  }, [newSite, fetchSites, showToast])
 
   const handleDelete = useCallback(async (site: SpiritualSiteRow) => {
     if (!confirm(`Xóa "${site.name}"?`)) return
     await supabase.from('spiritual_sites').delete().eq('id', site.id)
     fetchSites()
-  }, [fetchSites])
+    showToast('Đã xóa điểm tâm linh', 'success')
+  }, [fetchSites, showToast])
 
   const handleStartEdit = useCallback((site: SpiritualSiteRow) => {
     setEditingId(site.id)
@@ -85,17 +89,17 @@ export function SpiritualSitesPage() {
         lng: editForm.lng,
         image_url: editForm.image_url
       }
-      // @ts-ignore - Supabase types issue
-      const { error } = await supabase.from('spiritual_sites').update(updateData).eq('id', editingId)
+      const { error } = await supabase.from('spiritual_sites').update(updateData as never).eq('id', editingId)
       if (error) throw error
       setEditingId(null)
       fetchSites()
+      showToast('Cập nhật thành công', 'success')
     } catch (err: any) {
-      alert('Lỗi: ' + err.message)
+      showToast('Lỗi: ' + err.message, 'error')
     } finally {
       setIsSaving(false)
     }
-  }, [editingId, editForm, fetchSites])
+  }, [editingId, editForm, fetchSites, showToast])
 
   const handleExport = useCallback(() => {
     const csv = [

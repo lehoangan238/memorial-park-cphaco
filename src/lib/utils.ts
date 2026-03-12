@@ -14,6 +14,14 @@ export function formatDate(date: Date | string): string {
 }
 
 /**
+ * Format number to Vietnamese currency format (1.000.000)
+ */
+export function formatVNCurrency(num: number | null | undefined): string {
+  if (!num) return '0'
+  return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+}
+
+/**
  * Normalize Vietnamese text for search/comparison
  * Removes diacritics, converts to lowercase, normalizes whitespace
  * Migrated from legacy ocm-hybrid.js
