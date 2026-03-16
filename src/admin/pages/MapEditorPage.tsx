@@ -94,7 +94,6 @@ export function MapEditorPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [overlayQuery, setOverlayQuery] = useState('')
   const [selectedPlot, setSelectedPlot] = useState<PlotRow | null>(null)
-  const [loadedOverlayIds, setLoadedOverlayIds] = useState<Set<string>>(new Set())
   const [mapReady, setMapReady] = useState(false)
   
   // Map view state
@@ -196,7 +195,7 @@ export function MapEditorPage() {
           }
         }
       })
-      .filter(Boolean)
+      .filter((feature): feature is NonNullable<typeof feature> => feature !== null)
 
     return {
       type: 'FeatureCollection' as const,
@@ -224,7 +223,6 @@ export function MapEditorPage() {
 
       // Skip if source already exists on current style.
       if (map.getSource(sourceId)) {
-        setLoadedOverlayIds((prev) => (prev.has(overlay.id) ? prev : new Set([...prev, overlay.id])))
         return
       }
 
@@ -279,7 +277,6 @@ export function MapEditorPage() {
           map.moveLayer('assigned-plots-circle')
         }
 
-        setLoadedOverlayIds(prev => new Set([...prev, overlay.id]))
         console.log(`Loaded overlay: ${overlay.name || overlay.id}`)
       } catch (err) {
         console.error(`Error loading overlay ${overlay.id}:`, err)
