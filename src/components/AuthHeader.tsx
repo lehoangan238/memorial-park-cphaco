@@ -53,8 +53,7 @@ export function AuthHeader({
   }
 
   const handleNavigateToAdmin = () => {
-    window.location.hash = '#/admin'
-    window.location.reload()
+    window.location.href = '/admin'
   }
 
   return (
@@ -113,21 +112,19 @@ export function AuthHeader({
               </Tooltip>
             </TooltipProvider>
 
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleNavigateToAdmin}
+              className="h-8 px-3 rounded-lg text-xs"
+            >
+              <Settings className="w-3.5 h-3.5 mr-1" />
+              <span className="hidden sm:inline">Admin</span>
+            </Button>
+
             {/* Auth */}
             {isAuthenticated ? (
               <>
-                {userRole === 'Admin' && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleNavigateToAdmin}
-                    className="h-8 px-3 rounded-lg text-xs"
-                  >
-                    <Settings className="w-3.5 h-3.5 mr-1" />
-                    <span className="hidden sm:inline">Admin</span>
-                  </Button>
-                )}
-
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>

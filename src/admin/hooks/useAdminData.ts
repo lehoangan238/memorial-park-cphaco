@@ -1,8 +1,9 @@
+import { logger } from '@/lib/logger'
 /**
  * Admin Data Hooks - Supabase integration
  */
 import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, supabasePublic } from '@/lib/supabase'
 import type { PlotRow, PlotUpdate, StaffRow, StaffInsert, StaffUpdate, PatrolLogRow } from '@/types/database'
 
 // Dashboard Stats type
@@ -15,6 +16,15 @@ interface DashboardStats {
   recentPatrolLogs: PatrolLogRow[]
 }
 
+function isAbortLikeError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false
+  return (
+    error.name === 'AbortError' ||
+    error.message.includes('AbortError') ||
+    error.message.includes('signal is aborted')
+  )
+}
+
 // ==================== PLOTS ====================
 export function usePlots() {
   const [plots, setPlots] = useState<PlotRow[]>([])
@@ -25,13 +35,27 @@ export function usePlots() {
     setLoading(true)
     setError(null)
     try {
-      const { data, error: err } = await supabase
-        .from('plots')
-        .select('*')
-        .order('name', { ascending: true })
-      
-      if (err) throw err
-      setPlots((data as PlotRow[]) || [])
+      const pageSize = 500
+      let from = 0
+      const allRows: PlotRow[] = []
+
+      while (true) {
+        const { data, error: err } = await supabase
+          .from('plots')
+          .select('*')
+          .order('name', { ascending: true })
+          .range(from, from + pageSize - 1)
+
+        if (err) throw err
+
+        const rows = (data as PlotRow[]) || []
+        allRows.push(...rows)
+
+        if (rows.length < pageSize) break
+        from += pageSize
+      }
+
+      setPlots(allRows)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to fetch plots')
     } finally {
@@ -188,14 +212,18 @@ export function useDashboardStats() {
     setError(null)
     try {
       // Fetch plots for stats
-      const { data: plots, error: plotsErr } = await supabase
+      const { data: plots, error: plotsErr } = await supabasePublic
         .from('plots')
         .select('*')
       
-      if (plotsErr) throw plotsErr
+      if (plotsErr) {
+        const isAbort = plotsErr.message?.includes('AbortError') || plotsErr.message?.includes('signal is aborted')
+        if (isAbort) throw new Error('AbortError')
+        throw plotsErr
+      }
 
       // Fetch recent patrol logs
-      const { data: logs } = await supabase
+      const { data: logs } = await supabasePublic
         .from('patrol_logs')
         .select('*')
         .order('created_at', { ascending: false })
@@ -218,6 +246,27 @@ export function useDashboardStats() {
         recentPatrolLogs: (logs as PatrolLogRow[]) || []
       })
     } catch (e) {
+      if (isAbortLikeError(e)) {
+        logger.warn('[DashboardStats] Request aborted, retrying once with public client...')
+        try {
+          const { data: plots2, error: plotsErr2 } = await supabasePublic.from('plots').select('*')
+          if (plotsErr2) throw plotsErr2
+          const { data: logs2 } = await supabasePublic.from('patrol_logs').select('*').order('created_at', { ascending: false }).limit(5)
+          const plotsData = (plots2 as PlotRow[]) || []
+          setStats({
+            totalPlots: plotsData.length,
+            soldPlots: plotsData.filter(p => p.status === 'Đã bán' || p.status === 'Đã an táng').length,
+            availablePlots: plotsData.filter(p => p.status === 'Trống').length,
+            reservedPlots: plotsData.filter(p => p.status === 'Đặt cọc').length,
+            totalRevenue: plotsData.reduce((sum, p) => sum + (p.price || 0), 0),
+            recentPatrolLogs: (logs2 as PatrolLogRow[]) || []
+          })
+          return
+        } catch {
+          // Retry also failed; keep old stats and suppress transient abort UI.
+          return
+        }
+      }
       setError(e instanceof Error ? e.message : 'Failed to fetch stats')
     } finally {
       setLoading(false)
@@ -384,3 +433,4 @@ export function useCustomers() {
 
   return { customers, loading, error, fetchCustomers, addCustomer, updateCustomer, deleteCustomer }
 }
+

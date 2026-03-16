@@ -33,6 +33,20 @@ const OVERLAY_TYPES: { value: OverlayType; label: string }[] = [
 
 const MAX_IMAGE_SIZE = 2048
 
+const isAbortLikeError = (error: unknown): boolean => {
+  if (!error) return false
+  if (error instanceof Error) {
+    return error.name === 'AbortError' || error.message.includes('AbortError: signal is aborted')
+  }
+  if (typeof error === 'object') {
+    const maybeError = error as { name?: string; message?: string; details?: string }
+    return maybeError.name === 'AbortError'
+      || (typeof maybeError.message === 'string' && maybeError.message.includes('AbortError: signal is aborted'))
+      || (typeof maybeError.details === 'string' && maybeError.details.includes('AbortError: signal is aborted'))
+  }
+  return false
+}
+
 const resizeImage = (file: File, maxSize: number): Promise<Blob> => {
   return new Promise((resolve, reject) => {
     const img = new window.Image()
@@ -76,6 +90,17 @@ export function OverlayManagerPage() {
     nw_lat: '', nw_lng: '', se_lat: '', se_lng: '',
     type: 'zone_map' as OverlayType, opacity: 85
   })
+
+  const runWithSessionRetry = useCallback(async <T,>(operation: () => Promise<T>) => {
+    try {
+      return await operation()
+    } catch (error) {
+      if (!isAbortLikeError(error)) throw error
+      // Session may be idle/stale; wake auth state then retry once.
+      await supabase.auth.getSession()
+      return await operation()
+    }
+  }, [])
 
   const filteredData = useMemo(() => {
     if (filterType === 'all') return overlays
@@ -244,7 +269,15 @@ export function OverlayManagerPage() {
 
   const handleStartEdit = useCallback((overlay: OverlayRow) => {
     setEditingId(overlay.id)
-    setEditForm({ ...overlay })
+    setEditForm({
+      ...overlay,
+      nw_lat: Number.isFinite(overlay.nw_lat) ? overlay.nw_lat : undefined,
+      nw_lng: Number.isFinite(overlay.nw_lng) ? overlay.nw_lng : undefined,
+      se_lat: Number.isFinite(overlay.se_lat) ? overlay.se_lat : undefined,
+      se_lng: Number.isFinite(overlay.se_lng) ? overlay.se_lng : undefined,
+      opacity: Number.isFinite(overlay.opacity) ? overlay.opacity : 85,
+      z_index: Number.isFinite(overlay.z_index) ? overlay.z_index : 0,
+    })
   }, [])
 
   const handleReplaceImage = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -255,40 +288,84 @@ export function OverlayManagerPage() {
       const baseName = (editForm.name || editingId).replace(/\s+/g, '_')
       const resizedBlob = await resizeImage(file, MAX_IMAGE_SIZE)
       const fileName = `${baseName}_${Date.now()}.png`
-      const { error: uploadErr } = await supabase.storage.from('overlays').upload(fileName, resizedBlob, { cacheControl: '3600', upsert: false })
-      if (uploadErr) throw uploadErr
+      await runWithSessionRetry(async () => {
+        const { error: uploadErr } = await supabase.storage.from('overlays').upload(fileName, resizedBlob, { cacheControl: '3600', upsert: false })
+        if (uploadErr) throw uploadErr
+        return true
+      })
       const { data: urlData } = supabase.storage.from('overlays').getPublicUrl(fileName)
-      await supabase.from('overlays').update({ url: urlData.publicUrl } as never).eq('id', editingId)
+      await runWithSessionRetry(async () => {
+        const { error } = await supabase.from('overlays').update({ url: urlData.publicUrl } as never).eq('id', editingId)
+        if (error) throw error
+        return true
+      })
       setEditForm(prev => ({ ...prev, url: urlData.publicUrl }))
       refetch()
       showToast('Đã thay ảnh overlay', 'success')
     } catch (err: any) {
-      showToast('Lỗi khi thay ảnh: ' + err.message, 'error')
+      if (isAbortLikeError(err)) {
+        showToast('Phiên làm việc vừa tạm ngắt. Vui lòng thử lưu lại.', 'error')
+      } else {
+        showToast('Lỗi khi thay ảnh: ' + err.message, 'error')
+      }
     } finally {
       setIsSaving(false)
       if (replaceFileRef.current) replaceFileRef.current.value = ''
     }
-  }, [editingId, editForm.name, refetch, showToast])
+  }, [editingId, editForm.name, refetch, runWithSessionRetry, showToast])
 
   const handleSaveEdit = useCallback(async () => {
     if (!editingId) return
+    
+    // Validation
+    const errors: string[] = []
+    if (!editForm.name?.trim()) errors.push('Tên là bắt buộc')
+    if (!Number.isFinite(editForm.nw_lat)) errors.push('NW Lat phải là số hợp lệ')
+    if (!Number.isFinite(editForm.nw_lng)) errors.push('NW Lng phải là số hợp lệ')
+    if (!Number.isFinite(editForm.se_lat)) errors.push('SE Lat phải là số hợp lệ')
+    if (!Number.isFinite(editForm.se_lng)) errors.push('SE Lng phải là số hợp lệ')
+    if (editForm.opacity === undefined || editForm.opacity === null || !Number.isFinite(editForm.opacity)) errors.push('Opacity phải là số hợp lệ')
+    
+    if (errors.length > 0) {
+      showToast(errors.join(', '), 'error')
+      return
+    }
+    
     setIsSaving(true)
     try {
       const updateData: OverlayUpdate = {
-        name: editForm.name, display_name: editForm.display_name, description: editForm.description,
-        nw_lat: editForm.nw_lat, nw_lng: editForm.nw_lng, se_lat: editForm.se_lat, se_lng: editForm.se_lng,
-        opacity: editForm.opacity, z_index: editForm.z_index, type: editForm.type, is_visible: editForm.is_visible
+        name: editForm.name?.trim() || null,
+        display_name: editForm.display_name?.trim() || null,
+        description: editForm.description?.trim() || null,
+        nw_lat: editForm.nw_lat as number,
+        nw_lng: editForm.nw_lng as number,
+        se_lat: editForm.se_lat as number,
+        se_lng: editForm.se_lng as number,
+        opacity: editForm.opacity ?? 85,
+        z_index: editForm.z_index ?? 0,
+        type: editForm.type,
+        is_visible: editForm.is_visible
       }
-      await supabase.from('overlays').update(updateData as never).eq('id', editingId)
+      await runWithSessionRetry(async () => {
+        const { error } = await supabase.from('overlays').update(updateData as never).eq('id', editingId)
+        if (error) throw error
+        return true
+      })
+      
       setEditingId(null)
       refetch()
       showToast('Lưu overlay thành công', 'success')
-    } catch {
-      showToast('Lỗi khi lưu', 'error')
+    } catch (err: any) {
+      if (isAbortLikeError(err)) {
+        showToast('Phiên làm việc vừa tạm ngắt. Vui lòng bấm Lưu lại.', 'error')
+        return
+      }
+      console.error('Save error:', err)
+      showToast(`Lỗi khi lưu: ${err.message || 'Không xác định'}`, 'error')
     } finally {
       setIsSaving(false)
     }
-  }, [editingId, editForm, refetch, showToast])
+  }, [editingId, editForm, refetch, runWithSessionRetry, showToast])
 
   const handleExport = useCallback(() => {
     const data = table.getFilteredRowModel().rows.map(r => r.original)
@@ -407,17 +484,17 @@ export function OverlayManagerPage() {
               <div><label className="text-sm text-stone-500">Mô tả</label><Input value={editForm.description || ''} onChange={(e) => setEditForm(p => ({...p, description: e.target.value}))} /></div>
             </div>
             <div className="grid grid-cols-4 gap-3 mb-4">
-              <div><label className="text-sm text-stone-500">NW Lat</label><Input type="number" step="any" value={editForm.nw_lat || ''} onChange={(e) => setEditForm(p => ({...p, nw_lat: parseFloat(e.target.value)}))} /></div>
-              <div><label className="text-sm text-stone-500">NW Lng</label><Input type="number" step="any" value={editForm.nw_lng || ''} onChange={(e) => setEditForm(p => ({...p, nw_lng: parseFloat(e.target.value)}))} /></div>
-              <div><label className="text-sm text-stone-500">SE Lat</label><Input type="number" step="any" value={editForm.se_lat || ''} onChange={(e) => setEditForm(p => ({...p, se_lat: parseFloat(e.target.value)}))} /></div>
-              <div><label className="text-sm text-stone-500">SE Lng</label><Input type="number" step="any" value={editForm.se_lng || ''} onChange={(e) => setEditForm(p => ({...p, se_lng: parseFloat(e.target.value)}))} /></div>
+              <div><label className="text-sm text-stone-500">NW Lat</label><Input type="number" step="any" value={Number.isFinite(editForm.nw_lat) ? editForm.nw_lat : ''} onChange={(e) => { const val = e.target.value.trim(); setEditForm(p => ({...p, nw_lat: val === '' ? undefined : parseFloat(val)})) }} /></div>
+              <div><label className="text-sm text-stone-500">NW Lng</label><Input type="number" step="any" value={Number.isFinite(editForm.nw_lng) ? editForm.nw_lng : ''} onChange={(e) => { const val = e.target.value.trim(); setEditForm(p => ({...p, nw_lng: val === '' ? undefined : parseFloat(val)})) }} /></div>
+              <div><label className="text-sm text-stone-500">SE Lat</label><Input type="number" step="any" value={Number.isFinite(editForm.se_lat) ? editForm.se_lat : ''} onChange={(e) => { const val = e.target.value.trim(); setEditForm(p => ({...p, se_lat: val === '' ? undefined : parseFloat(val)})) }} /></div>
+              <div><label className="text-sm text-stone-500">SE Lng</label><Input type="number" step="any" value={Number.isFinite(editForm.se_lng) ? editForm.se_lng : ''} onChange={(e) => { const val = e.target.value.trim(); setEditForm(p => ({...p, se_lng: val === '' ? undefined : parseFloat(val)})) }} /></div>
             </div>
             <div className="grid grid-cols-3 gap-4 mb-4">
               <div>
-                <label className="text-sm text-stone-500">Opacity: {editForm.opacity}%</label>
-                <input type="range" min="0" max="100" value={editForm.opacity || 85} onChange={(e) => setEditForm(p => ({...p, opacity: parseInt(e.target.value)}))} className="w-full" />
+                <label className="text-sm text-stone-500">Opacity: {Number.isFinite(editForm.opacity) ? editForm.opacity : 85}%</label>
+                <input type="range" min="0" max="100" value={Number.isFinite(editForm.opacity) ? editForm.opacity : 85} onChange={(e) => setEditForm(p => ({...p, opacity: parseInt(e.target.value)}))} className="w-full" />
               </div>
-              <div><label className="text-sm text-stone-500">Z-Index</label><Input type="number" value={editForm.z_index || 0} onChange={(e) => setEditForm(p => ({...p, z_index: parseInt(e.target.value)}))} /></div>
+              <div><label className="text-sm text-stone-500">Z-Index</label><Input type="number" value={Number.isFinite(editForm.z_index) ? editForm.z_index : 0} onChange={(e) => { const val = e.target.value.trim(); setEditForm(p => ({...p, z_index: val === '' ? 0 : parseInt(val)})) }} /></div>
               <div className="flex items-center gap-2 pt-5">
                 <input type="checkbox" checked={editForm.is_visible ?? true} onChange={(e) => setEditForm(p => ({...p, is_visible: e.target.checked}))} className="w-4 h-4" />
                 <label className="text-sm">Hiển thị trên bản đồ</label>

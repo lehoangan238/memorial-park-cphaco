@@ -1,10 +1,41 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useEffect, useMemo } from 'react'
+import { supabasePublic } from '@/lib/supabase'
 import { saveToCache, getFromCache } from '@/lib/offlineCache'
 import type { PlotRow, OverlayRow, SpiritualSiteRow, PlotFeatureCollection, RoadNodeRow, RoadEdgeRow } from '@/types/database'
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 import { logger } from '@/lib/logger'
+
+type CacheDataKey = 'plots' | 'overlays' | 'spiritual_sites' | 'road_nodes' | 'road_edges'
+
+const CACHE_TIMEOUT_MS = 1200
+const NETWORK_TIMEOUT_MS = 12000
+const PLOTS_NETWORK_TIMEOUT_MS = 35000
+
+function withTimeout<T>(promise: PromiseLike<T>, timeoutMs: number, label: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timeoutId = setTimeout(() => reject(new Error(`${label} timed out after ${timeoutMs}ms`)), timeoutMs)
+
+    Promise.resolve(promise)
+      .then((value) => {
+        clearTimeout(timeoutId)
+        resolve(value)
+      })
+      .catch((error: unknown) => {
+        clearTimeout(timeoutId)
+        reject(error)
+      })
+  })
+}
+
+async function getCacheWithTimeout<T>(key: CacheDataKey): Promise<T | null> {
+  try {
+    return await withTimeout(getFromCache<T>(key), CACHE_TIMEOUT_MS, `cache:${key}`)
+  } catch (error) {
+    logger.warn(`[useMapData] Cache read skipped for ${key}:`, error)
+    return null
+  }
+}
 
 /**
  * Status color mapping for Vietnamese statuses
@@ -31,37 +62,76 @@ function getPlotStatusColor(status: string): string {
  */
 async function fetchPlots(): Promise<PlotRow[]> {
   logger.info('[fetchPlots] Starting fetch...')
-  
-  // Try cache first for faster initial load
-  const cached = await getFromCache<PlotRow[]>('plots').catch(() => null)
+
+  // Read cache in parallel and do not let IndexedDB block network fetches forever.
+  const cachedPromise = getCacheWithTimeout<PlotRow[]>('plots')
   
   try {
-    // Fetch from network
-    const { data, error } = await supabase
-      .from('plots')
-      .select('*')
-      .order('zone', { ascending: true })
-      .abortSignal(undefined as unknown as AbortSignal) // Disable abort signal
+    const pageSize = 500
+    let from = 0
+    const allRows: PlotRow[] = []
+    let pageError: Error | null = null
 
-    if (error) {
-      logger.error('[fetchPlots] Supabase error:', error)
+    while (true) {
+      const { data, error } = await withTimeout<any>(
+        supabasePublic
+          .from('plots')
+          .select('*')
+          .order('id', { ascending: true })
+          .range(from, from + pageSize - 1),
+        PLOTS_NETWORK_TIMEOUT_MS,
+        `network:plots:${from}`
+      )
+
+      if (error) {
+        pageError = error as unknown as Error
+        break
+      }
+
+      const rows = ((data || []) as Array<Partial<PlotRow>>).map((row) => ({
+        ...row,
+        deceased_name: row.deceased_name ?? null,
+        birth_date: row.birth_date ?? null,
+        death_date: row.death_date ?? null,
+      })) as PlotRow[]
+      allRows.push(...rows)
+
+      if (rows.length < pageSize) {
+        break
+      }
+
+      from += pageSize
+    }
+
+    const cached = await cachedPromise
+
+    if (pageError) {
+      const isAbort = pageError.message?.includes('AbortError') || pageError.message?.includes('signal is aborted')
+      if (isAbort) {
+        logger.warn('[fetchPlots] Request aborted by Supabase internals, using cache')
+        if (cached && cached.length > 0) return cached
+      } else {
+        logger.error('[fetchPlots] Supabase error:', pageError)
+      }
       // Return cached data if available
       if (cached && cached.length > 0) {
         logger.info(`[fetchPlots] Using ${cached.length} cached plots due to error`)
         return cached
       }
-      throw error
+      throw pageError
     }
     
-    logger.info(`[fetchPlots] Fetched ${data?.length || 0} plots from network`)
+    logger.info(`[fetchPlots] Fetched ${allRows.length || 0} plots from network`)
     
     // Save to cache for offline use
-    if (data && data.length > 0) {
-      saveToCache('plots', data).catch((error) => logger.error(error))
+    if (allRows.length > 0) {
+      saveToCache('plots', allRows).catch((error) => logger.error(error))
     }
     
-    return data || []
+    return allRows
   } catch (error) {
+    const cached = await cachedPromise
+
     // Check if it's an AbortError - use cached data
     if (error instanceof Error && error.name === 'AbortError') {
       logger.warn('[fetchPlots] Request aborted, using cache')
@@ -87,13 +157,14 @@ async function fetchPlots(): Promise<PlotRow[]> {
  * Convert plots to GeoJSON FeatureCollection for map rendering
  */
 export function plotsToGeoJSON(plots: PlotRow[]): PlotFeatureCollection {
+  const validPlots = plots.filter(p => isFinite(Number(p.lng)) && isFinite(Number(p.lat)))
   return {
     type: 'FeatureCollection',
-    features: plots.map(plot => ({
+    features: validPlots.map(plot => ({
       type: 'Feature',
       geometry: {
         type: 'Point',
-        coordinates: [plot.lng, plot.lat] // GeoJSON uses [lng, lat]
+        coordinates: [Number(plot.lng), Number(plot.lat)] // GeoJSON uses [lng, lat]
       },
       properties: {
         ...plot,
@@ -110,6 +181,7 @@ export function usePlots() {
   return useQuery({
     queryKey: ['plots'],
     queryFn: fetchPlots,
+    retry: 1,
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false
   })
@@ -121,9 +193,13 @@ export function usePlots() {
 export function usePlotsGeoJSON() {
   const query = usePlots()
   
+  const geoJSON = useMemo(() => {
+    return query.data ? plotsToGeoJSON(query.data) : null
+  }, [query.data])
+
   return {
     ...query,
-    geoJSON: query.data ? plotsToGeoJSON(query.data) : null
+    geoJSON
   }
 }
 
@@ -133,13 +209,19 @@ export function usePlotsGeoJSON() {
  * Fetch all overlays from Supabase with offline cache fallback
  */
 async function fetchOverlays(): Promise<OverlayRow[]> {
-  const cached = await getFromCache<OverlayRow[]>('overlays').catch(() => null)
+  const cachedPromise = getCacheWithTimeout<OverlayRow[]>('overlays')
   
   try {
-    const { data, error } = await supabase
-      .from('overlays')
-      .select('*')
-      .order('name', { ascending: true })
+    const { data, error } = await withTimeout<any>(
+      supabasePublic
+        .from('overlays')
+        .select('*')
+        .order('name', { ascending: true }),
+      NETWORK_TIMEOUT_MS,
+      'network:overlays'
+    )
+
+    const cached = await cachedPromise
 
     if (error) {
       if (cached && cached.length > 0) return cached
@@ -153,6 +235,8 @@ async function fetchOverlays(): Promise<OverlayRow[]> {
     
     return data || []
   } catch (error) {
+    const cached = await cachedPromise
+
     if (error instanceof Error && error.name === 'AbortError' && cached) {
       return cached
     }
@@ -169,6 +253,7 @@ export function useOverlays() {
   return useQuery({
     queryKey: ['overlays'],
     queryFn: fetchOverlays,
+    retry: 1,
     staleTime: 10 * 60 * 1000, // 10 minutes - overlays change less frequently
     refetchOnWindowFocus: false
   })
@@ -180,13 +265,19 @@ export function useOverlays() {
  * Fetch all spiritual sites from Supabase with offline cache fallback
  */
 async function fetchSpiritualSites(): Promise<SpiritualSiteRow[]> {
-  const cached = await getFromCache<SpiritualSiteRow[]>('spiritual_sites').catch(() => null)
+  const cachedPromise = getCacheWithTimeout<SpiritualSiteRow[]>('spiritual_sites')
   
   try {
-    const { data, error } = await supabase
-      .from('spiritual_sites')
-      .select('*')
-      .order('name', { ascending: true })
+    const { data, error } = await withTimeout<any>(
+      supabasePublic
+        .from('spiritual_sites')
+        .select('*')
+        .order('name', { ascending: true }),
+      NETWORK_TIMEOUT_MS,
+      'network:spiritual_sites'
+    )
+
+    const cached = await cachedPromise
 
     if (error) {
       if (cached && cached.length > 0) return cached
@@ -199,6 +290,8 @@ async function fetchSpiritualSites(): Promise<SpiritualSiteRow[]> {
     
     return data || []
   } catch (error) {
+    const cached = await cachedPromise
+
     if (error instanceof Error && error.name === 'AbortError' && cached) {
       return cached
     }
@@ -215,6 +308,7 @@ export function useSpiritualSites() {
   return useQuery({
     queryKey: ['spiritual_sites'],
     queryFn: fetchSpiritualSites,
+    retry: 1,
     staleTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false
   })
@@ -229,10 +323,14 @@ export function useSpiritualSites() {
  */
 async function fetchRoadNodes(): Promise<RoadNodeRow[]> {
   try {
-    const { data, error } = await supabase
-      .from('road_nodes')
-      .select('*')
-      .order('name', { ascending: true })
+    const { data, error } = await withTimeout<any>(
+      supabasePublic
+        .from('road_nodes')
+        .select('*')
+        .order('name', { ascending: true }),
+      NETWORK_TIMEOUT_MS,
+      'network:road_nodes'
+    )
 
     if (error) throw error
     
@@ -256,9 +354,13 @@ async function fetchRoadNodes(): Promise<RoadNodeRow[]> {
  */
 async function fetchRoadEdges(): Promise<RoadEdgeRow[]> {
   try {
-    const { data, error } = await supabase
-      .from('road_edges')
-      .select('*')
+    const { data, error } = await withTimeout<any>(
+      supabasePublic
+        .from('road_edges')
+        .select('*'),
+      NETWORK_TIMEOUT_MS,
+      'network:road_edges'
+    )
 
     if (error) throw error
     
@@ -284,6 +386,7 @@ export function useRoadNodes() {
   return useQuery({
     queryKey: ['road_nodes'],
     queryFn: fetchRoadNodes,
+    retry: 1,
     staleTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false
   })
@@ -296,6 +399,7 @@ export function useRoadEdges() {
   return useQuery({
     queryKey: ['road_edges'],
     queryFn: fetchRoadEdges,
+    retry: 1,
     staleTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false
   })
@@ -319,7 +423,7 @@ function useRealtimeSubscription() {
     logger.info('[Realtime] Setting up Supabase subscriptions...')
 
     // Subscribe to plots changes
-    const plotsChannel = supabase
+    const plotsChannel = supabasePublic
       .channel('plots-changes')
       .on(
         'postgres_changes',
@@ -354,7 +458,7 @@ function useRealtimeSubscription() {
       })
 
     // Subscribe to overlays changes
-    const overlaysChannel = supabase
+    const overlaysChannel = supabasePublic
       .channel('overlays-changes')
       .on(
         'postgres_changes',
@@ -372,7 +476,7 @@ function useRealtimeSubscription() {
       })
 
     // Subscribe to spiritual_sites changes
-    const sitesChannel = supabase
+    const sitesChannel = supabasePublic
       .channel('spiritual-sites-changes')
       .on(
         'postgres_changes',
@@ -393,12 +497,14 @@ function useRealtimeSubscription() {
     return () => {
       isActive = false
       logger.info('[Realtime] Cleaning up subscriptions...')
-      supabase.removeChannel(plotsChannel).catch(() => {})
-      supabase.removeChannel(overlaysChannel).catch(() => {})
-      supabase.removeChannel(sitesChannel).catch(() => {})
+      supabasePublic.removeChannel(plotsChannel).catch(() => {})
+      supabasePublic.removeChannel(overlaysChannel).catch(() => {})
+      supabasePublic.removeChannel(sitesChannel).catch(() => {})
     }
   }, [queryClient])
 }
+
+const EMPTY_ARRAY: any[] = []
 
 /**
  * Fetch all map data in parallel with real-time updates
@@ -413,17 +519,19 @@ export function useMapData() {
   // Enable real-time subscriptions
   useRealtimeSubscription()
 
-  const isLoading = plots.isLoading || overlays.isLoading || spiritualSites.isLoading
-  const isError = plots.isError || overlays.isError || spiritualSites.isError
+  // Plots are the critical data source; overlays/sites are optional enrichments.
+  // Do not block the entire map when optional queries are slow or failing.
+  const isLoading = plots.isLoading && !plots.data
+  const isError = plots.isError && !plots.data
   const error = plots.error || overlays.error || spiritualSites.error
 
   return {
-    plots: plots.data || [],
+    plots: plots.data || EMPTY_ARRAY as PlotRow[],
     plotsGeoJSON: plots.geoJSON,
-    overlays: overlays.data || [],
-    spiritualSites: spiritualSites.data || [],
-    roadNodes: roadNodes.data || [],
-    roadEdges: roadEdges.data || [],
+    overlays: overlays.data || EMPTY_ARRAY as OverlayRow[],
+    spiritualSites: spiritualSites.data || EMPTY_ARRAY as SpiritualSiteRow[],
+    roadNodes: roadNodes.data || EMPTY_ARRAY as RoadNodeRow[],
+    roadEdges: roadEdges.data || EMPTY_ARRAY as RoadEdgeRow[],
     isLoading,
     isError,
     error,

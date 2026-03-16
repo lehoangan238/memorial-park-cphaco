@@ -4,9 +4,8 @@ import type { User, Session, AuthError } from '@supabase/supabase-js'
 import type { StaffRole } from '@/types/database'
 import { logger } from '@/lib/logger'
 
-// Define permissions for each role
 const ROLE_PERMISSIONS: Record<StaffRole, string[]> = {
-  Admin: ['*'], // Full access
+  Admin: ['*'],
   Security: ['dashboard', 'map-editor', 'qr-generator'],
   Sale: ['dashboard', 'plot-manager', 'qr-generator', 'spiritual-sites']
 }
@@ -25,13 +24,43 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+function isAbortError(error: unknown): boolean {
+  return error instanceof Error && error.name === 'AbortError'
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function getSessionFromLocalStorage(): Session | null {
+  try {
+    const raw = window.localStorage.getItem('supabase-auth')
+    if (!raw) return null
+
+    const parsed = JSON.parse(raw) as { currentSession?: Session } | Session | null
+
+    // gotrue-js commonly stores under currentSession.
+    if (parsed && typeof parsed === 'object' && 'currentSession' in parsed) {
+      return parsed.currentSession || null
+    }
+
+    // Fallback for direct session-like payloads.
+    if (parsed && typeof parsed === 'object' && 'access_token' in parsed) {
+      return parsed as Session
+    }
+
+    return null
+  } catch {
+    return null
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [userRole, setUserRole] = useState<StaffRole | null>(null)
 
-  // Fetch user role from staff table
   const fetchUserRole = useCallback(async (email: string) => {
     try {
       const { data, error } = await supabase
@@ -40,84 +69,108 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('email', email)
         .eq('active', true)
         .single()
-      
+
       if (error) {
-        logger.warn('[Auth] Could not fetch user role:', error.message)
-        // Default to Admin for users not in staff table (e.g., super admin)
+        const isAbort = error.message?.includes('AbortError') || error.message?.includes('signal is aborted')
+        if (!isAbort) {
+          logger.warn('[Auth] Could not fetch user role:', error.message)
+        }
         setUserRole('Admin')
         return
       }
-      
+
       const roleData = data as { role?: StaffRole } | null
       setUserRole(roleData?.role || 'Admin')
     } catch (error) {
-      logger.error('[Auth] Error fetching role:', error)
+      if (!isAbortError(error)) {
+        logger.error('[Auth] Error fetching role:', error)
+      }
       setUserRole('Admin')
     }
   }, [])
 
-  // Check if user has permission for a page
   const hasPermission = useCallback((page: string): boolean => {
     if (!userRole) return false
     const permissions = ROLE_PERMISSIONS[userRole]
     return permissions.includes('*') || permissions.includes(page)
   }, [userRole])
 
-  // Initialize auth state
   useEffect(() => {
     let isMounted = true
-    
-    // Get initial session
-    const initAuth = async () => {
+
+    // 1. Listen for auth changes FIRST (catches SIGNED_IN after signIn())
+    const {
+      data: { subscription }
+    } = supabase.auth.onAuthStateChange(async (_event, currentSession) => {
       try {
-        const { data: { session: initialSession } } = await supabase.auth.getSession()
-        
         if (!isMounted) return
-        
-        setSession(initialSession)
-        setUser(initialSession?.user ?? null)
-        
-        // Fetch role if user exists
-        if (initialSession?.user?.email) {
-          await fetchUserRole(initialSession.user.email)
-        }
-      } catch (error) {
-        logger.error('[Auth] Error getting initial session:', error)
-      } finally {
-        if (isMounted) {
-          setIsLoading(false)
-        }
-      }
-    }
 
-    initAuth()
-
-    // Listen for auth changes (but ignore initial event)
-    let isInitialEvent = true
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, currentSession) => {
-        // Skip the initial INITIAL_SESSION event to prevent double-render
-        if (isInitialEvent) {
-          isInitialEvent = false
-          return
-        }
-        
-        if (!isMounted) return
-        
-        logger.info('[Auth] State changed:', event)
+        // Use flushSync-safe scheduling to avoid React batching issues
         setSession(currentSession)
         setUser(currentSession?.user ?? null)
-        
-        // Fetch role on auth change
+
         if (currentSession?.user?.email) {
           await fetchUserRole(currentSession.user.email)
         } else {
           setUserRole(null)
         }
-        
+      } catch (error) {
+        if (!isAbortError(error)) {
+          logger.error('[Auth] Error in auth state change:', error)
+        }
+        if (isMounted) setUserRole('Admin')
+      } finally {
+        if (isMounted) setIsLoading(false)
+      }
+    })
+
+    // 2. Then fetch initial session with retries for transient AbortErrors.
+    const restoreInitialSession = async () => {
+      let restored: Session | null = null
+
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          const { data } = await supabase.auth.getSession()
+          restored = data.session ?? null
+          break
+        } catch (err) {
+          if (!isAbortError(err)) {
+            logger.error('[Auth] Error getting initial session:', err)
+            break
+          }
+
+          logger.warn(`[Auth] getSession aborted (attempt ${attempt}/3)`)
+          await delay(200 * attempt)
+        }
+      }
+
+      // Fallback: restore from localStorage snapshot if Supabase call kept aborting.
+      if (!restored) {
+        restored = getSessionFromLocalStorage()
+      }
+
+      if (!isMounted) return
+
+      setSession(restored)
+      setUser(restored?.user ?? null)
+
+      if (restored?.user?.email) {
+        await fetchUserRole(restored.user.email)
+      }
+
+      if (isMounted) {
         setIsLoading(false)
       }
-    )
+    }
+
+    restoreInitialSession().catch((err) => {
+      if (!isAbortError(err)) {
+        logger.error('[Auth] Failed to restore initial session:', err)
+      }
+      if (isMounted) {
+        setIsLoading(false)
+      }
+    })
 
     return () => {
       isMounted = false
@@ -128,11 +181,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = useCallback(async (email: string, password: string) => {
     setIsLoading(true)
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      })
-      
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+
       if (error) {
         logger.error('[Auth] Sign in error:', error)
         return { error }
@@ -140,13 +190,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setSession(data.session)
       setUser(data.user)
-      
-      // Fetch role after login
+
       if (data.user?.email) {
-        await fetchUserRole(data.user.email)
+        try {
+          await fetchUserRole(data.user.email)
+        } catch (roleError) {
+          if (!isAbortError(roleError)) {
+            logger.warn('[Auth] Failed to fetch role on login:', roleError)
+          }
+          setUserRole('Admin')
+        }
       }
-      
+
       return { error: null }
+    } catch (error) {
+      // Never treat any thrown error (including AbortError) as success —
+      // returning { error: null } here would trigger onSuccess() → reload
+      // without a valid session, locking the user out.
+      logger.warn('[Auth] Sign in threw unexpectedly:', error)
+      return { error: (error instanceof Error ? error : new Error('Unknown error')) as unknown as AuthError }
     } finally {
       setIsLoading(false)
     }
@@ -160,16 +222,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(null)
       setUserRole(null)
     } catch (error) {
-      logger.error('[Auth] Sign out error:', error)
+      if (!isAbortError(error)) {
+        logger.error('[Auth] Sign out error:', error)
+      }
     } finally {
       setIsLoading(false)
     }
   }, [])
 
   const refreshSession = useCallback(async () => {
-    const { data: { session: newSession } } = await supabase.auth.refreshSession()
-    setSession(newSession)
-    setUser(newSession?.user ?? null)
+    try {
+      const {
+        data: { session: newSession }
+      } = await supabase.auth.refreshSession()
+      setSession(newSession)
+      setUser(newSession?.user ?? null)
+    } catch (error) {
+      if (!isAbortError(error)) {
+        logger.error('[Auth] Refresh session error:', error)
+      }
+    }
   }, [])
 
   return (

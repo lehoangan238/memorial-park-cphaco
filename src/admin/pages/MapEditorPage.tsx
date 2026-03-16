@@ -9,7 +9,7 @@
  * 4. Auto flyTo when selecting plot
  */
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react'
-import Map, { NavigationControl, ScaleControl } from 'react-map-gl/maplibre'
+import Map, { NavigationControl, ScaleControl, Source, Layer } from 'react-map-gl/maplibre'
 import type { MapRef } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { motion } from 'framer-motion'
@@ -27,6 +27,64 @@ const DEFAULT_ZOOM = 17
 // Map style - using CartoDB Positron
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
 
+function normalizeOverlayOpacity(rawOpacity: unknown): number {
+  const value = Number(rawOpacity)
+  if (!Number.isFinite(value)) return 0.85
+
+  // Accept both DB formats: 0-1 and 0-100.
+  const normalized = value > 1 ? value / 100 : value
+  return Math.min(1, Math.max(0.05, normalized))
+}
+
+function parseCoordinate(value: unknown): number | null {
+  if (value === null || value === undefined) {
+    return null
+  }
+
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null
+  }
+
+  if (typeof value === 'string') {
+    const normalized = value.trim().replace(',', '.')
+    if (!normalized) return null
+    const parsed = Number(normalized)
+    return Number.isFinite(parsed) ? parsed : null
+  }
+
+  return null
+}
+
+function getPlotCoordinates(plot: PlotRow): { lat: number; lng: number } | null {
+  const lat = parseCoordinate(plot.lat)
+  const lng = parseCoordinate(plot.lng)
+  if (lat === null || lng === null) return null
+  return { lat, lng }
+}
+
+function getOverlayBounds(overlay: OverlayRow) {
+  const rawNwLng = Number(overlay.nw_lng)
+  const rawNwLat = Number(overlay.nw_lat)
+  const rawSeLng = Number(overlay.se_lng)
+  const rawSeLat = Number(overlay.se_lat)
+
+  if (!isFinite(rawNwLng) || !isFinite(rawNwLat) || !isFinite(rawSeLng) || !isFinite(rawSeLat)) {
+    return null
+  }
+
+  // Normalize bounds to tolerate swapped NW/SE data from admin inputs.
+  const west = Math.min(rawNwLng, rawSeLng)
+  const east = Math.max(rawNwLng, rawSeLng)
+  const south = Math.min(rawNwLat, rawSeLat)
+  const north = Math.max(rawNwLat, rawSeLat)
+
+  if (west === east || south === north) {
+    return null
+  }
+
+  return { west, east, south, north }
+}
+
 export function MapEditorPage() {
   const mapRef = useRef<MapRef>(null)
   const { plots, loading, updatePlotLocation, fetchPlots } = usePlots()
@@ -34,6 +92,7 @@ export function MapEditorPage() {
   const { showToast } = useToast()
   
   const [searchQuery, setSearchQuery] = useState('')
+  const [overlayQuery, setOverlayQuery] = useState('')
   const [selectedPlot, setSelectedPlot] = useState<PlotRow | null>(null)
   const [loadedOverlayIds, setLoadedOverlayIds] = useState<Set<string>>(new Set())
   const [mapReady, setMapReady] = useState(false)
@@ -50,7 +109,7 @@ export function MapEditorPage() {
   // Filter plots: only show plots WITHOUT location
   const filteredPlots = useMemo(() => {
     return plots
-      .filter(p => !p.lat || !p.lng) // Only plots without coordinates
+      .filter((p) => !getPlotCoordinates(p)) // Only plots without valid coordinates
       .filter(p =>
         p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.customer_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -60,10 +119,90 @@ export function MapEditorPage() {
 
   // Stats
   const plotsWithoutLocation = useMemo(() => {
-    return plots.filter(p => !p.lat || !p.lng).length
+    return plots.filter((p) => !getPlotCoordinates(p)).length
   }, [plots])
 
   const plotsWithLocation = plots.length - plotsWithoutLocation
+
+  const assignedPlotsGeoJSON = useMemo(() => {
+    const assigned = plots
+      .map((plot) => {
+        const coordinates = getPlotCoordinates(plot)
+        return coordinates ? { plot, coordinates } : null
+      })
+      .filter(Boolean) as Array<{ plot: PlotRow; coordinates: { lat: number; lng: number } }>
+
+    return {
+      type: 'FeatureCollection' as const,
+      features: assigned.map(({ plot, coordinates }) => ({
+        type: 'Feature' as const,
+        geometry: {
+          type: 'Point' as const,
+          coordinates: [coordinates.lng, coordinates.lat] as [number, number]
+        },
+        properties: {
+          id: plot.id,
+          status: plot.status
+        }
+      }))
+    }
+  }, [plots])
+
+  const filteredOverlays = useMemo(() => {
+    const query = overlayQuery.trim().toLowerCase()
+    if (!query) return overlays
+
+    return overlays.filter((overlay) => {
+      const name = (overlay.name || '').toLowerCase()
+      const displayName = (overlay.display_name || '').toLowerCase()
+      const id = overlay.id.toLowerCase()
+      return name.includes(query) || displayName.includes(query) || id.includes(query)
+    })
+  }, [overlays, overlayQuery])
+
+  const visibleOverlayIds = useMemo(() => {
+    return new Set(filteredOverlays.map((overlay) => overlay.id))
+  }, [filteredOverlays])
+
+  const invalidFilteredOverlays = useMemo(() => {
+    return filteredOverlays.filter((overlay) => {
+      const bounds = getOverlayBounds(overlay)
+      const hasUrl = Boolean((overlay.url || overlay.url_mobile || '').trim())
+      return !bounds || !hasUrl
+    })
+  }, [filteredOverlays])
+
+  const overlayBoundsGeoJSON = useMemo(() => {
+    const features = filteredOverlays
+      .map((overlay) => {
+        const bounds = getOverlayBounds(overlay)
+        if (!bounds) return null
+
+        return {
+          type: 'Feature' as const,
+          geometry: {
+            type: 'Polygon' as const,
+            coordinates: [[
+              [bounds.west, bounds.north],
+              [bounds.east, bounds.north],
+              [bounds.east, bounds.south],
+              [bounds.west, bounds.south],
+              [bounds.west, bounds.north]
+            ]]
+          },
+          properties: {
+            id: overlay.id,
+            name: overlay.display_name || overlay.name || overlay.id
+          }
+        }
+      })
+      .filter(Boolean)
+
+    return {
+      type: 'FeatureCollection' as const,
+      features
+    }
+  }, [filteredOverlays])
 
   // Load overlay images onto map
   useEffect(() => {
@@ -72,21 +211,33 @@ export function MapEditorPage() {
     const map = mapRef.current?.getMap()
     if (!map) return
 
-    overlays.forEach((overlay: OverlayRow) => {
+    const sortedOverlays = [...overlays].sort((a, b) => {
+      const zA = Number.isFinite(Number(a.z_index)) ? Number(a.z_index) : 0
+      const zB = Number.isFinite(Number(b.z_index)) ? Number(b.z_index) : 0
+      if (zA !== zB) return zA - zB
+      return (a.name || a.id).localeCompare(b.name || b.id)
+    })
+
+    sortedOverlays.forEach((overlay: OverlayRow) => {
       const sourceId = `overlay-${overlay.id}`
       const layerId = `overlay-layer-${overlay.id}`
 
-      // Skip if already loaded
-      if (loadedOverlayIds.has(overlay.id)) return
-      if (map.getSource(sourceId)) return
+      // Skip if source already exists on current style.
+      if (map.getSource(sourceId)) {
+        setLoadedOverlayIds((prev) => (prev.has(overlay.id) ? prev : new Set([...prev, overlay.id])))
+        return
+      }
 
-      const nwLng = Number(overlay.nw_lng)
-      const nwLat = Number(overlay.nw_lat)
-      const seLng = Number(overlay.se_lng)
-      const seLat = Number(overlay.se_lat)
+      const bounds = getOverlayBounds(overlay)
+      const sourceUrl = (overlay.url || overlay.url_mobile || '').trim()
 
-      if (!isFinite(nwLng) || !isFinite(nwLat) || !isFinite(seLng) || !isFinite(seLat)) {
+      if (!bounds) {
         console.warn(`Invalid coordinates for overlay ${overlay.id}`)
+        return
+      }
+
+      if (!sourceUrl) {
+        console.warn(`Missing image URL for overlay ${overlay.id}`)
         return
       }
 
@@ -94,25 +245,39 @@ export function MapEditorPage() {
         // Add image source
         map.addSource(sourceId, {
           type: 'image',
-          url: overlay.url,
+          url: sourceUrl,
           coordinates: [
-            [nwLng, nwLat], // top-left
-            [seLng, nwLat], // top-right
-            [seLng, seLat], // bottom-right
-            [nwLng, seLat]  // bottom-left
+            [bounds.west, bounds.north], // top-left
+            [bounds.east, bounds.north], // top-right
+            [bounds.east, bounds.south], // bottom-right
+            [bounds.west, bounds.south]  // bottom-left
           ]
         })
 
-        // Add raster layer
-        map.addLayer({
+        const overlayLayerConfig = {
           id: layerId,
           type: 'raster',
           source: sourceId,
           paint: {
-            'raster-opacity': 0.85,
+            'raster-opacity': normalizeOverlayOpacity(overlay.opacity),
             'raster-fade-duration': 300
+          },
+          layout: {
+            visibility: 'visible'
           }
-        })
+        } as const
+
+        // Add raster layer (insert below assigned dots only when that layer exists).
+        if (map.getLayer('assigned-plots-circle')) {
+          map.addLayer(overlayLayerConfig, 'assigned-plots-circle')
+        } else {
+          map.addLayer(overlayLayerConfig)
+        }
+
+        // Ensure assigned position dots stay on top after overlay updates.
+        if (map.getLayer('assigned-plots-circle')) {
+          map.moveLayer('assigned-plots-circle')
+        }
 
         setLoadedOverlayIds(prev => new Set([...prev, overlay.id]))
         console.log(`Loaded overlay: ${overlay.name || overlay.id}`)
@@ -120,7 +285,54 @@ export function MapEditorPage() {
         console.error(`Error loading overlay ${overlay.id}:`, err)
       }
     })
-  }, [mapReady, overlays, loadedOverlayIds])
+  }, [mapReady, overlays])
+
+  // Toggle overlay visibility based on search filter.
+  useEffect(() => {
+    if (!mapReady) return
+
+    const map = mapRef.current?.getMap()
+    if (!map) return
+
+    const sortedOverlays = [...overlays].sort((a, b) => {
+      const zA = Number.isFinite(Number(a.z_index)) ? Number(a.z_index) : 0
+      const zB = Number.isFinite(Number(b.z_index)) ? Number(b.z_index) : 0
+      if (zA !== zB) return zA - zB
+      return (a.name || a.id).localeCompare(b.name || b.id)
+    })
+
+    sortedOverlays.forEach((overlay: OverlayRow) => {
+      const layerId = `overlay-layer-${overlay.id}`
+      if (!map.getLayer(layerId)) return
+
+      const shouldShow = visibleOverlayIds.has(overlay.id)
+      map.setLayoutProperty(layerId, 'visibility', shouldShow ? 'visible' : 'none')
+    })
+  }, [mapReady, overlays, visibleOverlayIds])
+
+  const handleFocusOverlay = useCallback((overlay: OverlayRow) => {
+    const map = mapRef.current?.getMap()
+    if (!map) return
+
+    const bounds = getOverlayBounds(overlay)
+
+    if (!bounds) {
+      showToast('Overlay này có tọa độ không hợp lệ', 'error')
+      return
+    }
+
+    map.fitBounds(
+      [
+        [bounds.west, bounds.south],
+        [bounds.east, bounds.north]
+      ],
+      {
+        padding: 80,
+        duration: 700,
+        maxZoom: 20
+      }
+    )
+  }, [showToast])
 
   // Handle selecting a plot from the list
   const handlePlotSelect = useCallback((plot: PlotRow) => {
@@ -273,6 +485,52 @@ export function MapEditorPage() {
           attributionControl={false}
           cursor={selectedPlot ? 'crosshair' : 'grab'}
         >
+          {/* Debug bounds for filtered overlays (helps detect image loading issues) */}
+          {overlayQuery.trim() && overlayBoundsGeoJSON.features.length > 0 && (
+            <Source id="overlay-bounds-debug" type="geojson" data={overlayBoundsGeoJSON}>
+              <Layer
+                id="overlay-bounds-line"
+                type="line"
+                paint={{
+                  'line-color': '#1D4ED8',
+                  'line-width': 1.4,
+                  'line-opacity': 0.8,
+                  'line-dasharray': [2, 2]
+                }}
+              />
+            </Source>
+          )}
+
+          {/* Assigned plot positions */}
+          {assignedPlotsGeoJSON.features.length > 0 && (
+            <Source id="assigned-plots" type="geojson" data={assignedPlotsGeoJSON}>
+              <Layer
+                id="assigned-plots-circle"
+                type="circle"
+                paint={{
+                  'circle-radius': [
+                    'interpolate', ['linear'], ['zoom'],
+                    14, 2.4,
+                    16, 3.2,
+                    18, 4.2,
+                    20, 5.4
+                  ],
+                  'circle-color': [
+                    'match', ['get', 'status'],
+                    'Trống', '#10B981',
+                    'Đã bán', '#EF4444',
+                    'Đặt cọc', '#F59E0B',
+                    'Đã an táng', '#6B7280',
+                    '#3B82F6'
+                  ],
+                  'circle-opacity': 0.9,
+                  'circle-stroke-color': '#ffffff',
+                  'circle-stroke-width': 1.3
+                }}
+              />
+            </Source>
+          )}
+
           {/* Navigation Controls */}
           <NavigationControl position="bottom-right" showCompass />
           <ScaleControl position="bottom-left" />
@@ -306,6 +564,37 @@ export function MapEditorPage() {
           </p>
         </div>
 
+        {/* Overlay Filter */}
+        <div className="absolute top-16 left-4 z-10 w-[300px] bg-white/90 backdrop-blur rounded-lg p-3 shadow-lg border border-gray-100">
+          <div className="text-xs font-semibold text-gray-700 mb-2">Lọc overlay theo tên</div>
+          <Input
+            value={overlayQuery}
+            onChange={(e) => setOverlayQuery(e.target.value)}
+            placeholder="Nhập tên, display name hoặc ID..."
+            className="h-8 text-xs"
+          />
+          <div className="mt-2 text-[11px] text-gray-600 flex gap-3">
+            <span>Khớp: <strong>{filteredOverlays.length}</strong></span>
+            <span>Hiện: <strong>{visibleOverlayIds.size}</strong></span>
+            <span>Lỗi tọa độ: <strong className="text-red-600">{invalidFilteredOverlays.length}</strong></span>
+          </div>
+
+          {filteredOverlays.length > 0 && (
+            <div className="mt-2 max-h-28 overflow-auto space-y-1">
+              {filteredOverlays.map((overlay) => (
+                <button
+                  key={overlay.id}
+                  onClick={() => handleFocusOverlay(overlay)}
+                  className="w-full text-left px-2 py-1 rounded text-[11px] hover:bg-blue-50 text-gray-700"
+                  title="Zoom đến overlay này"
+                >
+                  {(overlay.display_name || overlay.name || overlay.id)}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Overlay Status */}
         <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur p-3 rounded-lg shadow-lg text-xs z-10">
           <div className="flex items-center gap-2 text-gray-600">
@@ -313,8 +602,11 @@ export function MapEditorPage() {
             <span>
               {overlaysLoading 
                 ? 'Đang tải bản đồ...' 
-                : `${loadedOverlayIds.size}/${overlays.length} overlay`}
+                : `${visibleOverlayIds.size}/${filteredOverlays.length} overlay`}
             </span>
+          </div>
+          <div className="mt-1 text-gray-600">
+            Vị trí đã gán: <strong>{plotsWithLocation}</strong>
           </div>
         </div>
       </motion.div>

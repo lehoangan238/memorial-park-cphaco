@@ -20,12 +20,14 @@ import {
   Loader2,
   AlertCircle,
   Church,
-  Image
+  Image,
+  ExternalLink
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useMapData } from '@/hooks/useMapData'
+import { supabasePublic } from '@/lib/supabase'
 import type { PlotRow, OverlayRow, SpiritualSiteRow, PlotFeatureCollection } from '@/types/database'
 import { cn, formatVNCurrency } from '@/lib/utils'
 import type { ViewStateChangeEvent } from 'react-map-gl/maplibre'
@@ -49,6 +51,144 @@ const INITIAL_VIEW_STATE: {
 
 // Map style
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
+const MAX_OVERLAY_RETRIES = 3
+const OVERLAY_RETRY_COOLDOWN_MS = 4000
+const OVERLAY_FETCH_TIMEOUT_MS = 10000
+const OVERLAY_LABELS_HIDE_ZOOM = 18.6
+const OVERLAY_LABEL_EXCLUDE_KEYWORDS = ['VONG XOAY'] as const
+
+function normalizeLabelToken(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+}
+
+function shouldHideOverlayLabel(overlay: OverlayRow): boolean {
+  const labelCandidates = [overlay.display_name, overlay.name]
+    .filter((value): value is string => Boolean(value?.trim()))
+    .map((value) => normalizeLabelToken(value.trim()))
+
+  return labelCandidates.some((label) =>
+    OVERLAY_LABEL_EXCLUDE_KEYWORDS.some((keyword) => label.includes(keyword))
+  )
+}
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timeoutId = setTimeout(() => reject(new Error(`timeout after ${timeoutMs}ms`)), timeoutMs)
+    promise
+      .then((value) => {
+        clearTimeout(timeoutId)
+        resolve(value)
+      })
+      .catch((error) => {
+        clearTimeout(timeoutId)
+        reject(error)
+      })
+  })
+}
+
+function encodePathSegments(path: string): string {
+  return path
+    .split('/')
+    .filter(Boolean)
+    .map((segment) => {
+      try {
+        return encodeURIComponent(decodeURIComponent(segment))
+      } catch {
+        return encodeURIComponent(segment)
+      }
+    })
+    .join('/')
+}
+
+function extractOverlayStoragePath(url?: string | null): string | null {
+  if (!url) return null
+
+  try {
+    const parsed = new URL(url)
+    const marker = '/storage/v1/object/public/overlays/'
+    const markerIndex = parsed.pathname.indexOf(marker)
+    if (markerIndex === -1) return null
+
+    const rawPath = parsed.pathname.slice(markerIndex + marker.length)
+    if (!rawPath) return null
+
+    try {
+      return decodeURIComponent(rawPath)
+    } catch {
+      return rawPath
+    }
+  } catch {
+    return null
+  }
+}
+
+function toSupabasePublicOverlayUrl(path: string): string {
+  const baseUrl = String(import.meta.env.VITE_SUPABASE_URL || '').replace(/\/$/, '')
+  const safePath = encodePathSegments(path)
+  return `${baseUrl}/storage/v1/object/public/overlays/${safePath}`
+}
+
+function getOverlayCandidateUrls(overlay: OverlayRow, isMobile: boolean): string[] {
+  const primary = isMobile ? overlay.url_mobile || overlay.url : overlay.url
+  const secondary = isMobile ? overlay.url : overlay.url_mobile
+
+  const candidates = [primary, secondary].filter((value): value is string => Boolean(value))
+
+  for (const sourceUrl of [overlay.url, overlay.url_mobile]) {
+    const path = extractOverlayStoragePath(sourceUrl)
+    if (path) {
+      candidates.push(toSupabasePublicOverlayUrl(path))
+    }
+  }
+
+  return [...new Set(candidates)]
+}
+
+async function fetchOverlayObjectUrl(imageUrl: string): Promise<string> {
+  const storagePath = extractOverlayStoragePath(imageUrl)
+  if (storagePath) {
+    try {
+      const { data, error } = await withTimeout(
+        supabasePublic.storage.from('overlays').download(storagePath),
+        OVERLAY_FETCH_TIMEOUT_MS
+      )
+
+      if (!error && data) {
+        return URL.createObjectURL(data)
+      }
+    } catch {
+      // Fall back to direct fetch below.
+    }
+  }
+
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), OVERLAY_FETCH_TIMEOUT_MS)
+
+  try {
+    const response = await fetch(imageUrl, {
+      method: 'GET',
+      mode: 'cors',
+      cache: 'force-cache',
+      signal: controller.signal
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+
+    const blob = await response.blob()
+    if (!blob || blob.size === 0) {
+      throw new Error('Empty overlay image response')
+    }
+
+    return URL.createObjectURL(blob)
+  } finally {
+    clearTimeout(timeout)
+  }
+}
 
 interface ParkMapProps {
   onPlotSelect: (plot: PlotRow | null) => void
@@ -63,11 +203,12 @@ const plotsCirclePaint = {
     'interpolate',
     ['linear'],
     ['zoom'],
-    16, 0,      // Hidden at zoom 16
-    17, 6,      // Start showing at zoom 17
-    18, 8,
-    19, 12,
-    22, 18
+    14.5, 0,    // Hidden at low zoom
+    15.5, 2.5,
+    16.5, 3.8,
+    18, 5.2,
+    19, 6.8,
+    22, 10
   ],
   'circle-color': ['get', '_statusColor'],
   'circle-stroke-color': '#ffffff',
@@ -75,16 +216,20 @@ const plotsCirclePaint = {
     'interpolate',
     ['linear'],
     ['zoom'],
-    16, 0,
-    17, 1.5,
-    19, 2
+    14.5, 0,
+    15.5, 0.55,
+    16.5, 0.8,
+    19, 1.1
   ],
   'circle-opacity': [
     'interpolate',
     ['linear'],
     ['zoom'],
-    16, 0,
-    17, 0.9
+    14.5, 0,
+    15.5, 0.5,
+    16.5, 0.68,
+    17, 0.78,
+    19, 0.85
   ]
 }
 
@@ -94,11 +239,12 @@ const plotsHoverPaint = {
     'interpolate',
     ['linear'],
     ['zoom'],
-    16, 0,
-    17, 12,
-    18, 14,
-    19, 20,
-    22, 28
+    14.5, 0,
+    15.5, 5,
+    16.5, 7.5,
+    18, 9.5,
+    19, 12.5,
+    22, 18
   ],
   'circle-color': 'rgba(59, 130, 246, 0.3)',
   'circle-stroke-color': '#3B82F6',
@@ -106,8 +252,9 @@ const plotsHoverPaint = {
     'interpolate',
     ['linear'],
     ['zoom'],
-    16, 0,
-    17, 2
+    14.5, 0,
+    15.5, 0.8,
+    16.5, 1.3
   ]
 }
 
@@ -118,13 +265,20 @@ export function ParkMap({
   flyToPlot
 }: ParkMapProps) {
   const mapRef = useRef<MapRef>(null)
-  const [viewState, setViewState] = useState(INITIAL_VIEW_STATE)
+  const [mapInfo, setMapInfo] = useState(INITIAL_VIEW_STATE)
+  const pendingViewStateRef = useRef(INITIAL_VIEW_STATE)
+  const viewInfoRafRef = useRef<number | null>(null)
   const [showOverlays, setShowOverlays] = useState(true)
   const [showMarkers, setShowMarkers] = useState(true)
   const [hoveredPlotId, setHoveredPlotId] = useState<string | null>(null)
   const [loadedOverlayIds, setLoadedOverlayIds] = useState<Set<string>>(new Set())
   const [mapReady, setMapReady] = useState(false)
   const [failedOverlayIds, setFailedOverlayIds] = useState<Set<string>>(new Set())
+  const failedOverlayRetryRef = useRef<Record<string, { attempts: number; lastAttemptAt: number }>>({})
+  const overlayObjectUrlsRef = useRef<Record<string, string>>({})
+  const [selectedSpiritualSite, setSelectedSpiritualSite] = useState<SpiritualSiteRow | null>(null)
+  const [loadingTimedOut, setLoadingTimedOut] = useState(false)
+  const [geoLocateError, setGeoLocateError] = useState<string | null>(null)
 
   // Fetch data from Supabase
   const { 
@@ -136,6 +290,21 @@ export function ParkMap({
     isError, 
     error 
   } = useMapData()
+
+  const hasPlotData = (plots?.length || 0) > 0 || (plotsGeoJSON?.features.length || 0) > 0
+
+  useEffect(() => {
+    if (!isLoading) {
+      setLoadingTimedOut(false)
+      return
+    }
+
+    const timer = setTimeout(() => {
+      setLoadingTimedOut(true)
+    }, 12000)
+
+    return () => clearTimeout(timer)
+  }, [isLoading])
 
   // Filter plots based on status only (search is handled by autocomplete)
   const filteredGeoJSON = useMemo<PlotFeatureCollection | null>(() => {
@@ -152,6 +321,17 @@ export function ParkMap({
     }
   }, [plotsGeoJSON, filterStatus])
 
+  const filteredPlotFallback = useMemo(() => {
+    if (!plots || plots.length === 0) return [] as PlotRow[]
+    return plots
+      .filter(plot => (filterStatus === 'all' || plot.status === filterStatus))
+      .filter(plot => isFinite(Number(plot.lng)) && isFinite(Number(plot.lat)))
+      .slice(0, 400)
+  }, [plots, filterStatus])
+
+  const shouldShowPlotFallbackMarkers =
+    !isLoading && !isError && filteredPlotFallback.length > 0 && (!filteredGeoJSON || filteredGeoJSON.features.length === 0)
+
   // Find hovered plot data
   const hoveredPlot = useMemo(() => {
     if (!hoveredPlotId || !plots) return null
@@ -167,26 +347,41 @@ export function ParkMap({
     
     overlays
       .filter(overlay => overlay.is_visible !== false)
+      .filter((overlay) => !shouldHideOverlayLabel(overlay))
       .forEach(overlay => {
         // Use display_name if available, otherwise use name
-        const labelName = overlay.display_name || overlay.name
+        const labelName = (overlay.display_name || overlay.name || '').trim()
         if (!labelName) return
 
-        if (!groups[labelName]) {
-          groups[labelName] = { lngs: [], lats: [], name: labelName }
+        // Normalize key to prevent duplicates like "B2.2" vs "b2.2 "
+        const groupKey = labelName.toUpperCase()
+
+        const nwLng = Number(overlay.nw_lng)
+        const seLng = Number(overlay.se_lng)
+        const nwLat = Number(overlay.nw_lat)
+        const seLat = Number(overlay.se_lat)
+
+        if (!isFinite(nwLng) || !isFinite(seLng) || !isFinite(nwLat) || !isFinite(seLat)) {
+          return
+        }
+
+        if (!groups[groupKey]) {
+          groups[groupKey] = { lngs: [], lats: [], name: labelName }
         }
         
         // Add center point of this overlay to the group
-        groups[labelName].lngs.push((Number(overlay.nw_lng) + Number(overlay.se_lng)) / 2)
-        groups[labelName].lats.push((Number(overlay.nw_lat) + Number(overlay.se_lat)) / 2)
+        groups[groupKey].lngs.push((nwLng + seLng) / 2)
+        groups[groupKey].lats.push((nwLat + seLat) / 2)
       })
 
     // Create features with averaged center points
-    const features = Object.values(groups).map(group => {
-      const centerLng = group.lngs.reduce((a, b) => a + b, 0) / group.lngs.length
-      const centerLat = group.lats.reduce((a, b) => a + b, 0) / group.lats.length
+    const features = Object.values(groups)
+      .filter(group => group.lngs.length > 0 && group.lats.length > 0)
+      .map(group => {
+        const centerLng = group.lngs.reduce((a, b) => a + b, 0) / group.lngs.length
+        const centerLat = group.lats.reduce((a, b) => a + b, 0) / group.lats.length
 
-      return {
+        return {
         type: 'Feature' as const,
         geometry: {
           type: 'Point' as const,
@@ -204,11 +399,57 @@ export function ParkMap({
     }
   }, [overlays])
 
+  // Create GeoJSON for close-zoom labels: one label per visible overlay
+  const overlayPerImageLabelsGeoJSON = useMemo(() => {
+    if (!overlays || overlays.length === 0) return null
+
+    const features = overlays
+      .filter(overlay => overlay.is_visible !== false)
+      .filter((overlay) => !shouldHideOverlayLabel(overlay))
+      .map((overlay) => {
+        const labelName = (overlay.display_name || overlay.name || '').trim()
+        const centerLng = (Number(overlay.nw_lng) + Number(overlay.se_lng)) / 2
+        const centerLat = (Number(overlay.nw_lat) + Number(overlay.se_lat)) / 2
+
+        if (!labelName || !isFinite(centerLng) || !isFinite(centerLat)) {
+          return null
+        }
+
+        return {
+          type: 'Feature' as const,
+          geometry: {
+            type: 'Point' as const,
+            coordinates: [centerLng, centerLat]
+          },
+          properties: {
+            name: labelName
+          }
+        }
+      })
+      .filter((feature): feature is NonNullable<typeof feature> => feature !== null)
+
+    return {
+      type: 'FeatureCollection' as const,
+      features
+    }
+  }, [overlays])
+
 
   // Fly to plot when flyToPlot prop changes
   useEffect(() => {
     if (flyToPlot) {
-      setViewState(prev => ({
+      const map = mapRef.current?.getMap()
+      if (map) {
+        map.flyTo({
+          center: [flyToPlot.lng, flyToPlot.lat],
+          zoom: 19,
+          pitch: 60,
+          bearing: 0,
+          duration: 700
+        })
+      }
+
+      setMapInfo((prev) => ({
         ...prev,
         longitude: flyToPlot.lng,
         latitude: flyToPlot.lat,
@@ -255,7 +496,7 @@ export function ParkMap({
 
   // Minimum zoom level to load overlays (helps weak mobile devices)
   const isMobile = window.innerWidth < 768
-  const MIN_OVERLAY_ZOOM = isMobile ? 17.5 : 16
+  const MIN_OVERLAY_ZOOM = isMobile ? 16.2 : 15.5
 
   // Lazy load overlays based on viewport - runs on map move
   const loadVisibleOverlays = useCallback(() => {
@@ -277,20 +518,18 @@ export function ParkMap({
       return
     }
 
-    // Show overlays when zoom is high enough
-    if (showOverlays) {
-      loadedOverlayIds.forEach((overlayId) => {
-        const layerId = `overlay-layer-${overlayId}`
-        if (map.getLayer(layerId)) {
-          map.setLayoutProperty(layerId, 'visibility', 'visible')
-        }
-      })
-    }
+    // When zooming back in, show already loaded overlays again.
+    loadedOverlayIds.forEach((overlayId) => {
+      const layerId = `overlay-layer-${overlayId}`
+      if (map.getLayer(layerId)) {
+        map.setLayoutProperty(layerId, 'visibility', showOverlays ? 'visible' : 'none')
+      }
+    })
 
     let newlyLoaded = 0
 
-    // Limit number of overlays loaded at once on mobile to prevent memory issues
-    const maxOverlaysToLoad = isMobile ? 2 : 20
+    // Keep per-cycle loading moderate to avoid frame drops while panning/zooming.
+    const maxOverlaysToLoad = isMobile ? 4 : 16
 
     // Sort overlays by z_index (lower values load first, appear below)
     const sortedOverlays = [...overlays].sort((a, b) => (a.z_index ?? 0) - (b.z_index ?? 0))
@@ -305,8 +544,15 @@ export function ParkMap({
       // Skip if already loaded
       if (loadedOverlayIds.has(overlay.id)) return
 
-      // Skip if previously failed
-      if (failedOverlayIds.has(overlay.id)) return
+      // Retry failed overlays with cooldown instead of skipping forever.
+      if (failedOverlayIds.has(overlay.id)) {
+        const retry = failedOverlayRetryRef.current[overlay.id]
+        if (!retry) return
+
+        const reachedRetryLimit = retry.attempts >= MAX_OVERLAY_RETRIES
+        const stillCoolingDown = Date.now() - retry.lastAttemptAt < OVERLAY_RETRY_COOLDOWN_MS
+        if (reachedRetryLimit || stillCoolingDown) return
+      }
 
       // Skip if not visible
       if (overlay.is_visible === false) return
@@ -332,60 +578,112 @@ export function ParkMap({
         [nwLng, seLat]  // Bottom Left (SW)
       ]
 
-      // Add cache-busting timestamp to URL
-      const imageUrl = overlay.url.includes('?') 
-        ? `${overlay.url}&_t=${Date.now()}` 
-        : `${overlay.url}?_t=${Date.now()}`
+      const candidateUrls = getOverlayCandidateUrls(overlay, isMobile)
+      if (candidateUrls.length === 0) {
+        return
+      }
 
       // Load overlay image
       const loadOverlayImage = async () => {
         try {
-          // Check if source already exists (prevent duplicate error)
           if (map.getSource(sourceId)) {
-            console.log(`[Overlays] Source already exists: ${overlay.name || overlay.id}`)
             setLoadedOverlayIds(prev => new Set([...prev, overlay.id]))
             return
           }
 
-          map.addSource(sourceId, {
-            type: 'image',
-            url: imageUrl,
-            coordinates: coordinates
-          })
+          let loaded = false
+          let lastError: unknown = null
 
-          // Use opacity from database (default 85, convert to 0-1 range)
-          const opacityValue = (overlay.opacity ?? 85) / 100
+          for (const imageUrl of candidateUrls) {
+            try {
+              if (map.getLayer(layerId)) map.removeLayer(layerId)
+              if (map.getSource(sourceId)) map.removeSource(sourceId)
 
-          map.addLayer({
-            id: layerId,
-            type: 'raster',
-            source: sourceId,
-            paint: { 
-              'raster-opacity': opacityValue,
-              'raster-fade-duration': 300
+              if (overlayObjectUrlsRef.current[overlay.id]) {
+                URL.revokeObjectURL(overlayObjectUrlsRef.current[overlay.id])
+                delete overlayObjectUrlsRef.current[overlay.id]
+              }
+
+              const localObjectUrl = await fetchOverlayObjectUrl(imageUrl)
+              overlayObjectUrlsRef.current[overlay.id] = localObjectUrl
+
+              map.addSource(sourceId, {
+                type: 'image',
+                url: localObjectUrl,
+                coordinates: coordinates
+              })
+
+              const opacityValue = (overlay.opacity ?? 85) / 100
+
+              map.addLayer({
+                id: layerId,
+                type: 'raster',
+                source: sourceId,
+                paint: {
+                  'raster-opacity': opacityValue,
+                  'raster-fade-duration': 300
+                }
+              })
+
+              map.setLayoutProperty(layerId, 'visibility', showOverlays ? 'visible' : 'none')
+
+              setLoadedOverlayIds(prev => new Set([...prev, overlay.id]))
+              setFailedOverlayIds(prev => {
+                if (!prev.has(overlay.id)) return prev
+                const next = new Set(prev)
+                next.delete(overlay.id)
+                return next
+              })
+              delete failedOverlayRetryRef.current[overlay.id]
+              console.log(`[Overlays] Loaded: ${overlay.name || overlay.id}`)
+
+              const plotLayers = ['plots-circle', 'plots-hover', 'plots-selected']
+              plotLayers.forEach(plotLayerId => {
+                if (map.getLayer(plotLayerId)) {
+                  map.moveLayer(plotLayerId)
+                }
+              })
+
+              // Keep text labels above plot circles so markers do not hide labels.
+              ;['overlay-labels-text', 'overlay-labels-close-text'].forEach((labelLayerId) => {
+                if (map.getLayer(labelLayerId)) {
+                  map.moveLayer(labelLayerId)
+                }
+              })
+
+              loaded = true
+              break
+            } catch (innerErr) {
+              lastError = innerErr
+              continue
             }
-          })
+          }
 
-          // Apply current visibility state
-          map.setLayoutProperty(layerId, 'visibility', showOverlays ? 'visible' : 'none')
-
-          setLoadedOverlayIds(prev => new Set([...prev, overlay.id]))
-          console.log(`[Overlays] Loaded: ${overlay.name || overlay.id}`)
-
-          // Move plot layers to top
-          const plotLayers = ['plots-circle', 'plots-hover', 'plots-selected']
-          plotLayers.forEach(plotLayerId => {
-            if (map.getLayer(plotLayerId)) {
-              map.moveLayer(plotLayerId)
-            }
-          })
+          if (!loaded) {
+            throw lastError || new Error('No overlay URL candidate could be loaded')
+          }
         } catch (err) {
           // Handle "already exists" error gracefully
           if (err instanceof Error && err.message.includes('already exists')) {
             console.log(`[Overlays] Already loaded: ${overlay.name || overlay.id}`)
             setLoadedOverlayIds(prev => new Set([...prev, overlay.id]))
+            setFailedOverlayIds(prev => {
+              if (!prev.has(overlay.id)) return prev
+              const next = new Set(prev)
+              next.delete(overlay.id)
+              return next
+            })
+            delete failedOverlayRetryRef.current[overlay.id]
             return
           }
+
+          const previousRetry = failedOverlayRetryRef.current[overlay.id]
+          const nextAttempts = (previousRetry?.attempts || 0) + 1
+          failedOverlayRetryRef.current[overlay.id] = {
+            attempts: nextAttempts,
+            lastAttemptAt: Date.now()
+          }
+
           console.error(`[Overlays] Failed to load ${overlay.name || overlay.id}:`, err)
           setFailedOverlayIds(prev => new Set([...prev, overlay.id]))
         }
@@ -407,7 +705,8 @@ export function ParkMap({
       const timer = setTimeout(loadVisibleOverlays, 100)
       return () => clearTimeout(timer)
     }
-  }, [mapReady, overlays.length, loadVisibleOverlays])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapReady, overlays.length]) // Purposely removed loadVisibleOverlays to prevent re-triggering on loaded overlays state changes
 
   // Clear loaded overlays when overlay data changes (e.g., image replaced)
   const overlayUrlsRef = useRef<Record<string, string>>({})
@@ -427,6 +726,10 @@ export function ParkMap({
         const sourceId = `overlay-${overlay.id}`
         if (mapInstance.getLayer(layerId)) mapInstance.removeLayer(layerId)
         if (mapInstance.getSource(sourceId)) mapInstance.removeSource(sourceId)
+        if (overlayObjectUrlsRef.current[overlay.id]) {
+          URL.revokeObjectURL(overlayObjectUrlsRef.current[overlay.id])
+          delete overlayObjectUrlsRef.current[overlay.id]
+        }
         // Remove from loaded set so it will be reloaded
         setLoadedOverlayIds(prev => {
           const newSet = new Set(prev)
@@ -457,50 +760,124 @@ export function ParkMap({
     })
   }, [showOverlays, loadedOverlayIds])
 
-  // Debounced overlay loading on map move
-  const moveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  
-  const handleMove = useCallback((evt: ViewStateChangeEvent) => {
-    setViewState(evt.viewState)
-    
-    // Debounce overlay loading - wait 200ms after last move
-    if (moveTimeoutRef.current) {
-      clearTimeout(moveTimeoutRef.current)
+  useEffect(() => {
+    return () => {
+      Object.values(overlayObjectUrlsRef.current).forEach((url) => {
+        URL.revokeObjectURL(url)
+      })
+      overlayObjectUrlsRef.current = {}
     }
-    moveTimeoutRef.current = setTimeout(() => {
-      loadVisibleOverlays()
-    }, 200)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (viewInfoRafRef.current != null) {
+        cancelAnimationFrame(viewInfoRafRef.current)
+      }
+    }
+  }, [])
+
+  const handleMove = useCallback((evt: ViewStateChangeEvent) => {
+    pendingViewStateRef.current = evt.viewState
+
+    if (viewInfoRafRef.current != null) return
+
+    viewInfoRafRef.current = requestAnimationFrame(() => {
+      viewInfoRafRef.current = null
+      setMapInfo(pendingViewStateRef.current)
+    })
+  }, [])
+
+  const handleMoveEnd = useCallback(() => {
+    const map = mapRef.current?.getMap()
+    if (map) {
+      setMapInfo({
+        longitude: map.getCenter().lng,
+        latitude: map.getCenter().lat,
+        zoom: map.getZoom(),
+        pitch: map.getPitch(),
+        bearing: map.getBearing()
+      })
+    }
+
+    loadVisibleOverlays()
   }, [loadVisibleOverlays])
 
+  const bringOverlayLabelsToFront = useCallback(() => {
+    const map = mapRef.current?.getMap()
+    if (!map) return
+
+    ;['overlay-labels-text', 'overlay-labels-close-text'].forEach((layerId) => {
+      if (map.getLayer(layerId)) {
+        map.moveLayer(layerId)
+      }
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!mapReady) return
+    bringOverlayLabelsToFront()
+  }, [mapReady, hoveredPlotId, selectedPlot, overlayLabelsGeoJSON, overlayPerImageLabelsGeoJSON, bringOverlayLabelsToFront])
+
   const handleZoomIn = useCallback(() => {
-    setViewState(prev => ({ ...prev, zoom: Math.min(prev.zoom + 1, 22) }))
+    const map = mapRef.current?.getMap()
+    if (!map) return
+    map.easeTo({ zoom: Math.min(map.getZoom() + 1, 22), duration: 180 })
   }, [])
 
   const handleZoomOut = useCallback(() => {
-    setViewState(prev => ({ ...prev, zoom: Math.max(prev.zoom - 1, 10) }))
+    const map = mapRef.current?.getMap()
+    if (!map) return
+    map.easeTo({ zoom: Math.max(map.getZoom() - 1, 10), duration: 180 })
   }, [])
 
   const handleReset = useCallback(() => {
-    setViewState(INITIAL_VIEW_STATE)
+    const map = mapRef.current?.getMap()
+    if (!map) return
+    map.easeTo({
+      center: [INITIAL_VIEW_STATE.longitude, INITIAL_VIEW_STATE.latitude],
+      zoom: INITIAL_VIEW_STATE.zoom,
+      pitch: INITIAL_VIEW_STATE.pitch,
+      bearing: INITIAL_VIEW_STATE.bearing,
+      duration: 350
+    })
   }, [])
 
   // Handle plot click
   const handlePlotClick = useCallback((e: MapLayerMouseEvent) => {
-    if (!e.features || e.features.length === 0) return
+    if (!e.features || e.features.length === 0) {
+      setSelectedSpiritualSite(null)
+      return
+    }
     
     const feature = e.features[0]
     const props = feature.properties as PlotRow
     
     // Zoom to the clicked plot
-    setViewState(prev => ({
-      ...prev,
-      longitude: props.lng,
-      latitude: props.lat,
-      zoom: Math.max(prev.zoom, 18)
-    }))
+    const map = mapRef.current?.getMap()
+    if (map) {
+      map.easeTo({
+        center: [props.lng, props.lat],
+        zoom: Math.max(map.getZoom(), 18),
+        duration: 250
+      })
+    }
     
+    setSelectedSpiritualSite(null)
     onPlotSelect(props)
   }, [onPlotSelect])
+
+  const handleSpiritualSiteClick = useCallback((site: SpiritualSiteRow, event: React.MouseEvent) => {
+    event.stopPropagation()
+    onPlotSelect(null)
+    setSelectedSpiritualSite(site)
+  }, [onPlotSelect])
+
+  const handleOpenDirectionsToSpiritualSite = useCallback(() => {
+    if (!selectedSpiritualSite) return
+    const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${selectedSpiritualSite.lat},${selectedSpiritualSite.lng}&travelmode=walking`
+    window.open(directionsUrl, '_blank', 'noopener,noreferrer')
+  }, [selectedSpiritualSite])
 
   // Handle plot hover
   const handlePlotHover = useCallback((e: MapLayerMouseEvent) => {
@@ -523,12 +900,28 @@ export function ParkMap({
   }, [])
 
   // Loading state
-  if (isLoading) {
+  if (isLoading && !hasPlotData && !loadingTimedOut) {
     return (
       <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-stone-100">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin text-emerald-600 mx-auto mb-4" />
           <p className="text-stone-600 font-medium">Đang tải dữ liệu bản đồ...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Timed out loading state when core plot data is still unavailable
+  if (isLoading && !hasPlotData && loadingTimedOut) {
+    return (
+      <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-stone-100">
+        <div className="text-center max-w-md px-4">
+          <AlertCircle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+          <p className="text-stone-900 font-medium mb-2">Dữ liệu đang phản hồi quá chậm</p>
+          <p className="text-stone-600 text-sm mb-4">Không lấy được danh sách vị trí trong thời gian chờ. Vui lòng thử tải lại.</p>
+          <Button onClick={() => window.location.reload()} variant="outline">
+            Tải lại
+          </Button>
         </div>
       </div>
     )
@@ -552,11 +945,34 @@ export function ParkMap({
 
   return (
     <div className="absolute inset-0 w-full h-full">
+      {loadingTimedOut && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 shadow">
+          <p className="text-sm text-amber-800">
+            Dữ liệu đang tải chậm. Bản đồ đã mở, bạn có thể thử tải lại sau.
+          </p>
+        </div>
+      )}
+
+      {shouldShowPlotFallbackMarkers && (
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 shadow">
+          <p className="text-sm text-blue-800">
+            Đang dùng lớp hiển thị dự phòng cho vị trí. Dữ liệu vẫn đang có sẵn.
+          </p>
+        </div>
+      )}
+
+      {geoLocateError && (
+        <div className="absolute top-28 left-1/2 -translate-x-1/2 z-30 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 shadow">
+          <p className="text-sm text-rose-800">{geoLocateError}</p>
+        </div>
+      )}
+
       {/* MapLibre GL Map */}
       <Map
         ref={mapRef}
-        {...viewState}
+        initialViewState={INITIAL_VIEW_STATE}
         onMove={handleMove}
+        onMoveEnd={handleMoveEnd}
         onLoad={handleMapLoad}
         mapStyle={MAP_STYLE}
         style={{ width: '100%', height: '100%' }}
@@ -571,8 +987,16 @@ export function ParkMap({
         {/* Navigation Controls */}
         <NavigationControl position="bottom-right" showCompass showZoom={false} />
         <GeolocateControl 
-          position="bottom-right" 
+          position="bottom-right"
+          positionOptions={{ enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }}
           trackUserLocation
+          onError={(event) => {
+            const message = (event as { message?: string } | undefined)?.message || 'Không thể lấy vị trí hiện tại. Hãy bật quyền truy cập vị trí cho trình duyệt.'
+            setGeoLocateError(message)
+          }}
+          onGeolocate={() => {
+            setGeoLocateError(null)
+          }}
         />
         <ScaleControl position="bottom-left" />
 
@@ -590,12 +1014,12 @@ export function ParkMap({
                   ['zoom'],
                   14, 16,
                   16, 14,
-                  17, 12,
-                  18, 0
+                  16.8, 10,
+                  17, 0
                 ],
                 'text-anchor': 'center',
-                'text-allow-overlap': true,
-                'text-ignore-placement': true,
+                'text-allow-overlap': false,
+                'text-ignore-placement': false,
                 'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold']
               }}
               paint={{
@@ -607,8 +1031,50 @@ export function ParkMap({
                   ['linear'],
                   ['zoom'],
                   14, 1,
-                  17, 0.7,
-                  18, 0
+                  16.6, 0.65,
+                  17, 0
+                ]
+              }}
+            />
+          </Source>
+        )}
+
+        {/* Overlay Labels (Close Zoom) - one label per overlay image */}
+        {overlayPerImageLabelsGeoJSON && (
+          <Source id="overlay-labels-close" type="geojson" data={overlayPerImageLabelsGeoJSON}>
+            <Layer
+              id="overlay-labels-close-text"
+              type="symbol"
+              layout={{
+                'text-field': ['get', 'name'],
+                'text-size': [
+                  'interpolate',
+                  ['linear'],
+                  ['zoom'],
+                  16.8, 0,
+                  17, 11,
+                  18, 12,
+                  OVERLAY_LABELS_HIDE_ZOOM, 0,
+                  22, 0
+                ],
+                'text-anchor': 'center',
+                'text-allow-overlap': true,
+                'text-ignore-placement': true,
+                'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold']
+              }}
+              paint={{
+                'text-color': '#1e3a8a',
+                'text-halo-color': '#ffffff',
+                'text-halo-width': 1.8,
+                'text-opacity': [
+                  'interpolate',
+                  ['linear'],
+                  ['zoom'],
+                  16.8, 0,
+                  17, 0.75,
+                  18, 0.9,
+                  OVERLAY_LABELS_HIDE_ZOOM, 0,
+                  22, 0
                 ]
               }}
             />
@@ -618,6 +1084,7 @@ export function ParkMap({
         {/* GeoJSON Source for Plots */}
         {filteredGeoJSON && (
           <Source id="plots" type="geojson" data={filteredGeoJSON}>
+
             {/* Main circle layer */}
             <Layer
               id="plots-circle"
@@ -729,12 +1196,34 @@ export function ParkMap({
 
         {/* Spiritual Sites Markers */}
         <AnimatePresence>
-          {showMarkers && spiritualSites.map((site: SpiritualSiteRow) => (
+          {shouldShowPlotFallbackMarkers && filteredPlotFallback.map((plot) => (
+            <Marker
+              key={`fallback-plot-${plot.id}`}
+              longitude={Number(plot.lng)}
+              latitude={Number(plot.lat)}
+              anchor="center"
+            >
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation()
+                  setSelectedSpiritualSite(null)
+                  onPlotSelect(plot)
+                }}
+                className="h-2.5 w-2.5 rounded-full border border-white bg-emerald-600 shadow"
+                aria-label={`Chọn vị trí ${plot.name || plot.id}`}
+              />
+            </Marker>
+          ))}
+
+          {showMarkers && spiritualSites
+            .filter(site => isFinite(Number(site.lng)) && isFinite(Number(site.lat)))
+            .map((site: SpiritualSiteRow) => (
             <Marker
               key={site.id}
-              longitude={site.lng}
-              latitude={site.lat}
-              anchor="center"
+              longitude={Number(site.lng)}
+              latitude={Number(site.lat)}
+              anchor="bottom"
             >
               <TooltipProvider>
                 <Tooltip>
@@ -746,17 +1235,32 @@ export function ParkMap({
                       whileHover={{ scale: 1.1 }}
                       className="cursor-pointer"
                     >
-                      <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center shadow-lg border-2 border-white">
-                        {site.image_url ? (
-                          <img 
-                            src={site.image_url} 
-                            alt={site.name}
-                            className="w-8 h-8 rounded-full object-cover"
+                      <button
+                        type="button"
+                        onClick={(event) => handleSpiritualSiteClick(site, event)}
+                        className="focus:outline-none"
+                        aria-label={`Xem chi tiết ${site.name}`}
+                      >
+                        <div className="relative flex flex-col items-center">
+                          <div
+                            className={cn(
+                              'w-9 h-9 rounded-full flex items-center justify-center shadow-lg border-[3px] transition-all',
+                              selectedSpiritualSite?.id === site.id
+                                ? 'bg-amber-500 border-white scale-110'
+                                : 'bg-slate-500 border-white'
+                            )}
+                          >
+                            <Church className="w-4 h-4 text-white" />
+                          </div>
+                          <div
+                            className={cn(
+                              'w-3 h-3 -mt-1 rotate-45 rounded-[2px] shadow-sm',
+                              selectedSpiritualSite?.id === site.id ? 'bg-amber-500' : 'bg-slate-500'
+                            )}
                           />
-                        ) : (
-                          <Church className="w-5 h-5 text-white" />
-                        )}
-                      </div>
+                          <div className="w-2 h-2 -mt-1 rounded-full bg-white" />
+                        </div>
+                      </button>
                     </motion.div>
                   </TooltipTrigger>
                   <TooltipContent side="top" className="max-w-[200px]">
@@ -771,6 +1275,79 @@ export function ParkMap({
           ))}
         </AnimatePresence>
       </Map>
+
+      {/* Spiritual Site Detail Panel (Google Maps-style) */}
+      <AnimatePresence>
+        {selectedSpiritualSite && (
+          <motion.aside
+            initial={{ x: -30, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -30, opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="absolute top-20 left-4 z-20 w-[min(360px,calc(100vw-2rem))] bg-white rounded-2xl shadow-2xl border border-stone-200 overflow-hidden"
+          >
+            {selectedSpiritualSite.image_url ? (
+              <img
+                src={selectedSpiritualSite.image_url}
+                alt={selectedSpiritualSite.name}
+                draggable={false}
+                className="w-full h-44 object-cover select-none"
+                style={{ touchAction: 'none' }}
+              />
+            ) : (
+              <div className="w-full h-44 bg-stone-100 border-b border-stone-200 flex items-center justify-center text-stone-500 text-sm">
+                Chưa có hình ảnh
+              </div>
+            )}
+
+            <div className="p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="text-2xl font-semibold text-stone-900 leading-tight">{selectedSpiritualSite.name}</h3>
+                  <p className="text-sm text-stone-500 mt-1">{selectedSpiritualSite.type || 'Điểm tâm linh'}</p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedSpiritualSite(null)}
+                  className="h-8 px-3"
+                >
+                  Đóng
+                </Button>
+              </div>
+
+              <div className="mt-4 rounded-lg bg-stone-50 border border-stone-200 px-3 py-2">
+                <p className="text-xs text-stone-500">Tọa độ</p>
+                <p className="text-sm font-mono text-stone-700 mt-1">
+                  {selectedSpiritualSite.lat.toFixed(6)}, {selectedSpiritualSite.lng.toFixed(6)}
+                </p>
+              </div>
+
+              <Button
+                variant="outline"
+                onClick={handleOpenDirectionsToSpiritualSite}
+                className="w-full mt-3"
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Chỉ đường bằng Google Maps
+              </Button>
+
+              {selectedSpiritualSite.image_url && (
+                <div className="mt-3 flex items-center gap-2">
+                  <a
+                    href={selectedSpiritualSite.image_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center rounded-md bg-amber-600 px-3 py-2 text-sm font-medium text-white hover:bg-amber-700"
+                  >
+                    Xem ảnh gốc
+                  </a>
+                </div>
+              )}
+            </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
 
       {/* Custom Map Controls Overlay */}
       <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
@@ -891,7 +1468,7 @@ export function ParkMap({
       {/* Coordinates Display */}
       <div className="absolute top-4 left-4 z-10 glass rounded-xl px-3 py-2">
         <p className="text-xs text-stone-600 font-mono">
-          {viewState.latitude.toFixed(4)}°N, {viewState.longitude.toFixed(4)}°E | Zoom: {viewState.zoom.toFixed(1)}
+          {mapInfo.latitude.toFixed(4)}°N, {mapInfo.longitude.toFixed(4)}°E | Zoom: {mapInfo.zoom.toFixed(1)}
         </p>
       </div>
     </div>

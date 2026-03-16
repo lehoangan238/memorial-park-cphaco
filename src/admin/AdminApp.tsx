@@ -174,7 +174,9 @@ function ProtectedAdmin() {
   }
 
   if (!isAuthenticated) {
-    return <LoginPage onSuccess={() => window.location.reload()} />
+    // No reload needed: signIn() already updates auth state in context,
+    // which causes ProtectedAdmin to re-render and show AdminContent.
+    return <LoginPage onSuccess={() => {}} />
   }
 
   return (
