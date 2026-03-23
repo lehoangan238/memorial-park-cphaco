@@ -11,10 +11,10 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      includeAssets: ['logo.png', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Hoa Viên Nghĩa Trang Bình Dương',
-        short_name: 'Hoa Viên BD',
+        name: 'Bản Đồ Số  - Hoa Viên Bình Dương',
+        short_name: 'Bản Đồ Số',
         description: 'Bản đồ số nghĩa trang - Nơi an nghỉ vĩnh hằng',
         theme_color: '#10B981',
         background_color: '#F8FAFC',
@@ -106,7 +106,7 @@ export default defineConfig({
         ]
       },
       devOptions: {
-        enabled: true
+        enabled: false
       }
     })
   ],

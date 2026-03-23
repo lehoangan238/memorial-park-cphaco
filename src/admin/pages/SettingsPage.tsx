@@ -19,7 +19,7 @@ const DEFAULT_SETTINGS: Settings = {
   mapCenterLat: '11.168266',
   mapCenterLng: '106.651891',
   mapZoom: '17',
-  companyName: 'Hoa Viên Nghĩa Trang Bình Dương'
+  companyName: 'Bản Đồ Số  - Hoa Viên Bình Dương'
 }
 
 export function SettingsPage() {

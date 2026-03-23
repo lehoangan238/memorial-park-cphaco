@@ -70,7 +70,7 @@ export function QRGeneratorPage() {
       
       ctx.font = '16px system-ui'
       ctx.fillStyle = '#6b7280'
-      ctx.fillText(selectedPlot.zone || 'Hoa Viên Nghĩa Trang', size / 2, size + 60)
+      ctx.fillText(selectedPlot.zone || 'Hoa Viên Bình Dương', size / 2, size + 60)
 
       // Download
       const link = document.createElement('a')
@@ -130,7 +130,7 @@ export function QRGeneratorPage() {
         <div class="qr-container">
           ${svgHtml}
           <h1>${selectedPlot.name || selectedPlot.id}</h1>
-          <p>${selectedPlot.zone || 'Hoa Viên Nghĩa Trang Bình Dương'}</p>
+          <p>${selectedPlot.zone || 'Bản Đồ Số  - Hoa Viên Bình Dương'}</p>
           <div class="instructions">
             📱 Quét mã QR để được dẫn đường đến vị trí này
           </div>
@@ -224,7 +224,7 @@ export function QRGeneratorPage() {
                   level="H"
                   includeMargin
                   imageSettings={{
-                    src: '/vite.svg',
+                    src: '/logo.png',
                     height: 40,
                     width: 40,
                     excavate: true
@@ -237,7 +237,7 @@ export function QRGeneratorPage() {
                 <h3 className="text-xl font-bold text-stone-900">
                   {selectedPlot.name || selectedPlot.id}
                 </h3>
-                <p className="text-stone-500">{selectedPlot.zone || 'Hoa Viên Nghĩa Trang'}</p>
+                <p className="text-stone-500">{selectedPlot.zone || 'Hoa Viên Bình Dương'}</p>
                 
                 <div className="flex items-center justify-center gap-1 mt-2 text-xs text-stone-400">
                   <MapPin className="w-3 h-3" />

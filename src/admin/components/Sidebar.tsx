@@ -23,6 +23,7 @@ import {
   Heart,
   UserCheck
 } from 'lucide-react'
+import logoImage from '@/assets/logo.png'
 
 export type AdminPage = 'dashboard' | 'map-editor' | 'road-editor' | 'qr-generator' | 'overlay-manager' | 'plot-manager' | 'spiritual-sites' | 'import-export' | 'staff' | 'settings' | 'drawing-editor' | 'deceased' | 'customers'
 
@@ -100,10 +101,12 @@ export function Sidebar({ activePage, onPageChange, onLogout, hasPermission }: S
             animate={{ opacity: 1 }}
             className="flex items-center gap-2"
           >
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <Map className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-semibold text-gray-900">Hoa Viên Admin</span>
+            <img
+              src={logoImage}
+              alt="Logo"
+              className="w-8 h-8 rounded-lg object-cover border border-gray-200"
+            />
+            <span className="font-semibold text-gray-900">Bản Đồ Số Admin</span>
           </motion.div>
         )}
         {!isMobile && (

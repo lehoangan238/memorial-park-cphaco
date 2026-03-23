@@ -2,7 +2,7 @@
  * Admin Dashboard Main App
  * Cemetery Management System - Hoa Vien Digital Map
  */
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { lazy, Suspense } from 'react'
 import { motion } from 'framer-motion'
 import { Sidebar, type AdminPage } from './components/Sidebar'
@@ -30,6 +30,10 @@ function AdminContent() {
   const [activePage, setActivePage] = useState<AdminPage>('dashboard')
   const { signOut, user, userRole, hasPermission } = useAuth()
   const { showToast } = useToast()
+
+  useEffect(() => {
+    document.title = 'Bản Đồ Số  - Hoa Viên Bình Dương | Admin'
+  }, [])
 
   const handleLogout = useCallback(async () => {
     await signOut()

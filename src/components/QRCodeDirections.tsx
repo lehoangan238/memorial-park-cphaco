@@ -142,7 +142,7 @@ export function QRCodeDirections({
               bgColor="#ffffff"
               fgColor="#1c1917"
               imageSettings={{
-                src: '/vite.svg', // You can replace with park logo
+                src: '/logo.png',
                 x: undefined,
                 y: undefined,
                 height: 30,

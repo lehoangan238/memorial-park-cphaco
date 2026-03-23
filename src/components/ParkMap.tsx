@@ -17,6 +17,9 @@ import {
   ZoomOut, 
   Layers,
   Navigation,
+  Info,
+  Menu,
+  X,
   Loader2,
   AlertCircle,
   Church,
@@ -279,6 +282,24 @@ export function ParkMap({
   const [selectedSpiritualSite, setSelectedSpiritualSite] = useState<SpiritualSiteRow | null>(null)
   const [loadingTimedOut, setLoadingTimedOut] = useState(false)
   const [geoLocateError, setGeoLocateError] = useState<string | null>(null)
+  const [showLegendMobile, setShowLegendMobile] = useState(false)
+  const [showMobileControlPanel, setShowMobileControlPanel] = useState(false)
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 767px)').matches)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 767px)')
+    const handleChange = (event: MediaQueryListEvent) => setIsMobile(event.matches)
+    setIsMobile(mediaQuery.matches)
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [])
+
+  useEffect(() => {
+    if (!isMobile) {
+      setShowMobileControlPanel(false)
+      setShowLegendMobile(false)
+    }
+  }, [isMobile])
 
   // Fetch data from Supabase
   const { 
@@ -495,7 +516,6 @@ export function ParkMap({
   }, [])
 
   // Minimum zoom level to load overlays (helps weak mobile devices)
-  const isMobile = window.innerWidth < 768
   const MIN_OVERLAY_ZOOM = isMobile ? 16.2 : 15.5
 
   // Lazy load overlays based on viewport - runs on map move
@@ -946,7 +966,10 @@ export function ParkMap({
   return (
     <div className="absolute inset-0 w-full h-full">
       {loadingTimedOut && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 shadow">
+        <div className={cn(
+          'absolute left-1/2 -translate-x-1/2 z-30 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 shadow',
+          isMobile ? 'top-[88px] w-[calc(100%-1rem)] max-w-md' : 'top-4'
+        )}>
           <p className="text-sm text-amber-800">
             Dữ liệu đang tải chậm. Bản đồ đã mở, bạn có thể thử tải lại sau.
           </p>
@@ -954,7 +977,10 @@ export function ParkMap({
       )}
 
       {shouldShowPlotFallbackMarkers && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 shadow">
+        <div className={cn(
+          'absolute left-1/2 -translate-x-1/2 z-30 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 shadow',
+          isMobile ? 'top-[132px] w-[calc(100%-1rem)] max-w-md' : 'top-16'
+        )}>
           <p className="text-sm text-blue-800">
             Đang dùng lớp hiển thị dự phòng cho vị trí. Dữ liệu vẫn đang có sẵn.
           </p>
@@ -962,7 +988,10 @@ export function ParkMap({
       )}
 
       {geoLocateError && (
-        <div className="absolute top-28 left-1/2 -translate-x-1/2 z-30 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 shadow">
+        <div className={cn(
+          'absolute left-1/2 -translate-x-1/2 z-30 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 shadow',
+          isMobile ? 'top-[176px] w-[calc(100%-1rem)] max-w-md' : 'top-28'
+        )}>
           <p className="text-sm text-rose-800">{geoLocateError}</p>
         </div>
       )}
@@ -985,7 +1014,7 @@ export function ParkMap({
         cursor={hoveredPlotId ? 'pointer' : 'grab'}
       >
         {/* Navigation Controls */}
-        <NavigationControl position="bottom-right" showCompass showZoom={false} />
+        {!isMobile && <NavigationControl position="bottom-right" showCompass showZoom={false} />}
         <GeolocateControl 
           position="bottom-right"
           positionOptions={{ enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }}
@@ -998,7 +1027,7 @@ export function ParkMap({
             setGeoLocateError(null)
           }}
         />
-        <ScaleControl position="bottom-left" />
+        {!isMobile && <ScaleControl position="bottom-left" />}
 
         {/* Overlay Zone Labels - show zone names like B1.2, B3.1 */}
         {overlayLabelsGeoJSON && (
@@ -1284,18 +1313,23 @@ export function ParkMap({
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -30, opacity: 0 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="absolute top-20 left-4 z-20 w-[min(360px,calc(100vw-2rem))] bg-white rounded-2xl shadow-2xl border border-stone-200 overflow-hidden"
+            className={cn(
+              'absolute z-20 bg-white rounded-2xl shadow-2xl border border-stone-200 overflow-hidden',
+              isMobile
+                ? 'left-3 right-3 bottom-3 w-auto'
+                : 'top-20 left-4 w-[min(360px,calc(100vw-2rem))]'
+            )}
           >
             {selectedSpiritualSite.image_url ? (
               <img
                 src={selectedSpiritualSite.image_url}
                 alt={selectedSpiritualSite.name}
                 draggable={false}
-                className="w-full h-44 object-cover select-none"
+                className={cn('w-full object-cover select-none', isMobile ? 'h-36' : 'h-44')}
                 style={{ touchAction: 'none' }}
               />
             ) : (
-              <div className="w-full h-44 bg-stone-100 border-b border-stone-200 flex items-center justify-center text-stone-500 text-sm">
+              <div className={cn('w-full bg-stone-100 border-b border-stone-200 flex items-center justify-center text-stone-500 text-sm', isMobile ? 'h-36' : 'h-44')}>
                 Chưa có hình ảnh
               </div>
             )}
@@ -1350,127 +1384,239 @@ export function ParkMap({
       </AnimatePresence>
 
       {/* Custom Map Controls Overlay */}
-      <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
-        <div className="glass rounded-xl p-1 flex flex-col gap-1">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
+      {isMobile ? (
+        <div
+          className="absolute right-3 bottom-3 z-10 flex flex-col items-end gap-2"
+          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        >
+          <AnimatePresence>
+            {showMobileControlPanel && (
+              <motion.div
+                initial={{ opacity: 0, y: 12, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 12, scale: 0.96 }}
+                transition={{ duration: 0.18 }}
+                className="glass rounded-2xl p-1.5 flex flex-col gap-1"
+              >
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={handleZoomIn}
-                  className="h-8 w-8 cursor-pointer hover:bg-stone-100"
+                  className="h-11 w-11 cursor-pointer hover:bg-stone-100"
                 >
                   <ZoomIn className="w-4 h-4" />
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent side="left">Phóng to</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={handleZoomOut}
-                  className="h-8 w-8 cursor-pointer hover:bg-stone-100"
+                  className="h-11 w-11 cursor-pointer hover:bg-stone-100"
                 >
                   <ZoomOut className="w-4 h-4" />
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent side="left">Thu nhỏ</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={handleReset}
-                  className="h-8 w-8 cursor-pointer hover:bg-stone-100"
+                  className="h-11 w-11 cursor-pointer hover:bg-stone-100"
                 >
                   <Navigation className="w-4 h-4" />
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent side="left">Đặt lại góc nhìn</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setShowMarkers(!showMarkers)}
-                  className={cn('h-8 w-8 cursor-pointer hover:bg-stone-100', showMarkers && 'bg-stone-100')}
+                  className={cn('h-11 w-11 cursor-pointer hover:bg-stone-100', showMarkers && 'bg-stone-100')}
                 >
                   <Layers className="w-4 h-4" />
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent side="left">Bật/tắt điểm đánh dấu</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setShowOverlays(!showOverlays)}
-                  className={cn('h-8 w-8 cursor-pointer hover:bg-stone-100', showOverlays && 'bg-stone-100')}
+                  className={cn('h-11 w-11 cursor-pointer hover:bg-stone-100', showOverlays && 'bg-stone-100')}
                 >
                   <Image className="w-4 h-4" />
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent side="left">Bật/tắt lớp phủ</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-      </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowLegendMobile(!showLegendMobile)}
+                  className={cn('h-11 w-11 cursor-pointer hover:bg-stone-100', showLegendMobile && 'bg-stone-100')}
+                >
+                  <Info className="w-4 h-4" />
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-      {/* Legend */}
-      <div className="absolute bottom-4 left-4 z-10 glass rounded-xl p-3">
-        <p className="text-xs font-medium text-stone-700 mb-2">Chú thích</p>
-        <div className="flex flex-wrap gap-2">
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#10B981' }} />
-            <span className="text-xs text-stone-600">Trống</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#EF4444' }} />
-            <span className="text-xs text-stone-600">Đã bán</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#F59E0B' }} />
-            <span className="text-xs text-stone-600">Đặt cọc</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#6B7280' }} />
-            <span className="text-xs text-stone-600">Đã an táng</span>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setShowMobileControlPanel((prev) => !prev)}
+            className="h-12 w-12 rounded-full shadow-lg border-stone-300 bg-white/95 cursor-pointer"
+            aria-label={showMobileControlPanel ? 'Đóng điều khiển bản đồ' : 'Mở điều khiển bản đồ'}
+          >
+            {showMobileControlPanel ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </Button>
+        </div>
+      ) : (
+        <div className="absolute right-3 sm:right-4 top-4 z-10 flex flex-col gap-2">
+          <div className="glass rounded-xl p-1 flex flex-col gap-1">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleZoomIn}
+                    className="h-8 w-8 cursor-pointer hover:bg-stone-100"
+                  >
+                    <ZoomIn className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="left">Phóng to</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleZoomOut}
+                    className="h-8 w-8 cursor-pointer hover:bg-stone-100"
+                  >
+                    <ZoomOut className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="left">Thu nhỏ</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleReset}
+                    className="h-8 w-8 cursor-pointer hover:bg-stone-100"
+                  >
+                    <Navigation className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="left">Đặt lại góc nhìn</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowMarkers(!showMarkers)}
+                    className={cn('h-8 w-8 cursor-pointer hover:bg-stone-100', showMarkers && 'bg-stone-100')}
+                  >
+                    <Layers className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="left">Bật/tắt điểm đánh dấu</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowOverlays(!showOverlays)}
+                    className={cn('h-8 w-8 cursor-pointer hover:bg-stone-100', showOverlays && 'bg-stone-100')}
+                  >
+                    <Image className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="left">Bật/tắt lớp phủ</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
-        
-        {/* Stats */}
-        <div className="mt-3 pt-2 border-t border-stone-200 space-y-1">
-          <p className="text-xs text-stone-500">
-            Vị trí: <span className="font-medium text-stone-700">{filteredGeoJSON?.features.length || 0}</span> / {plots.length}
-          </p>
-          <p className="text-xs text-stone-500">
-            Lớp phủ: <span className="font-medium text-stone-700">{loadedOverlayIds.size}</span> / {overlays.length}
-            {loadedOverlayIds.size > 0 && showOverlays && <span className="text-emerald-600"> ✓</span>}
-            {!showOverlays && <span className="text-amber-600 text-[10px] ml-1">(tắt)</span>}
-            {failedOverlayIds.size > 0 && <span className="text-red-500 text-[10px] ml-1">({failedOverlayIds.size} lỗi)</span>}
-          </p>
-          <p className="text-xs text-stone-500">
-            Tâm linh: <span className="font-medium text-stone-700">{spiritualSites.length}</span>
-          </p>
+      )}
+      {!isMobile && (
+        <div className="absolute bottom-4 left-4 z-10 glass rounded-xl p-3">
+          <p className="text-xs font-medium text-stone-700 mb-2">Chú thích</p>
+          <div className="flex flex-wrap gap-2">
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#10B981' }} />
+              <span className="text-xs text-stone-600">Trống</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#EF4444' }} />
+              <span className="text-xs text-stone-600">Đã bán</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#F59E0B' }} />
+              <span className="text-xs text-stone-600">Đặt cọc</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#6B7280' }} />
+              <span className="text-xs text-stone-600">Đã an táng</span>
+            </div>
+          </div>
+          
+          {/* Stats */}
+          <div className="mt-3 pt-2 border-t border-stone-200 space-y-1">
+            <p className="text-xs text-stone-500">
+              Vị trí: <span className="font-medium text-stone-700">{filteredGeoJSON?.features.length || 0}</span> / {plots.length}
+            </p>
+            <p className="text-xs text-stone-500">
+              Lớp phủ: <span className="font-medium text-stone-700">{loadedOverlayIds.size}</span> / {overlays.length}
+              {loadedOverlayIds.size > 0 && showOverlays && <span className="text-emerald-600"> ✓</span>}
+              {!showOverlays && <span className="text-amber-600 text-[10px] ml-1">(tắt)</span>}
+              {failedOverlayIds.size > 0 && <span className="text-red-500 text-[10px] ml-1">({failedOverlayIds.size} lỗi)</span>}
+            </p>
+            <p className="text-xs text-stone-500">
+              Tâm linh: <span className="font-medium text-stone-700">{spiritualSites.length}</span>
+            </p>
+          </div>
         </div>
-      </div>
+      )}
+
+      {isMobile && showLegendMobile && (
+        <div className="absolute left-3 right-3 bottom-3 z-10 glass rounded-xl p-3">
+          <p className="text-xs font-medium text-stone-700 mb-2">Chú thích nhanh</p>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#10B981' }} />
+              <span className="text-xs text-stone-600">Trống</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#EF4444' }} />
+              <span className="text-xs text-stone-600">Đã bán</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#F59E0B' }} />
+              <span className="text-xs text-stone-600">Đặt cọc</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#6B7280' }} />
+              <span className="text-xs text-stone-600">Đã an táng</span>
+            </div>
+          </div>
+          <div className="mt-2 pt-2 border-t border-stone-200 space-y-1">
+            <p className="text-xs text-stone-500">
+              Vị trí: <span className="font-medium text-stone-700">{filteredGeoJSON?.features.length || 0}</span> / {plots.length}
+            </p>
+            <p className="text-xs text-stone-500">
+              Lớp phủ: <span className="font-medium text-stone-700">{loadedOverlayIds.size}</span> / {overlays.length}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Coordinates Display */}
-      <div className="absolute top-4 left-4 z-10 glass rounded-xl px-3 py-2">
-        <p className="text-xs text-stone-600 font-mono">
-          {mapInfo.latitude.toFixed(4)}°N, {mapInfo.longitude.toFixed(4)}°E | Zoom: {mapInfo.zoom.toFixed(1)}
-        </p>
-      </div>
+      {!isMobile && (
+        <div className="absolute top-4 left-4 z-10 glass rounded-xl px-3 py-2">
+          <p className="text-xs text-stone-600 font-mono">
+            {mapInfo.latitude.toFixed(4)}°N, {mapInfo.longitude.toFixed(4)}°E | Zoom: {mapInfo.zoom.toFixed(1)}
+          </p>
+        </div>
+      )}
     </div>
   )
 }
