@@ -104,7 +104,8 @@ export function Sidebar({ activePage, onPageChange, onLogout, hasPermission }: S
             <img
               src={logoImage}
               alt="Logo"
-              className="w-8 h-8 rounded-lg object-cover border border-gray-200"
+              className="w-8 h-8 object-contain"
+              style={{ borderRadius: 0, background: 'transparent' }}
             />
             <span className="font-semibold text-gray-900">Bản Đồ Số Admin</span>
           </motion.div>

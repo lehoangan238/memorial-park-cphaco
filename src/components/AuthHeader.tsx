@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import { RefreshCw, Wifi, LogIn, LogOut, Shield, Map, BarChart3, Settings, SlidersHorizontal } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { RefreshCw, Wifi, LogIn, LogOut, Shield, Map, BarChart3, Settings, SlidersHorizontal, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { SearchAutocomplete } from '@/components/SearchAutocomplete'
@@ -84,7 +84,7 @@ export function AuthHeader({
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="glass rounded-2xl px-2 sm:px-3 py-2 max-w-7xl mx-auto shadow-lg"
+        className="glass rounded-2xl px-2 sm:px-3 py-1.5 sm:py-2 max-w-7xl mx-auto shadow-lg"
       >
         {/* Row 1: Logo + Search + Actions */}
         <div className="flex items-center justify-between gap-2">
@@ -93,7 +93,8 @@ export function AuthHeader({
             <img
               src={logoImage}
               alt="CPHA"
-              className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl object-cover bg-white shadow-md border border-stone-200"
+              className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+              style={{ borderRadius: 0, background: 'transparent' }}
               onError={(event) => {
                 event.currentTarget.onerror = null
                 event.currentTarget.src = '/pwa-192x192.png'
@@ -187,7 +188,8 @@ export function AuthHeader({
           </div>
         </div>
 
-        {/* Row 2: Tabs + Filters - Integrated */}
+        {/* Row 2: Desktop Tabs + Filters */}
+        {!isMobile && (
         <div className="mt-2 pt-2 border-t border-stone-200/50">
           <div className="flex items-center justify-between gap-2">
             {/* Tab Switcher */}
@@ -263,7 +265,127 @@ export function AuthHeader({
             </div>
           )}
         </div>
+        )}
       </motion.div>
+
+      {/* Mobile Bottom Dock */}
+      {isMobile && (
+        <>
+          <div
+            className="fixed left-1/2 -translate-x-1/2 z-30 glass rounded-2xl px-1 py-1 shadow-lg"
+            style={{ bottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+          >
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => {
+                  onTabChange('map')
+                  setShowMobileFilters(false)
+                }}
+                className={cn(
+                  'flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer',
+                  activeTab === 'map'
+                    ? 'bg-stone-900 text-white'
+                    : 'text-stone-700 hover:bg-white/80'
+                )}
+              >
+                <Map className="w-3.5 h-3.5" />
+                Bản đồ
+              </button>
+              <button
+                onClick={() => {
+                  onTabChange('overview')
+                  setShowMobileFilters(false)
+                }}
+                className={cn(
+                  'flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer',
+                  activeTab === 'overview'
+                    ? 'bg-stone-900 text-white'
+                    : 'text-stone-700 hover:bg-white/80'
+                )}
+              >
+                <BarChart3 className="w-3.5 h-3.5" />
+                Tổng quan
+              </button>
+              {activeTab === 'map' && (
+                <button
+                  onClick={() => setShowMobileFilters((prev) => !prev)}
+                  className={cn(
+                    'flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer',
+                    showMobileFilters
+                      ? 'bg-stone-900 text-white'
+                      : 'text-stone-700 hover:bg-white/80'
+                  )}
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5" />
+                  Lọc
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Mobile Filter Bottom Sheet */}
+          <AnimatePresence>
+            {activeTab === 'map' && showMobileFilters && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-40"
+              >
+                <button
+                  type="button"
+                  aria-label="Đóng bộ lọc"
+                  onClick={() => setShowMobileFilters(false)}
+                  className="absolute inset-0 bg-black/25"
+                />
+                <motion.div
+                  initial={{ y: '100%' }}
+                  animate={{ y: 0 }}
+                  exit={{ y: '100%' }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className="absolute left-0 right-0 bottom-0 bg-white rounded-t-3xl border-t border-stone-200 p-4"
+                  style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-semibold text-stone-900">Lọc trạng thái</h3>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setShowMobileFilters(false)}
+                      className="h-9 w-9"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {STATUS_FILTERS.map((filter) => (
+                      <button
+                        key={filter.value}
+                        onClick={() => {
+                          onFilterChange(filter.value)
+                          setShowMobileFilters(false)
+                        }}
+                        className={cn(
+                          'flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer border',
+                          filterStatus === filter.value
+                            ? 'bg-stone-900 text-white border-stone-900'
+                            : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
+                        )}
+                      >
+                        <span
+                          className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: filter.color }}
+                        />
+                        <span>{filter.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
+      )}
     </header>
   )
 }

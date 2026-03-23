@@ -1386,8 +1386,8 @@ export function ParkMap({
       {/* Custom Map Controls Overlay */}
       {isMobile ? (
         <div
-          className="absolute right-3 bottom-3 z-10 flex flex-col items-end gap-2"
-          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+          className="absolute right-3 z-10 flex flex-col items-end gap-2"
+          style={{ bottom: 'max(4.5rem, calc(env(safe-area-inset-bottom) + 3.5rem))' }}
         >
           <AnimatePresence>
             {showMobileControlPanel && (
@@ -1578,7 +1578,10 @@ export function ParkMap({
       )}
 
       {isMobile && showLegendMobile && (
-        <div className="absolute left-3 right-3 bottom-3 z-10 glass rounded-xl p-3">
+        <div
+          className="absolute left-3 right-3 z-10 glass rounded-xl p-3"
+          style={{ bottom: 'max(4.5rem, calc(env(safe-area-inset-bottom) + 3.5rem))' }}
+        >
           <p className="text-xs font-medium text-stone-700 mb-2">Chú thích nhanh</p>
           <div className="grid grid-cols-2 gap-2">
             <div className="flex items-center gap-1.5">
