@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo, lazy, Suspense } from 'react'
+import { useState, useCallback, useEffect, lazy, Suspense } from 'react'
 import { PlotEditDrawer } from '@/components/PlotEditDrawer'
 import { AuthHeader } from '@/components/AuthHeader'
 import { AdvancedSearch } from '@/components/AdvancedSearch'
@@ -11,7 +11,7 @@ import { QRDirectionsPage } from '@/pages/QRDirectionsPage'
 import { useMapData } from '@/hooks/useMapData'
 import type { PlotRow } from '@/types/database'
 import { formatVNCurrency } from '@/lib/utils'
-import { ToastProvider } from '@/admin/components/Toast'
+import { ToastProvider, useToast } from '@/admin/components/Toast'
 
 const ParkMap = lazy(() => import('@/components/ParkMap').then(module => ({ default: module.ParkMap })))
 
@@ -19,44 +19,76 @@ interface MainAppProps {
   onNavigateToLogin: () => void
 }
 
+function getPlotIdFromUrl(): string | null {
+  const urlParams = new URLSearchParams(window.location.search)
+  const value = urlParams.get('plot') || urlParams.get('id')
+  const normalized = value?.trim()
+  return normalized ? normalized : null
+}
+
 function MainApp({ onNavigateToLogin }: MainAppProps) {
+  const { showToast } = useToast()
   const [selectedPlot, setSelectedPlot] = useState<PlotRow | null>(null)
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'map' | 'overview'>('map')
   const [flyToPlot, setFlyToPlot] = useState<PlotRow | null>(null)
-  const [initialPlotId, setInitialPlotId] = useState<string | null>(null)
+  const [initialPlotId, setInitialPlotId] = useState<string | null>(() => getPlotIdFromUrl())
+  const [initialPlotRetryRequested, setInitialPlotRetryRequested] = useState(false)
 
   const { plots, isLoading, isError, error, refetch } = useMapData()
 
-  // Check URL for shared plot link on mount - use useMemo to avoid setState in effect
-  const initialPlotFromUrl = useMemo(() => {
-    const urlParams = new URLSearchParams(window.location.search)
-    return urlParams.get('plot') || urlParams.get('id')
-  }, [])
-
-  // Set initial plot ID from URL (only once)
+  // Keep shared plot id in sync with URL so links opened while app is alive still work.
   useEffect(() => {
-    if (initialPlotFromUrl && !initialPlotId) {
-      setInitialPlotId(initialPlotFromUrl)
+    const syncPlotIdFromUrl = () => {
+      const nextPlotId = getPlotIdFromUrl()
+      setInitialPlotId((prev) => (prev === nextPlotId ? prev : nextPlotId))
+      if (nextPlotId) {
+        setInitialPlotRetryRequested(false)
+      }
     }
-  }, [initialPlotFromUrl, initialPlotId])
+
+    syncPlotIdFromUrl()
+    window.addEventListener('popstate', syncPlotIdFromUrl)
+    window.addEventListener('focus', syncPlotIdFromUrl)
+
+    return () => {
+      window.removeEventListener('popstate', syncPlotIdFromUrl)
+      window.removeEventListener('focus', syncPlotIdFromUrl)
+    }
+  }, [])
 
   // Open shared plot when data is loaded
   useEffect(() => {
-    if (initialPlotId && plots.length > 0 && !isLoading) {
-      const plot = plots.find(p => p.id === initialPlotId)
-      if (plot) {
-        setActiveTab('map')
-        setFlyToPlot(plot)
-        setSelectedPlot(plot)
-        setTimeout(() => setFlyToPlot(null), 100)
-        // Clear the URL param after opening
-        window.history.replaceState({}, '', window.location.pathname)
-      }
+    if (!initialPlotId || isLoading || plots.length === 0) return
+
+    const normalizedTargetId = initialPlotId.trim().toLowerCase()
+    const plot = plots.find((p) => String(p.id).trim().toLowerCase() === normalizedTargetId)
+
+    if (plot) {
+      setActiveTab('map')
+      setFlyToPlot(plot)
+      setSelectedPlot(plot)
+      setTimeout(() => setFlyToPlot(null), 100)
       setInitialPlotId(null)
+      setInitialPlotRetryRequested(false)
+      // Clear the URL param after opening
+      window.history.replaceState({}, '', window.location.pathname)
+      return
     }
-  }, [initialPlotId, plots, isLoading])
+
+    // Cached data can be stale; refetch once before reporting missing shared ID.
+    if (!initialPlotRetryRequested) {
+      setInitialPlotRetryRequested(true)
+      refetch()
+      return
+    }
+
+    showToast('Không tìm thấy vị trí từ liên kết chia sẻ.', 'error')
+    setInitialPlotId(null)
+    setInitialPlotRetryRequested(false)
+    window.history.replaceState({}, '', window.location.pathname)
+  }, [initialPlotId, plots, isLoading, initialPlotRetryRequested, refetch, showToast])
 
   const handlePlotSelect = useCallback((plot: PlotRow | null) => {
     setSelectedPlot(plot)

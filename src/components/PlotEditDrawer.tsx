@@ -49,6 +49,29 @@ export function PlotEditDrawer({ plot, onClose, onUpdate }: PlotEditDrawerProps)
   // QR URL (opens directions page)
   const qrUrl = plot ? `${window.location.origin}/qr?plot=${plot.id}` : ''
 
+  const copyTextToClipboard = useCallback(async (value: string) => {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(value)
+        return true
+      }
+
+      // Legacy fallback for environments where Clipboard API is unavailable.
+      const textarea = document.createElement('textarea')
+      textarea.value = value
+      textarea.setAttribute('readonly', '')
+      textarea.style.position = 'absolute'
+      textarea.style.left = '-9999px'
+      document.body.appendChild(textarea)
+      textarea.select()
+      const ok = document.execCommand('copy')
+      document.body.removeChild(textarea)
+      return ok
+    } catch {
+      return false
+    }
+  }, [])
+
   // Reset form when plot changes
   useEffect(() => {
     if (plot) {
@@ -64,10 +87,16 @@ export function PlotEditDrawer({ plot, onClose, onUpdate }: PlotEditDrawerProps)
 
   const handleCopyCoords = useCallback(() => {
     if (!plot) return
-    navigator.clipboard.writeText(`${plot.lat}, ${plot.lng}`)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }, [plot])
+    copyTextToClipboard(`${plot.lat}, ${plot.lng}`).then((ok) => {
+      if (ok) {
+        setCopied(true)
+        showToast('Đã sao chép tọa độ.', 'success')
+        setTimeout(() => setCopied(false), 2000)
+      } else {
+        showToast('Không thể sao chép tọa độ. Vui lòng thử lại.', 'error')
+      }
+    })
+  }, [plot, copyTextToClipboard, showToast])
 
   const handleShare = useCallback(async () => {
     if (!plot) return
@@ -80,17 +109,27 @@ export function PlotEditDrawer({ plot, onClose, onUpdate }: PlotEditDrawerProps)
           text: `Xem vị trí ${plot.name || plot.id} tại ${plot.zone || 'Hoa Viên Nghĩa Trang'}`,
           url: shareUrl
         })
+        showToast('Đã chia sẻ liên kết thành công.', 'success')
         return
-      } catch {
+      } catch (error) {
+        const shareError = error as { name?: string }
+        if (shareError?.name === 'AbortError') {
+          return
+        }
         // User cancelled or share failed, fall back to copy
       }
     }
     
     // Fallback: copy to clipboard
-    navigator.clipboard.writeText(shareUrl)
-    setCopiedShare(true)
-    setTimeout(() => setCopiedShare(false), 2000)
-  }, [plot, shareUrl])
+    const copiedOk = await copyTextToClipboard(shareUrl)
+    if (copiedOk) {
+      setCopiedShare(true)
+      showToast('Đã sao chép liên kết chia sẻ.', 'success')
+      setTimeout(() => setCopiedShare(false), 2000)
+    } else {
+      showToast('Không thể sao chép liên kết. Vui lòng thử lại.', 'error')
+    }
+  }, [plot, shareUrl, copyTextToClipboard, showToast])
 
   const handleStartEdit = useCallback(() => {
     if (!plot) return

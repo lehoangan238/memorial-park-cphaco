@@ -17,6 +17,7 @@ import {
   ZoomOut, 
   Layers,
   Navigation,
+  LocateFixed,
   Info,
   Menu,
   X,
@@ -59,6 +60,7 @@ const OVERLAY_RETRY_COOLDOWN_MS = 4000
 const OVERLAY_FETCH_TIMEOUT_MS = 10000
 const OVERLAY_LABELS_HIDE_ZOOM = 18.6
 const OVERLAY_LABEL_EXCLUDE_KEYWORDS = ['VONG XOAY'] as const
+const FLY_TO_PLOT_ZOOM = 20
 
 function normalizeLabelToken(value: string): string {
   return value
@@ -134,6 +136,20 @@ function toSupabasePublicOverlayUrl(path: string): string {
   return `${baseUrl}/storage/v1/object/public/overlays/${safePath}`
 }
 
+function toSupabaseRenderedOverlayUrl(
+  path: string,
+  options: { width: number; quality: number; format: 'origin' | 'webp' }
+): string {
+  const baseUrl = String(import.meta.env.VITE_SUPABASE_URL || '').replace(/\/$/, '')
+  const safePath = encodePathSegments(path)
+  const params = new URLSearchParams({
+    width: String(options.width),
+    quality: String(options.quality),
+    format: options.format
+  })
+  return `${baseUrl}/storage/v1/render/image/public/overlays/${safePath}?${params.toString()}`
+}
+
 function getOverlayCandidateUrls(overlay: OverlayRow, isMobile: boolean): string[] {
   const primary = isMobile ? overlay.url_mobile || overlay.url : overlay.url
   const secondary = isMobile ? overlay.url : overlay.url_mobile
@@ -143,6 +159,13 @@ function getOverlayCandidateUrls(overlay: OverlayRow, isMobile: boolean): string
   for (const sourceUrl of [overlay.url, overlay.url_mobile]) {
     const path = extractOverlayStoragePath(sourceUrl)
     if (path) {
+      if (isMobile) {
+        // Prioritize transformed assets on mobile to reduce image transfer and decode time.
+        candidates.push(
+          toSupabaseRenderedOverlayUrl(path, { width: 1280, quality: 72, format: 'webp' }),
+          toSupabaseRenderedOverlayUrl(path, { width: 1600, quality: 76, format: 'webp' })
+        )
+      }
       candidates.push(toSupabasePublicOverlayUrl(path))
     }
   }
@@ -279,12 +302,14 @@ export function ParkMap({
   const [failedOverlayIds, setFailedOverlayIds] = useState<Set<string>>(new Set())
   const failedOverlayRetryRef = useRef<Record<string, { attempts: number; lastAttemptAt: number }>>({})
   const overlayObjectUrlsRef = useRef<Record<string, string>>({})
+  const inFlightOverlayLoadsRef = useRef<Set<string>>(new Set())
   const [selectedSpiritualSite, setSelectedSpiritualSite] = useState<SpiritualSiteRow | null>(null)
   const [loadingTimedOut, setLoadingTimedOut] = useState(false)
   const [geoLocateError, setGeoLocateError] = useState<string | null>(null)
   const [showLegendMobile, setShowLegendMobile] = useState(false)
   const [showMobileControlPanel, setShowMobileControlPanel] = useState(false)
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 767px)').matches)
+  const pendingFlyToPlotRef = useRef<PlotRow | null>(null)
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(max-width: 767px)')
@@ -456,30 +481,46 @@ export function ParkMap({
   }, [overlays])
 
 
+  const flyToPlotTarget = useCallback((targetPlot: PlotRow) => {
+    const map = mapRef.current?.getMap()
+    if (!map || !mapReady) {
+      pendingFlyToPlotRef.current = targetPlot
+      return false
+    }
+
+    map.flyTo({
+      center: [targetPlot.lng, targetPlot.lat],
+      zoom: FLY_TO_PLOT_ZOOM,
+      pitch: 0,
+      bearing: 0,
+      duration: 700
+    })
+
+    setMapInfo((prev) => ({
+      ...prev,
+      longitude: targetPlot.lng,
+      latitude: targetPlot.lat,
+      zoom: FLY_TO_PLOT_ZOOM,
+      pitch: 0,
+      bearing: 0
+    }))
+
+    pendingFlyToPlotRef.current = null
+    return true
+  }, [mapReady])
+
   // Fly to plot when flyToPlot prop changes
   useEffect(() => {
-    if (flyToPlot) {
-      const map = mapRef.current?.getMap()
-      if (map) {
-        map.flyTo({
-          center: [flyToPlot.lng, flyToPlot.lat],
-          zoom: 19,
-          pitch: 60,
-          bearing: 0,
-          duration: 700
-        })
-      }
+    if (!flyToPlot) return
+    pendingFlyToPlotRef.current = flyToPlot
+    flyToPlotTarget(flyToPlot)
+  }, [flyToPlot, flyToPlotTarget])
 
-      setMapInfo((prev) => ({
-        ...prev,
-        longitude: flyToPlot.lng,
-        latitude: flyToPlot.lat,
-        zoom: 19,
-        pitch: 60,
-        bearing: 0
-      }))
-    }
-  }, [flyToPlot])
+  // If a fly target was queued before the map became ready, execute it now.
+  useEffect(() => {
+    if (!mapReady || !pendingFlyToPlotRef.current) return
+    flyToPlotTarget(pendingFlyToPlotRef.current)
+  }, [mapReady, flyToPlotTarget])
 
   // Helper function to check if overlay intersects with viewport bounds
   const isOverlayInViewport = useCallback((overlay: OverlayRow, bounds: maplibregl.LngLatBounds) => {
@@ -503,9 +544,10 @@ export function ParkMap({
     const viewSouth = bounds.getSouth()
     const viewNorth = bounds.getNorth()
 
-    // Expand viewport by 20% for preloading nearby overlays
-    const expandX = (viewEast - viewWest) * 0.2
-    const expandY = (viewNorth - viewSouth) * 0.2
+    // Expand viewport for preloading nearby overlays. Mobile gets a wider prefetch window.
+    const preloadFactor = isMobile ? 0.45 : 0.2
+    const expandX = (viewEast - viewWest) * preloadFactor
+    const expandY = (viewNorth - viewSouth) * preloadFactor
 
     return !(
       overlayEast < viewWest - expandX ||
@@ -513,7 +555,7 @@ export function ParkMap({
       overlayNorth < viewSouth - expandY ||
       overlaySouth > viewNorth + expandY
     )
-  }, [])
+  }, [isMobile])
 
   // Minimum zoom level to load overlays (helps weak mobile devices)
   const MIN_OVERLAY_ZOOM = isMobile ? 16.2 : 15.5
@@ -564,6 +606,9 @@ export function ParkMap({
       // Skip if already loaded
       if (loadedOverlayIds.has(overlay.id)) return
 
+      // Skip if this overlay is currently being loaded to avoid duplicate fetches.
+      if (inFlightOverlayLoadsRef.current.has(overlay.id)) return
+
       // Retry failed overlays with cooldown instead of skipping forever.
       if (failedOverlayIds.has(overlay.id)) {
         const retry = failedOverlayRetryRef.current[overlay.id]
@@ -605,6 +650,8 @@ export function ParkMap({
 
       // Load overlay image
       const loadOverlayImage = async () => {
+        inFlightOverlayLoadsRef.current.add(overlay.id)
+
         try {
           if (map.getSource(sourceId)) {
             setLoadedOverlayIds(prev => new Set([...prev, overlay.id]))
@@ -706,6 +753,8 @@ export function ParkMap({
 
           console.error(`[Overlays] Failed to load ${overlay.name || overlay.id}:`, err)
           setFailedOverlayIds(prev => new Set([...prev, overlay.id]))
+        } finally {
+          inFlightOverlayLoadsRef.current.delete(overlay.id)
         }
       }
 
@@ -863,6 +912,32 @@ export function ParkMap({
     })
   }, [])
 
+  const handleLocateUser = useCallback(() => {
+    if (!navigator.geolocation) {
+      setGeoLocateError('Thiết bị không hỗ trợ định vị GPS.')
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords
+        const map = mapRef.current?.getMap()
+        if (map) {
+          map.easeTo({
+            center: [longitude, latitude],
+            zoom: Math.max(map.getZoom(), 18),
+            duration: 350
+          })
+        }
+        setGeoLocateError(null)
+      },
+      () => {
+        setGeoLocateError('Không thể lấy vị trí hiện tại. Hãy bật quyền truy cập vị trí cho trình duyệt.')
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    )
+  }, [])
+
   // Handle plot click
   const handlePlotClick = useCallback((e: MapLayerMouseEvent) => {
     if (!e.features || e.features.length === 0) {
@@ -1015,18 +1090,20 @@ export function ParkMap({
       >
         {/* Navigation Controls */}
         {!isMobile && <NavigationControl position="bottom-right" showCompass showZoom={false} />}
-        <GeolocateControl 
-          position="bottom-right"
-          positionOptions={{ enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }}
-          trackUserLocation
-          onError={(event) => {
-            const message = (event as { message?: string } | undefined)?.message || 'Không thể lấy vị trí hiện tại. Hãy bật quyền truy cập vị trí cho trình duyệt.'
-            setGeoLocateError(message)
-          }}
-          onGeolocate={() => {
-            setGeoLocateError(null)
-          }}
-        />
+        {!isMobile && (
+          <GeolocateControl 
+            position="bottom-right"
+            positionOptions={{ enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }}
+            trackUserLocation
+            onError={(event) => {
+              const message = (event as { message?: string } | undefined)?.message || 'Không thể lấy vị trí hiện tại. Hãy bật quyền truy cập vị trí cho trình duyệt.'
+              setGeoLocateError(message)
+            }}
+            onGeolocate={() => {
+              setGeoLocateError(null)
+            }}
+          />
+        )}
         {!isMobile && <ScaleControl position="bottom-left" />}
 
         {/* Overlay Zone Labels - show zone names like B1.2, B3.1 */}
@@ -1316,9 +1393,10 @@ export function ParkMap({
             className={cn(
               'absolute z-20 bg-white rounded-2xl shadow-2xl border border-stone-200 overflow-hidden',
               isMobile
-                ? 'left-3 right-3 bottom-3 w-auto'
+                ? 'left-3 right-3 w-auto max-h-[calc(100vh-12rem)] overflow-y-auto'
                 : 'top-20 left-4 w-[min(360px,calc(100vw-2rem))]'
             )}
+            style={isMobile ? { bottom: 'max(5.75rem, calc(env(safe-area-inset-bottom) + 4.5rem))' } : undefined}
           >
             {selectedSpiritualSite.image_url ? (
               <img
@@ -1413,6 +1491,14 @@ export function ParkMap({
                   className="h-11 w-11 cursor-pointer hover:bg-stone-100"
                 >
                   <ZoomOut className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleLocateUser}
+                  className="h-11 w-11 cursor-pointer hover:bg-stone-100"
+                >
+                  <LocateFixed className="w-4 h-4" />
                 </Button>
                 <Button
                   variant="ghost"

@@ -93,7 +93,7 @@ export function AuthHeader({
             <img
               src={logoImage}
               alt="CPHA"
-              className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+              className="w-7 h-7 sm:w-10 sm:h-10 object-contain"
               style={{ borderRadius: 0, background: 'transparent' }}
               onError={(event) => {
                 event.currentTarget.onerror = null
@@ -111,12 +111,12 @@ export function AuthHeader({
             plots={plots}
             onSelect={onSearchResultSelect}
             isLoading={isLoading}
-            className="flex-1 min-w-0 max-w-none sm:max-w-sm mx-1 sm:mx-2"
+            className="flex-1 min-w-0 max-w-none sm:max-w-sm mx-0.5 sm:mx-2"
             searchCustomerName={isAuthenticated}
           />
 
           {/* Actions - Compact */}
-          <div className="flex items-center gap-1 flex-shrink-0">
+          <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
             {/* Live Indicator */}
             <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200">
               <Wifi className="w-3 h-3 text-emerald-600" />
@@ -131,7 +131,7 @@ export function AuthHeader({
                     variant="ghost"
                     size="icon"
                     onClick={onRefetch}
-                    className="h-9 w-9 sm:h-8 sm:w-8 cursor-pointer hover:bg-stone-100"
+                    className="h-8 w-8 sm:h-8 sm:w-8 cursor-pointer hover:bg-stone-100"
                     disabled={isLoading}
                   >
                     <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
@@ -145,7 +145,7 @@ export function AuthHeader({
               variant="outline"
               size="sm"
               onClick={handleNavigateToAdmin}
-              className="h-9 w-9 sm:w-auto sm:h-8 px-0 sm:px-3 rounded-lg text-xs"
+              className="h-8 w-8 sm:w-auto sm:h-8 px-0 sm:px-3 rounded-lg text-xs"
             >
               <Settings className="w-3.5 h-3.5 sm:mr-1" />
               <span className="hidden sm:inline">Admin</span>
@@ -161,7 +161,7 @@ export function AuthHeader({
                         variant="ghost"
                         size="icon"
                         onClick={handleLogout}
-                        className="h-9 w-9 sm:h-8 sm:w-8 cursor-pointer hover:bg-red-50 hover:text-red-600"
+                        className="h-8 w-8 sm:h-8 sm:w-8 cursor-pointer hover:bg-red-50 hover:text-red-600"
                         disabled={authLoading}
                       >
                         <LogOut className="w-4 h-4" />
@@ -179,7 +179,7 @@ export function AuthHeader({
                 variant="outline"
                 size="sm"
                 onClick={handleLogin}
-                className="h-9 w-9 sm:w-auto sm:h-8 px-0 sm:px-3 rounded-lg text-xs"
+                className="h-8 w-8 sm:w-auto sm:h-8 px-0 sm:px-3 rounded-lg text-xs"
               >
                 <LogIn className="w-3.5 h-3.5 sm:mr-1" />
                 <span className="hidden sm:inline">Đăng nhập</span>
@@ -272,7 +272,7 @@ export function AuthHeader({
       {isMobile && (
         <>
           <div
-            className="fixed left-1/2 -translate-x-1/2 z-30 glass rounded-2xl px-1 py-1 shadow-lg"
+            className="fixed left-1/2 -translate-x-1/2 z-30 glass rounded-2xl px-1.5 py-1.5 shadow-lg border border-white/60 max-w-[calc(100vw-1rem)]"
             style={{ bottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
           >
             <div className="flex items-center gap-1">
@@ -282,7 +282,7 @@ export function AuthHeader({
                   setShowMobileFilters(false)
                 }}
                 className={cn(
-                  'flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer',
+                  'flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-[13px] font-semibold leading-none whitespace-nowrap transition-all cursor-pointer',
                   activeTab === 'map'
                     ? 'bg-stone-900 text-white'
                     : 'text-stone-700 hover:bg-white/80'
@@ -297,7 +297,7 @@ export function AuthHeader({
                   setShowMobileFilters(false)
                 }}
                 className={cn(
-                  'flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer',
+                  'flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-[13px] font-semibold leading-none whitespace-nowrap transition-all cursor-pointer',
                   activeTab === 'overview'
                     ? 'bg-stone-900 text-white'
                     : 'text-stone-700 hover:bg-white/80'
@@ -310,7 +310,7 @@ export function AuthHeader({
                 <button
                   onClick={() => setShowMobileFilters((prev) => !prev)}
                   className={cn(
-                    'flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer',
+                    'flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-[13px] font-semibold leading-none whitespace-nowrap transition-all cursor-pointer',
                     showMobileFilters
                       ? 'bg-stone-900 text-white'
                       : 'text-stone-700 hover:bg-white/80'
